@@ -3,7 +3,7 @@ package org.nlp2rdf.core.urischemes;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.nlp2rdf.core.NIFVocabulary;
+import org.nlp2rdf.core.NIFNamespaces;
 import org.nlp2rdf.core.Span;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ import java.util.Set;
  * User: hellmann
  * Date: 12.02.13
  */
-public class ContextHashBasedString extends AbstractURIScheme implements URIScheme  {
+public class ContextHashBasedString extends AbstractURIScheme implements URIScheme {
 
     private static final Logger log = LoggerFactory.getLogger(ContextHashBasedString.class);
     public static final int firstCharLength = 20;
@@ -27,7 +27,7 @@ public class ContextHashBasedString extends AbstractURIScheme implements URISche
 
     @Override
     public String getOWLClassURI() {
-        return NIFVocabulary.NAMESPACE+ "ContextHashBasedString";
+        return NIFNamespaces.NIF + "ContextHashBasedString";
     }
 
     @Override

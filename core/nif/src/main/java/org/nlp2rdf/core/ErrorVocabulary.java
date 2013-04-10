@@ -8,6 +8,7 @@ import com.hp.hpl.jena.ontology.OntModel;
  * User: hellmann
  * Date: 16.03.13
  */
+@Deprecated
 public enum ErrorVocabulary {
     //Classes
     Error,
@@ -16,8 +17,7 @@ public enum ErrorVocabulary {
     fatal,
     message;
 
-    @Deprecated
-    public static final String NAMESPACE = "http://nlp2rdf.lod2.eu/schema/error/";
+    public static final String NAMESPACE = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/error#";
 
     String uri;
 

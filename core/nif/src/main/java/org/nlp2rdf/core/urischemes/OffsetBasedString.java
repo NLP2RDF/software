@@ -1,6 +1,6 @@
 package org.nlp2rdf.core.urischemes;
 
-import org.nlp2rdf.core.NIFVocabulary;
+import org.nlp2rdf.core.NIFNamespaces;
 import org.nlp2rdf.core.Span;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ public class OffsetBasedString extends AbstractURIScheme implements URIScheme {
 
     @Override
     public String getOWLClassURI() {
-        return NIFVocabulary.NAMESPACE + "OffsetBasedString";
+        return NIFNamespaces.NIF + "OffsetBasedString";
     }
 
 

@@ -11,13 +11,10 @@ public enum NIFDatatypeProperties {
     isString,
     lemma;
 
-    @Deprecated
-    public static final String NAMESPACE = "http://nlp2rdf.lod2.eu/schema/nif/";
-
     String uri;
 
     NIFDatatypeProperties() {
-        this.uri = NAMESPACE + name();
+        this.uri = NIFNamespaces.NIF + name();
     }
 
     public String getUri() {
@@ -29,10 +26,6 @@ public enum NIFDatatypeProperties {
         return "nif:" + name();
     }
 
-	@Deprecated
-    public static void addPrefixes(OntModel model) {
-        model.setNsPrefix("nif", NAMESPACE);
-    }
 
     public DatatypeProperty getDatatypeProperty(OntModel model) {
         return model.createDatatypeProperty(getUri());

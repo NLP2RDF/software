@@ -12,13 +12,10 @@ public enum NIFObjectProperties {
     word,
     sentence;
 
-    @Deprecated
-    public static final String NAMESPACE = "http://nlp2rdf.lod2.eu/schema/nif/";
-
     String uri;
 
     NIFObjectProperties() {
-        this.uri = NAMESPACE + name();
+        this.uri = NIFNamespaces.NIF + name();
     }
 
     public String getUri() {
@@ -30,9 +27,6 @@ public enum NIFObjectProperties {
         return "nif:" + name();
     }
 
-    public static void addPrefixes(OntModel model) {
-        model.setNsPrefix("nif", NAMESPACE);
-    }
 
     public ObjectProperty getObjectProperty(OntModel model) {
         return model.createObjectProperty(getUri());

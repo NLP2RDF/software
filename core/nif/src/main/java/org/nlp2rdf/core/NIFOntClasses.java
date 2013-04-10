@@ -16,13 +16,10 @@ public enum NIFOntClasses {
     Word,
     Phrase;
 
-    @Deprecated
-    public static final String NAMESPACE = "http://nlp2rdf.lod2.eu/schema/nif/";
-
     String uri;
 
     NIFOntClasses() {
-        this.uri = NAMESPACE + name();
+        this.uri = NIFNamespaces.NIF + name();
     }
 
     public String getUri() {
@@ -32,14 +29,6 @@ public enum NIFOntClasses {
     @Override
     public String toString() {
         return "nif:" + name();
-    }
-
-	/**
-	 * @deprecated why here?
-	 */
-	@Deprecated
-    public static void addPrefixes(OntModel model) {
-        model.setNsPrefix("nif", NAMESPACE);
     }
 
     public OntClass getOntClass(OntModel model) {

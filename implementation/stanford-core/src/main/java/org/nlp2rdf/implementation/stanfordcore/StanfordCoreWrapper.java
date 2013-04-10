@@ -29,7 +29,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
-import org.nlp2rdf.core.NIFVocabulary;
+import org.nlp2rdf.core.NIFDatatypeProperties;
 import org.nlp2rdf.core.Span;
 import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.URIScheme;
@@ -122,7 +122,7 @@ public class StanfordCoreWrapper {
                  * Lemma
                  ******/
 
-                wordIndividual.addProperty(NIFVocabulary.getLemmaProperty(model), token.get(CoreAnnotations.LemmaAnnotation.class));
+                wordIndividual.addProperty(NIFDatatypeProperties.lemma.getDatatypeProperty(model), token.get(CoreAnnotations.LemmaAnnotation.class));
 
                 /********************************
                  * POS tag
