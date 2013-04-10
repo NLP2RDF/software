@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>snowball</artifactId>
+        <groupId>org.nlp2rdf</groupId>
+        <version>1.9-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>snowball-wrapper</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Snowball Tartarus wrapper</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.nlp2rdf</groupId>
+            <artifactId>nif</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.hpl.jena</groupId>
+            <artifactId>jena</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-snowball</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.nlp2rdf</groupId>
+            <artifactId>opennlp-wrapper</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>

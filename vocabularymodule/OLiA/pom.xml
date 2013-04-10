@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>nlp2rdf-parent</artifactId>
+        <groupId>org.nlp2rdf</groupId>
+        <version>1.9-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>OLiA</artifactId>
+    <packaging>jar</packaging>
+
+    <name>OLiA</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.nlp2rdf</groupId>
+            <artifactId>nif</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+        </dependency>
+    </dependencies>
+</project>

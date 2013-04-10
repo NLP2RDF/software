@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>nlp2rdf-parent</artifactId>
+        <groupId>org.nlp2rdf</groupId>
+        <version>1.9-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>vocabularymodule</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Vocabulary Module for NIF</name>
+
+    <modules>
+        <!--module>opennlp</module-->
+        <module>OLiA</module>
+        <!--module>snowball</module-->
+        <!--module>demo</module-->
+        <!--module>lexo</module-->
+        <!--module>sample</module-->
+        <!--module>lingpipe</module-->
+
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+
+        </dependencies>
+    </dependencyManagement>
+
+
+</project>

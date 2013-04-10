@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:str="http://nlp2rdf.lod2.eu/schema/string/" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/">
+    <rdfs:label>Topic Modelling Ontology</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/">
+    <rdfs:comment>The Topic Modelling Ontology provides the vocabulary to express which latent topics occur in documents. To this end, topics are characterized by lemmata that are discriminative for their meaning.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/">
+    <owl:imports rdf:resource="http://nlp2rdf.lod2.eu/schema/string/"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/dominatingTopic">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/dominatingTopic">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/dominatingTopic">
+    <rdfs:subPropertyOf rdf:resource="http://nlp2rdf.lod2.eu/schema/topic/hasTopic"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/dominatingTopic">
+    <rdfs:domain rdf:resource="http://nlp2rdf.lod2.eu/schema/string/Document"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/dominatingTopic">
+    <rdfs:range rdf:resource="http://nlp2rdf.lod2.eu/schema/topic/Topic"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/hasTopic">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/hasTopic">
+    <rdfs:domain rdf:resource="http://nlp2rdf.lod2.eu/schema/string/Document"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/hasTopic">
+    <rdfs:range rdf:resource="http://nlp2rdf.lod2.eu/schema/topic/Topic"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/occursIn">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/occursIn">
+    <rdfs:range rdf:resource="http://nlp2rdf.lod2.eu/schema/string/Document"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/occursIn">
+    <rdfs:domain rdf:resource="http://nlp2rdf.lod2.eu/schema/topic/Topic"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/occursIn">
+    <owl:inverseOf rdf:resource="http://nlp2rdf.lod2.eu/schema/topic/hasTopic"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/characteristicLemma">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/characteristicLemma">
+    <rdfs:domain rdf:resource="http://nlp2rdf.lod2.eu/schema/topic/Topic"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/Topic">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/Topic">
+    <rdfs:label>Topic</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nlp2rdf.lod2.eu/schema/topic/Topic">
+    <rdfs:comment>A  Topic is characterized by a set of lemmata that characterize its meaning</rdfs:comment>
+  </rdf:Description>
+</rdf:RDF>
