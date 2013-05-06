@@ -26,6 +26,7 @@
         <module>core</module>
         <module>implementation</module>
         <module>vocabularymodule</module>
+        <module>tools</module>
         <!--module>ontologies/utilities/owl2java</module-->
     </modules>
 

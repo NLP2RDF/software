@@ -4,13 +4,49 @@ import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 
 /**
- * @author roederc
+ * This class was automatically generated from http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#
+ * @author croeder
  */
 public enum NIFObjectProperties {
 
-    referenceContext,
-    word,
-    sentence;
+     /* TODO add label -> $do.comment */
+        nextWordTrans,
+
+     /* TODO add label -> $do.comment */
+        subString,
+
+     /* TODO add label -> $do.comment */
+        previousWord,
+
+     /* reference context -> $do.comment */
+        referenceContext,
+
+     /* TODO add label -> $do.comment */
+        superString,
+
+     /* TODO add label -> $do.comment */
+        previousWordTrans,
+
+     /* TODO add label -> $do.comment */
+        previousSentence,
+
+     /* olia link -> $do.comment */
+        oliaLink,
+
+     /* TODO add label -> $do.comment */
+        superStringTrans,
+
+     /* TODO add label -> $do.comment */
+        nextWord,
+
+     /* TODO add label -> $do.comment */
+        nextSentenceTrans,
+
+     /* TODO add label -> $do.comment */
+        subStringTrans,
+
+     /* TODO add label -> $do.comment */
+        nextSentence;
 
     String uri;
 

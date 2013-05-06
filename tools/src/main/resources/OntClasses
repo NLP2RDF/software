@@ -1,0 +1,42 @@
+package org.nlp2rdf.core;
+
+import com.hp.hpl.jena.ontology.OntClass;
+import com.hp.hpl.jena.ontology.OntModel;
+
+/**
+ * This class was automatically generated from
+ * $ontology
+ *
+ * @author croeder
+ *
+ */
+public enum $className {
+    // Despite these being values in Java, they are classes in OWL.
+    // Hence the initial capital.
+#foreach( $oc in $ontClasses )
+
+     /* $oc.label -> $oc.comment */
+        $oc.name#if( $foreach.hasNext ),
+#end
+#end;
+
+
+    String uri;
+
+    NIFOntClasses() {
+        this.uri = NIFNamespaces.NIF + name();
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    @Override
+    public String toString() {
+        return "nif:" + name();
+    }
+
+    public OntClass getOntClass(OntModel model) {
+        return model.createClass(getUri());
+    }
+}

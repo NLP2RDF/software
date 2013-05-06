@@ -1,0 +1,38 @@
+package org.nlp2rdf.core;
+
+import com.hp.hpl.jena.ontology.DatatypeProperty;
+import com.hp.hpl.jena.ontology.OntModel;
+
+/**
+ * This class was automatically generated from $ontology
+ * @author croeder
+ *
+*/
+
+public enum NIFDatatypeProperties {
+#foreach( $dp in $datatypeProperties )
+
+     /* $dp.label -> $dp.comment */
+        $dp.name#if( $foreach.hasNext ),
+#end
+#end;
+
+    String uri;
+
+    NIFDatatypeProperties() {
+        this.uri = NIFNamespaces.NIF + name();
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    @Override
+    public String toString() {
+        return "nif:" + name();
+    }
+
+    public DatatypeProperty getDatatypeProperty(OntModel model) {
+        return model.createDatatypeProperty(getUri());
+    }
+}
