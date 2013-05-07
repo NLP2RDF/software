@@ -10,8 +10,10 @@ import com.hp.hpl.jena.ontology.OntModel;
 public enum NIFObjectProperties {
 #foreach( $op in $objectProperties )
 
-     /* $op.label -> $do.comment */
-        $op.name#if( $foreach.hasNext ),
+    /**
+     * $op.label -> $op.comment
+     */
+    $op.name#if( $foreach.hasNext ),
 #end
 #end;
 

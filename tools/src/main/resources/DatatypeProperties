@@ -12,8 +12,10 @@ import com.hp.hpl.jena.ontology.OntModel;
 public enum NIFDatatypeProperties {
 #foreach( $dp in $datatypeProperties )
 
-     /* $dp.label -> $dp.comment */
-        $dp.name#if( $foreach.hasNext ),
+    /**
+     * $dp.label -> $dp.comment
+     */
+    $dp.name#if( $foreach.hasNext ),
 #end
 #end;
 

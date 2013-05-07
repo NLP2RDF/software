@@ -11,12 +11,14 @@ import com.hp.hpl.jena.ontology.OntModel;
  *
  */
 public enum $className {
-    // Despite these being values in Java, they are classes in OWL.
-    // Hence the initial capital.
+// Despite these being values in Java, they are classes in OWL.
+// Hence the initial capital.
 #foreach( $oc in $ontClasses )
 
-     /* $oc.label -> $oc.comment */
-        $oc.name#if( $foreach.hasNext ),
+    /**
+     * $oc.label -> $oc.comment
+     */
+    $oc.name#if( $foreach.hasNext ),
 #end
 #end;
 

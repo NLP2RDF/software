@@ -80,13 +80,14 @@ public class Generate {
             } else {
                 String className = (String) options.valueOf("f");
                 outfile = new FileWriter((String) options.valueOf("f"));
-                context.put("className", className.substring(0, className.length() - 5).substring(className.lastIndexOf('/')+1));
+                context.put("className", className.substring(0, className.length() - 5).substring(className.lastIndexOf('/') + 1));
             }
 
             if (!options.hasArgument("o")) {
-                System.out.println("Please specify an output file  (using the -o option).");
+                System.out.println("Please specify an ontology url  (using the -o option).");
                 System.exit(0);
             } else {
+                System.out.println("Trying to read ontology form" + options.valueOf("o"));
                 model.read((String) options.valueOf("o"));
                 context.put("ontology", (String) options.valueOf("o"));
 
