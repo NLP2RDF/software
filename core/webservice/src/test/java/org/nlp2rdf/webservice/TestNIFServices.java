@@ -21,6 +21,8 @@
 
 package org.nlp2rdf.webservice;
 
+import org.junit.Test;
+
 /**
  * User: Sebastian Hellmann - http://bis.informatik.uni-leipzig.de/SebastianHellmann
  */
@@ -28,17 +30,17 @@ public class TestNIFServices {
     public static String base = "http://nlp2rdf.lod2.eu/NIFConverter/";
     public static String text = "This is a sentence. ";
 
-    /*@Test
+    @Test
     public void testNIFConverter() throws Exception {
-        NIFConverter nc = new NIFConverter();
+    /*    NIFConverter nc = new NIFConverter();
 
         OntModel model = new Text2RDF().processAsDocument(base, text, new FakeTokenizer(), new MD5Based());
         NIFParameters np = new NIFParameters(text, base, null, "offset", model, null);
         OntModel diff = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-        nc.execute(np, diff);
+        nc.execute(np, diff);*/
     }
 
-
+       /*
     @Test
     public void testNIFStemmer() throws Exception {
         NIFStemmer nc = new NIFStemmer();

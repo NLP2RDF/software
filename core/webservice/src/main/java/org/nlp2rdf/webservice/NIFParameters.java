@@ -26,6 +26,11 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.JenaException;
 import org.apache.commons.lang.StringUtils;
+import org.nlp2rdf.core.Text2RDF;
+import org.nlp2rdf.core.urischemes.ContextHashBasedString;
+import org.nlp2rdf.core.urischemes.OffsetBasedString;
+import org.nlp2rdf.core.urischemes.RFC5147String;
+import org.nlp2rdf.core.urischemes.URIScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +61,13 @@ public class NIFParameters {
 
     private final String prefix;
     private final String logPrefix;
-    private final String uriScheme;
+    private final URIScheme uriScheme;
     private final String[] uriSchemeParameters;
 
     private final String outputFormat;
 
-
-    public NIFParameters(OntModel inputModel, Map<String, String> parameterMap, String prefix, String logPrefix, String uriScheme, String[] uriSchemeParameters, String outputFormat) {
+    //TODO add text and context[] list
+    public NIFParameters(OntModel inputModel, Map<String, String> parameterMap, String prefix, String logPrefix, URIScheme uriScheme, String[] uriSchemeParameters, String outputFormat) {
         this.inputModel = inputModel;
         this.parameterMap = parameterMap;
         this.prefix = prefix;
@@ -82,59 +87,101 @@ public class NIFParameters {
         String requestUrl = httpServletRequest.getRequestURL().toString();
         try {
 
-            if (!isSet("input", httpServletRequest)) {
-                throw new IllegalArgumentException("Missing parameter: 'input' is required and should contain the NIF RDF. ");
-            }
-
-            /**Defaults**/
+            /***********
+             * Defaults
+             ***********/
+            String inputType = "rdf";
+            String inputFormat = "RDF/XML";
+            OntModel inputModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
             String prefix = "http://nlp2rdf.lod2.eu/nif/";
             String logPrefix = "http://nlp2rdf.lod2.eu/instance/log/id_";
-            String inputFormat = "rdfxml";
-            String outputFormat = "rdfxml";
-            String uriScheme = "rfc5147string";
+            String outputFormat = "RDF/XML";
+            URIScheme uriScheme = new RFC5147String();
             String[] uriSchemeParameters = null;
 
+
+            /************
+             * Get input type
+             ************/
+            if (!isSet("inputtype", httpServletRequest)) {
+                inputType = requiredParameter("inputtype", httpServletRequest, "rdf", "text", "url");
+            }
+            /************
+             * Read RDF input
+             ************/
+            if (inputType.equalsIgnoreCase("rdf")) {
+
+                //inputFormat
+                if (isSet("inputFormat", httpServletRequest)) {
+                    inputFormat = requiredParameter("inputFormat", httpServletRequest, "rdfxml", "turtle", "ntriples");
+                    inputFormat = inputFormat.replace("rdfxml", "RDF/XML").replace("turtle", "N3").replace("ntriples", "N-TRIPLE");
+                }
+
+                if (!isSet("input", httpServletRequest)) {
+                    throw new IllegalArgumentException("Missing parameter: 'input' is required and should contain NIF in RDF format. To fix either post NIF-RDF or add , because of 'inputtype=text', input='your text' ");
+                }
+
+                // Read the model directly from the input
+                ByteArrayInputStream bais = new ByteArrayInputStream(httpServletRequest.getParameter("input").getBytes());
+                try {
+                    inputModel.read(bais, "", inputFormat);
+                } catch (JenaException e) {
+                    throw new InvalidParameterException("Jena could not read the presented NIF in RDF/XML format." + e.getMessage());
+                }
+
+            }
+
+            /******
+             * text input
+             *****/
             //prefix
             if (isSet("prefix", httpServletRequest)) {
                 prefix = httpServletRequest.getParameter("prefix");
+            }
+
+            //uriSchemeParameters
+            if (isSet("uriSchemeParameters", httpServletRequest)) {
+                uriSchemeParameters = httpServletRequest.getParameter("uriSchemeParameters").split("|");
+            }
+            //uriScheme
+            if (isSet("uriScheme", httpServletRequest)) {
+
+                String us = requiredParameter("uriScheme", httpServletRequest,
+                        "rfc5147string", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#RFC5147String",
+                        "contexthashbasedstring",
+                        "offsetbasedstring");
+                if (us.equalsIgnoreCase("rfc5147string") || us.equalsIgnoreCase("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#RFC5147String")) {
+                    uriScheme = new RFC5147String();
+                } else if (us.equalsIgnoreCase("contexthashbasedstring") || us.equalsIgnoreCase("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#ContextHashBasedString")) {
+                    uriScheme = new ContextHashBasedString();
+                } else if (us.equalsIgnoreCase("offsetbasedstring") || us.equalsIgnoreCase("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#OffsetBasedString")) {
+                    uriScheme = new OffsetBasedString();
+                }
+
+            }
+
+
+            if (inputType.equalsIgnoreCase("text")) {
+                String text = httpServletRequest.getParameter("text");
+                new Text2RDF().createContextIndividual(prefix, text, uriScheme, inputModel);
+
+            }
+
+            /******
+             * url input
+             *****/
+            if (inputType.equalsIgnoreCase("url")) {
+                throw new InvalidParameterException(" Parameter 'inputtype=url' is not implemented yet.");
             }
 
             //logPrefix
             if (isSet("logPrefix", httpServletRequest)) {
                 logPrefix = httpServletRequest.getParameter("logPrefix");
             }
-
-            //inputFormat
-            if (isSet("inputFormat", httpServletRequest)) {
-                inputFormat = requiredParameter("inputFormat", httpServletRequest, "rdfxml", "turtle", "ntriples");
-                inputFormat = inputFormat.replace("rdfxml", "RDF/XML").replace("turtle", "N3").replace("ntriples", "N-TRIPLE");
-
-            }
-
             //outputFormat
             if (isSet("outputFormat", httpServletRequest)) {
                 outputFormat = requiredParameter("outputFormat", httpServletRequest, "rdfxml", "turtle", "json", "ntriples");
                 outputFormat = outputFormat.replace("rdfxml", "RDF/XML").replace("turtle", "N3").replace("ntriples", "N-TRIPLE");
-            }
-
-            //uriScheme
-            if (isSet("uriScheme", httpServletRequest)) {
-                uriScheme = requiredParameter("uriScheme", httpServletRequest, "rfc5147string", "contexthashbasedstring", "offsetbasedstring");
-            }
-            //uriSchemeParameters
-            if (isSet("uriSchemeParameters", httpServletRequest)) {
-                uriSchemeParameters = httpServletRequest.getParameter("uriSchemeParameters").split("|");
-            }
-
-
-            // Read the model directly from the input
-            OntModel inputModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-            ByteArrayInputStream bais = new ByteArrayInputStream(httpServletRequest.getParameter("input").getBytes());
-            try {
-
-                inputModel.read(bais, "", inputFormat);
-            } catch (JenaException e) {
-                throw new InvalidParameterException("Jena could not read the presented NIF in RDF/XML format.");
             }
 
             NIFParameters nifParameters = new NIFParameters(inputModel, copyParameterMap(httpServletRequest), prefix, logPrefix, uriScheme, uriSchemeParameters, outputFormat);
@@ -232,7 +279,7 @@ public class NIFParameters {
         return logPrefix;
     }
 
-    public String getUriScheme() {
+    public URIScheme getUriScheme() {
         return uriScheme;
     }
 
@@ -243,7 +290,6 @@ public class NIFParameters {
     public String getOutputFormat() {
         return outputFormat;
     }
-
 
 
 }
