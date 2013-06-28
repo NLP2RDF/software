@@ -28,6 +28,7 @@ import com.hp.hpl.jena.rdf.model.RDFWriter;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.NIFNamespaces;
+import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.vocab.RLOGIndividuals;
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public abstract class NIFServlet extends HttpServlet {
              ******************/
 
             Monitor mon = MonitorFactory.getTimeMonitor("NIFParameters.getInstance").start();
-            nifParameters = NIFParameters.getInstance(httpServletRequest);
+            nifParameters = NIFParameterWebserviceFactory.getInstance(httpServletRequest);
             log.debug("NIFParameters Object created: " + logMonitor(mon.stop()));
 
             /******************
