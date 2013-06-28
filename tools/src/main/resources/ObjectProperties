@@ -1,4 +1,4 @@
-package org.nlp2rdf.core;
+package org.nlp2rdf.core.vocab;
 
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -7,7 +7,7 @@ import com.hp.hpl.jena.ontology.OntModel;
  * This class was automatically generated from $ontology
  * @author croeder
  */
-public enum NIFObjectProperties {
+public enum $className {
 #foreach( $op in $objectProperties )
 
     /**
@@ -19,8 +19,8 @@ public enum NIFObjectProperties {
 
     String uri;
 
-    NIFObjectProperties() {
-        this.uri = NIFNamespaces.NIF + name();
+    $className() {
+        this.uri = "$preferredNamespaceUri" + name();
     }
 
     public String getUri() {
@@ -29,7 +29,7 @@ public enum NIFObjectProperties {
 
     @Override
     public String toString() {
-        return "nif:" + name();
+        return "$preferredNamespacePrefix:" + name();
     }
 
 

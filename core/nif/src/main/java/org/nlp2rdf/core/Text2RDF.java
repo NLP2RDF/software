@@ -27,6 +27,9 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.urischemes.URISchemeHelper;
+import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
+import org.nlp2rdf.core.vocab.NIFObjectProperties;
+import org.nlp2rdf.core.vocab.NIFOntClasses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

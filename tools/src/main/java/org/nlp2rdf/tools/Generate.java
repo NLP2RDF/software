@@ -2,7 +2,10 @@ package org.nlp2rdf.tools;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.ontology.Ontology;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -11,6 +14,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,8 +30,11 @@ import static java.util.Arrays.asList;
  * Date: 06.05.13
  */
 public class Generate {
+    private static Logger log = LoggerFactory.getLogger(Generate.class);
+
 
     public static void main(String[] args) throws IOException {
+
         //, ComponentInitException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, LearningProblemUnsupportedException {
 
         //used for the outfile
@@ -87,7 +95,7 @@ public class Generate {
                 System.out.println("Please specify an ontology url  (using the -o option).");
                 System.exit(0);
             } else {
-                System.out.println("Trying to read ontology form" + options.valueOf("o"));
+                System.out.println("Trying to read ontology from " + options.valueOf("o"));
                 model.read((String) options.valueOf("o"));
                 context.put("ontology", (String) options.valueOf("o"));
 
@@ -95,10 +103,22 @@ public class Generate {
 
         }
 
+        Ontology o = getOntologyObject(model.listOntologies());
 
+
+        Statement preferredNamespacePrefix = o.getProperty(model.createProperty("http://purl.org/vocab/vann/preferredNamespacePrefix"));
+        if (preferredNamespacePrefix != null && preferredNamespacePrefix.getObject().canAs(Literal.class)) {
+            context.put("preferredNamespacePrefix", preferredNamespacePrefix.getObject().asLiteral().getString());
+        }
+        Statement preferredNamespaceUri = o.getProperty(model.createProperty("http://purl.org/vocab/vann/preferredNamespaceUri"));
+
+        if (preferredNamespaceUri != null && preferredNamespaceUri.getObject().canAs(Literal.class)) {
+            context.put("preferredNamespaceUri", preferredNamespaceUri.getObject().asLiteral().getString());
+        }
         context.put("datatypeProperties", doit(model.listDatatypeProperties(), context));
         context.put("objectProperties", doit(model.listObjectProperties(), context));
         context.put("ontClasses", doit(model.listClasses(), context));
+        context.put("individuals", doit(model.listIndividuals(), context));
 
         //StringWriter st = new StringWriter();
         //template.merge(context, st);
@@ -108,6 +128,19 @@ public class Generate {
         outfile.flush();
         outfile.close();
     }
+
+    public static Ontology getOntologyObject(ExtendedIterator<Ontology> ontologies) {
+        Ontology o = null;
+        if (ontologies.hasNext()) {
+            o = ontologies.next();
+        }
+
+        if (ontologies.hasNext()) {
+            log.warn("More than one ontology object was found.");
+        }
+        return o;
+    }
+
 
     public static ArrayList doit(ExtendedIterator<? extends OntResource> it, VelocityContext context) {
         /* create our list of maps  */

@@ -13,7 +13,7 @@
 
     <modules>
         <module>nif</module>
-        <!--module>webservice</module-->
+        <module>webservice</module>
         <!--module>generated</module-->
     </modules>
 

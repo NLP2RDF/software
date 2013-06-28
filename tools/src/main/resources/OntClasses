@@ -1,4 +1,4 @@
-package org.nlp2rdf.core;
+package org.nlp2rdf.core.vocab;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -25,8 +25,8 @@ public enum $className {
 
     String uri;
 
-    NIFOntClasses() {
-        this.uri = NIFNamespaces.NIF + name();
+    $className() {
+        this.uri = "$preferredNamespaceUri" + name();
     }
 
     public String getUri() {
@@ -35,7 +35,7 @@ public enum $className {
 
     @Override
     public String toString() {
-        return "nif:" + name();
+        return "$preferredNamespacePrefix:" + name();
     }
 
     public OntClass getOntClass(OntModel model) {
