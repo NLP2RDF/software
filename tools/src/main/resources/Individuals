@@ -1,0 +1,40 @@
+package org.nlp2rdf.core.vocab;
+
+import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.vocabulary.OWL;
+/**
+ *
+ *
+ * @author kurzum
+ *
+ */
+public enum $className {
+#foreach( $ind in $individuals )
+
+    /**
+     * $ind.label -> $ind.comment
+     */
+    $ind.name#if( $foreach.hasNext ),
+#end
+#end;
+
+    String uri;
+
+    $className() {
+        this.uri = "$preferredNamespaceUri" + name();
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    @Override
+    public String toString() {
+        return "$preferredNamespacePrefix:" + name();
+    }
+
+    public Individual getIndividual(OntModel model) {
+        return model.createIndividual(getUri(), OWL.Thing);
+    }
+}
