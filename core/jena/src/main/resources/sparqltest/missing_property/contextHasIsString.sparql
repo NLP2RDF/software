@@ -1,7 +1,8 @@
 PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-Select * { 
-		# all nif:Context must have nif:isString
+
+Select ?s ?message {
 		?s a nif:Context .
+		BIND (concat(str(?s), ": all nif:Context must have an explicit nif:isString") AS ?message)
 		FILTER (NOT EXISTS {?s nif:isString ?o } )
 }

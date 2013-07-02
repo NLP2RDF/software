@@ -1,7 +1,0 @@
-PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-Select * { 
-		# all nif:Context must rdf:type nif:RFC5147String
-		?s a nif:Context
-		FILTER ( NOT EXISTS {?s a nif:RFC5147String } )
-}

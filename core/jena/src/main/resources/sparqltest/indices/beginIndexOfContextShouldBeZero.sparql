@@ -1,8 +1,11 @@
 PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-Select * { 
-		# beginIndex of Context must be zero
+
+Select ?s ?message {
+
 		?s a nif:Context .
 		?s nif:beginIndex ?begin .
 		FILTER (xsd:nonNegativeInteger(?begin) != xsd:nonNegativeInteger(0)) .
+		BIND (concat(str(?s), ": nif:beginIndex of nif:Context must be zero, but is ", str(?begin)) AS ?message)
+
 }

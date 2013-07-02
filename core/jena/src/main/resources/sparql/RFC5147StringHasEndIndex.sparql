@@ -1,7 +1,0 @@
-PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-Select * { 
-		# all nif:RFC5147String must have end index
-		?s a nif:RFC5147String . 
-		FILTER ( NOT EXISTS {?s nif:endIndex ?o}  ) 
-}
