@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>org.nlp2rdf</groupId>
-            <artifactId>nif</artifactId>
+            <artifactId>jena</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>

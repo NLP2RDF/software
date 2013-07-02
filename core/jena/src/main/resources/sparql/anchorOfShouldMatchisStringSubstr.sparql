@@ -1,0 +1,15 @@
+PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+Select ?resource ?message
+{
+		# all RFC5147String that aren't contexts must have an explicit referenceContext
+		?s a nif:RFC5147String .
+		?s nif:anchorOf ?anchorOf .
+		?s nif:beginIndex ?beginIndex .
+		?s nif:endIndex ?endIndex .
+		?s nif:referenceContext [ nif:isString ?referenceString ]  .
+		BIND (SUBSTR(?referenceContext, ?beginIndex , (?endIndex - ?beginIndex) ) AS ?test ) .
+		BIND (concat("foo", "bar")  AS ?message ) .
+		FILTER (str(?test) != str(?anchorOf )) .
+}

@@ -1,0 +1,8 @@
+PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+Select * { 
+		# beginIndex of Context must be zero
+		?s a nif:Context .
+		?s nif:beginIndex ?begin .
+		FILTER (xsd:nonNegativeInteger(?begin) != xsd:nonNegativeInteger(0)) .
+}

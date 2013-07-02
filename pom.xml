@@ -223,9 +223,10 @@
             <!--Dependencies that are generated as part of this parent pom-->
             <dependency>
                 <groupId>org.nlp2rdf</groupId>
-                <artifactId>nif</artifactId>
+                <artifactId>jena</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
 
             <dependency>
                 <groupId>org.nlp2rdf</groupId>
@@ -254,9 +255,14 @@
             </dependency>
             <!--Available via central, we use the latest with minor mods -->
             <dependency>
-                <groupId>com.hp.hpl.jena</groupId>
-                <artifactId>jena</artifactId>
-                <version>2.6.4</version>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-core</artifactId>
+                <version>2.10.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-arq</artifactId>
+                <version>2.10.1</version>
             </dependency>
             <dependency>
                 <groupId>com.jamonapi</groupId>

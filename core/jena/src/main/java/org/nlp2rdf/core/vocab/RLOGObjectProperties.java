@@ -1,34 +1,27 @@
 package org.nlp2rdf.core.vocab;
 
-import com.hp.hpl.jena.ontology.DatatypeProperty;
+import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 
 /**
  * This class was automatically generated from http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#
  * @author croeder
- *
-*/
-
-public enum RLOGDatatypeProperties {
+ */
+public enum RLOGObjectProperties {
 
     /**
-     * logLevel -> Attention: the ids here can change, they are just used to define an order over the levels!
+     * an associated resource -> If we mix normal and log output, this can be used to refer to the resource. 
      */
-    priority,
+    resource,
 
     /**
-     * Logging message -> TODO add comment
+     * logLevel -> TODO add comment
      */
-    message,
-
-    /**
-     * Logging date in datetime -> TODO add comment
-     */
-    date;
+    level;
 
     String uri;
 
-    RLOGDatatypeProperties() {
+    RLOGObjectProperties() {
         this.uri = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#" + name();
     }
 
@@ -41,7 +34,8 @@ public enum RLOGDatatypeProperties {
         return "rlog:" + name();
     }
 
-    public DatatypeProperty getDatatypeProperty(OntModel model) {
-        return model.createDatatypeProperty(getUri());
+
+    public ObjectProperty getObjectProperty(OntModel model) {
+        return model.createObjectProperty(getUri());
     }
 }

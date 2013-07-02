@@ -1,0 +1,9 @@
+PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+Select ?s ?message {
+		# all RFC5147String that aren't contexts must have an explicit referenceContext
+		?s a nif:RFC5147String .
+		BIND (concat(str(?s), ": all RFC5147String that aren't contexts must have an explicit referenceContext") AS ?message)
+		FILTER (NOT EXISTS {?s a nif:Context } ) .
+		FILTER (NOT EXISTS {?s nif:referenceContext [ a nif:Context ] . } ) .
+}

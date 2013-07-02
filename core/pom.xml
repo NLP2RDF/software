@@ -12,7 +12,7 @@
     <name>Core Module (NIF API and Ontologies)</name>
 
     <modules>
-        <module>nif</module>
+        <module>jena</module>
         <module>webservice</module>
         <!--module>generated</module-->
     </modules>

@@ -20,7 +20,7 @@ public enum NIFObjectProperties {
     subString,
 
     /**
-     * source URL -> The URL the context was extracted from, e.g. the blog or news article url. Doesn't matter whether it is HTML or XML or plain text. rdfs:range is foaf:Document, if the string comes form another NIF String, please use nif:convertedFrom
+     * source URL -> The URL the context was extracted from, e.g. the blog or news article url. Doesn't matter whether it is HTML or XML or plain text. rdfs:range is foaf:Document, if the string comes form another NIF String, please use nif:wasConvertedFrom
      */
     sourceUrl,
 

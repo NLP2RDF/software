@@ -9,16 +9,21 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="nif" />
-    <orderEntry type="library" name="Maven: com.hp.hpl.jena:jena:2.6.4" level="project" />
-    <orderEntry type="library" name="Maven: com.hp.hpl.jena:iri:0.8" level="project" />
-    <orderEntry type="library" name="Maven: com.ibm.icu:icu4j:3.4.4" level="project" />
-    <orderEntry type="library" name="Maven: xerces:xercesImpl:2.7.1" level="project" />
+    <orderEntry type="module" module-name="jena" />
+    <orderEntry type="module" module-name="jena" />
+    <orderEntry type="library" name="Maven: org.apache.jena:jena-core:2.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.jena:jena-iri:0.9.6" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-log4j12:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.16" level="project" />
-    <orderEntry type="library" name="Maven: com.jamonapi:jamon:2.7" level="project" />
+    <orderEntry type="library" name="Maven: xerces:xercesImpl:2.11.0" level="project" />
+    <orderEntry type="library" name="Maven: xml-apis:xml-apis:1.4.01" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.jena:jena-arq:2.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.2.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.2.2" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:1.6.4" level="project" />
+    <orderEntry type="library" name="Maven: com.jamonapi:jamon:2.7" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.2" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />

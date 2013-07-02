@@ -1,0 +1,11 @@
+PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+Select * { 
+		# begin and end index must be xsd:nonNegativeInteger 
+		# ?test will not be bound if ?o can not be casted
+		{ ?s nif:beginIndex ?o . }
+		UNION
+		{ ?s nif:endIndex ?o . }
+		LET (?test := DATATYPE(xsd:nonNegativeInteger(?o)))
+		FILTER ( ! bound (?test)  ) 
+}

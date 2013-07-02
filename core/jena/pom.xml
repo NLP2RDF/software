@@ -8,15 +8,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>nif</artifactId>
+    <artifactId>jena</artifactId>
     <packaging>jar</packaging>
 
     <name>Core - NIF Ontology Bindings and API</name>
 
     <dependencies>
         <dependency>
-            <groupId>com.hp.hpl.jena</groupId>
-            <artifactId>jena</artifactId>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-arq</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jamonapi</groupId>
