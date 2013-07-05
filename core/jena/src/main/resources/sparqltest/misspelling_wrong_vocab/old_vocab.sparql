@@ -1,0 +1,10 @@
+PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+Select ?s ?message {
+		?s a ?class .
+		BIND (concat(str(?class),": is using the old vocabulary, please switch to http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core/index.html") AS ?message)
+		FILTER ( 
+			CONTAINS (str(?class), "http://nlp2rdf.lod2.eu/schema/string/") ||
+			CONTAINS (str(?class), "http://nlp2rdf.lod2.eu/schema/sso/")
+			) 
+}

@@ -25,7 +25,16 @@ import java.util.Scanner;
 public class SPARQLValidator {
     private static Logger log = LoggerFactory.getLogger(SPARQLValidator.class);
 
-    public Model validate(OntModel toBeValidated, String query, String logPrefix) {
+    private String logPrefix = RLOGSLF4JBinding.defaultlogprefix;
+
+    public SPARQLValidator() {
+    }
+
+    public SPARQLValidator(String logPrefix) {
+        this.logPrefix = logPrefix;
+    }
+
+    public Model validate(OntModel toBeValidated, String query) {
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
         NIFNamespaces.addRLOGPrefix(model);
         model.setNsPrefix("mylog", logPrefix);
@@ -42,8 +51,7 @@ public class SPARQLValidator {
         return model;
     }
 
-    public static void main(String[] args) {
-        OntModel tobevalidated = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+    public OntModel validate(OntModel toBeValidated) {
         OntModel output = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
         output.setNsPrefix("rlog", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#");
         List<String> tests = new ArrayList<String>();
@@ -59,13 +67,18 @@ public class SPARQLValidator {
         tests.add(getQuery("sparqltest/missing_type/contextTypedAsRFC5147String.sparql"));
         tests.add(getQuery("sparqltest/misspelling_wrong_vocab/RFC5147StringMisspelling.sparql"));
         tests.add(getQuery("sparqltest/ranges/beginEndIndexAreNonNegativeInteger.sparql"));
-        tobevalidated.read(SPARQLValidator.class.getClassLoader().getResourceAsStream("erroneous/nif-error-1.ttl"), "", "Turtle");
         for (String q : tests) {
-            System.out.println(q);
-            output.add(new SPARQLValidator().validate(tobevalidated, q, "http://example.org/ex#"));
-            break;
-
+            //System.out.println(q);
+            output.add(validate(toBeValidated, q));
         }
+        return output;
+    }
+
+    public static void main(String[] args) {
+        OntModel tobevalidated = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+        tobevalidated.read(SPARQLValidator.class.getClassLoader().getResourceAsStream("erroneous/nif-error-1.ttl"), "", "Turtle");
+        OntModel output = new SPARQLValidator().validate(tobevalidated);
+
         RDFWriter rw = new JenaReadersWriters.RDFWriterRIOT_Turtle();
         rw.write(output, System.out, "");
         //QueryExecution qe = QueryExecutionFactory.create(theString, ModelFactory.createDefaultModel());
@@ -93,4 +106,11 @@ public class SPARQLValidator {
     }
 
 
+    public String getLogPrefix() {
+        return logPrefix;
+    }
+
+    public void setLogPrefix(String logPrefix) {
+        this.logPrefix = logPrefix;
+    }
 }

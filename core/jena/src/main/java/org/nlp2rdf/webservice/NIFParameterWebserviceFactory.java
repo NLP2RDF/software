@@ -26,6 +26,7 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.JenaException;
 import org.apache.commons.lang.StringUtils;
+import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.ContextHashBasedString;
@@ -94,7 +95,7 @@ public class NIFParameterWebserviceFactory {
                 //inputFormat
                 if (isSet("inputFormat", httpServletRequest)) {
                     inputFormat = requiredParameter("inputFormat", httpServletRequest, "rdfxml", "turtle", "ntriples");
-                    inputFormat = inputFormat.replace("rdfxml", "RDF/XML").replace("turtle", "N3").replace("ntriples", "N-TRIPLE");
+                    inputFormat = Format.toJena(inputFormat);
                 }
 
                 if (!isSet("input", httpServletRequest)) {

@@ -13,8 +13,6 @@
 
     <modules>
         <module>jena</module>
-        <module>webservice</module>
-        <!--module>generated</module-->
     </modules>
 
 </project>

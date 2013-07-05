@@ -227,7 +227,12 @@
                 <version>${project.version}</version>
             </dependency>
 
-
+            <dependency>
+                <groupId>net.sf.jopt-simple</groupId>
+                <artifactId>jopt-simple</artifactId>
+                <version>4.4</version>
+                <!--This version is the one released with DL-Learner 2048 -->
+            </dependency>
             <dependency>
                 <groupId>org.nlp2rdf</groupId>
                 <artifactId>OLiA</artifactId>
