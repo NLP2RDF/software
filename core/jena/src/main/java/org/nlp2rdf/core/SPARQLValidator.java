@@ -76,7 +76,7 @@ public class SPARQLValidator {
 
     public static void main(String[] args) {
         OntModel tobevalidated = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-        tobevalidated.read(SPARQLValidator.class.getClassLoader().getResourceAsStream("erroneous/nif-error-1.ttl"), "", "Turtle");
+        tobevalidated.read(SPARQLValidator.class.getClassLoader().getResourceAsStream("src/test/resource/erroneous/nif-erroneous-model.ttl"), "", "Turtle");
         OntModel output = new SPARQLValidator().validate(tobevalidated);
 
         RDFWriter rw = new JenaReadersWriters.RDFWriterRIOT_Turtle();

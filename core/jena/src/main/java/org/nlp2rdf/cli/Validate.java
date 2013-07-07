@@ -7,7 +7,6 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.SPARQLValidator;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 import java.net.URL;
