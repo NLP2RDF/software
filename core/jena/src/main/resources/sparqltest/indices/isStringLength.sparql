@@ -11,6 +11,6 @@ Select ?s ?message {
 		#LET (?b := xsd:nonNegativeInteger(?length) ) .
 		FILTER ( ?a != ?b  )
 
-		BIND (concat(str(?s), ": for the context, the length of nif:isString must equal nif:endIndex" ) AS ?message)
+		BIND (concat(str(?s), ": for the context, the length of nif:isString (",str(?a), ") must equal nif:endIndex(",str(?b),")" ) AS ?message)
 
 }
