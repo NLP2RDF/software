@@ -9,25 +9,24 @@ We would be happy, if you were to share your code for NIF implementations using 
 An up-to-date validator is supplied at root level: validate.jar
 Parameters are specified here: http://persistence.uni-leipzig.org/nlp2rdf/spec/2.0.html
 ### Use the Jar
-'''Shell
+```Shell
 java -jar validate.jar -h
 java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl 
 java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl -o turtle 
-
-'''
+```
 
 ### Use directly with Maven
-'''Shell
+```Shell
 cd core/jena
 mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.cli.Validate" -Dexec.args="-i nif-erroneous-model.ttl -o turtle"
-'''
+```
 
 ### Build Validator Jar 
 the jar appears in core/jena/target
-'''Shell
+```hell
 cd core/jena
 mvn clean compile assembly:single
-'''
+```
 
 
 ## Java RDF Libraries
