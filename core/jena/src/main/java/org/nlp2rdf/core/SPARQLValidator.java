@@ -26,6 +26,8 @@ public class SPARQLValidator {
     private static Logger log = LoggerFactory.getLogger(SPARQLValidator.class);
 
     private String logPrefix = RLOGSLF4JBinding.defaultlogprefix;
+    //no logging, e.g. on CLI
+    private boolean quiet = false;
 
     public SPARQLValidator() {
     }
@@ -45,7 +47,7 @@ public class SPARQLValidator {
             QuerySolution qs = rs.next();
             Resource relatedResource = qs.getResource("s");
             Literal message = qs.getLiteral("message");
-            model.add(RLOGSLF4JBinding.log(logPrefix, message.getString(), RLOGIndividuals.ERROR, relatedResource.getURI(), log));
+            model.add(RLOGSLF4JBinding.log(logPrefix, message.getString(), RLOGIndividuals.ERROR, relatedResource.getURI(), (quiet)?null:log));
 
         }
         return model;
@@ -112,5 +114,14 @@ public class SPARQLValidator {
 
     public void setLogPrefix(String logPrefix) {
         this.logPrefix = logPrefix;
+    }
+
+
+    public boolean isQuiet() {
+        return quiet;
+    }
+
+    public void setQuiet(boolean quiet) {
+        this.quiet = quiet;
     }
 }
