@@ -30,6 +30,13 @@ public enum NIFObjectProperties {
     occurrence,
 
     /**
+     * annotation -> 
+      see Towards Web-Scale Collaborative Knowledge Extraction  http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 5 .
+    
+     */
+    annotation,
+
+    /**
      * TODO add label -> see nif:nextSentence
      */
     previousWord,
@@ -37,7 +44,7 @@ public enum NIFObjectProperties {
     /**
      * reference context -> The reference text (called nif:Context) a nif:String occurs in.  
     Each String instance must have exactly one reference context. 
-    Instances of nif:Context have itself as reference context ( see also nif-core-inf.ttl)  . 
+    Instances of nif:Context have itself as reference context (see also nif-core-inf.ttl)  . 
     This property is functional in the validation model (nif-core-val.ttl).
      */
     referenceContext,
@@ -46,6 +53,11 @@ public enum NIFObjectProperties {
      * super String -> see nif:subString
      */
     superString,
+
+    /**
+     * confidence level -> the level of confidence for this Annotation (introduced by STANBOL-631).
+     */
+    confidence_level,
 
     /**
      * TODO add label -> see nif:nextSentence
@@ -78,6 +90,11 @@ public enum NIFObjectProperties {
     superStringTrans,
 
     /**
+     * narrower Context -> The inverse of nif:narrowerContext
+     */
+    narrowerContext,
+
+    /**
      * opinion -> This property is used to link to a marl:Opinion. We have not investigated marl, so it might be replaced. http://marl.gi2mo.org/?page_id=1#overview . InverseOf marl:extractedFrom
      */
     opinion,
@@ -91,6 +108,11 @@ public enum NIFObjectProperties {
      * TODO add label -> see nif:nextSentence
      */
     nextSentenceTrans,
+
+    /**
+     * extracted from -> links a nif:String to a nif:Annotation .
+     */
+    extractedFrom,
 
     /**
      * has first word -> This property links sentences to their last word.
@@ -123,7 +145,7 @@ public enum NIFObjectProperties {
     previousSentenceTrans,
 
     /**
-     * was Converted from -> This property should be used, when mapping one NIF String URI to another.
+     * was Converted from -> This property should be used, when mapping one NIF String URIScheme to another.
     It mainly is used to provide provenance during a conversion process, e.g. when removing tags from XHTML and then linking XPath URIs to NIF index based URIs (e.g.  RFC 5147 with char=x,y).
     An example of the usage of this property can be found here: http://www.w3.org/TR/its20/#conversion-to-nif
     

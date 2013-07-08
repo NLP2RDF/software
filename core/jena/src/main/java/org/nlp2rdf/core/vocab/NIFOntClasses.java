@@ -40,12 +40,17 @@ public enum NIFOntClasses {
     Sentence,
 
     /**
+     * Confidence Level -> Class for the four different confidence levels defined by this ontology (introduced with STANBOL-631)
+     */
+    ConfidenceLevel,
+
+    /**
      * RFC 5147 string -> cf. http://tools.ietf.org/html/rfc5147 
      */
     RFC5147String,
 
     /**
-     * String ->  see http://svn.aksw.org/papers/2013/ISWC_NIF/public.pdf 
+     * String ->  see http://svn.aksw.org/papers/2013/ISWC_NIF/public.pdf This is a subclass of Annotation, because it "annotates" strings for example with begin and end index. It is also very similar to fise:TextAnnotation
      */
     String,
 
@@ -53,6 +58,11 @@ public enum NIFOntClasses {
      * TODO add label -> TODO add comment
      */
     NormalizedContextOccurrence,
+
+    /**
+     * Annotation -> This class is an individual used in the NIF-Stanbol profile and can be a URN 
+     */
+    Annotation,
 
     /**
      * paragraph -> a paragraph.
@@ -70,7 +80,9 @@ public enum NIFOntClasses {
     CollectionOccurrence,
 
     /**
-     * word -> A string that can be considered a word or a punctuation mark, the sentence 'He enters the room.' for example has 5 words. In general, the division into nif:Word is done by a Tokenizer. Instances of this class should be a string, that is a 'meaningful' unit of characters. The class has not been named 'Token' as the NLP definition of 'Token' is more similar to our definition of nif:String in general. 
+     * word -> 
+    Assigning this class to a nif:String This class has definitory 
+    A string that can be considered a word or a punctuation mark, the sentence 'He enters the room.' for example has 5 words. In general, the division into nif:Word is done by a tokenizer. Instances of this class should be a string, that is a 'meaningful' unit of characters. The class has not been named 'Token' as the NLP definition of 'Token' is more similar to our definition of nif:String in general. For NIF we assume, that the Token 
      */
     Word,
 
@@ -85,7 +97,17 @@ public enum NIFOntClasses {
     ContextHashBasedString,
 
     /**
-     * Structure -> A structure is a more or less arbitrary label for a partitioning of a string. We do not follow a strict approach for what a word, phrase, sentence, paragraph is. 
+     * Entity Annotation -> This anntotation is an entity. Only usable with the Apache Stanbol profile. disjointWith nif:String and fise:TextAnnotation.
+     */
+    EntityAnnotation,
+
+    /**
+     * A Topic Annotation -> This anntotation is TODO:???? . Only usable with the Apache Stanbol profile. disjointWith nif:String and fise:TextAnnotation. 
+     */
+    TopicAnnotation,
+
+    /**
+     * Structure -> A structure is a more or less arbitrary label for a partitioning of a string. We do not follow a strict approach for what a word, phrase, sentence, title, paragraph is. These labels enable the definition processes for tool chains, e.g. tool analyses nif:Paragraph and calculates term frequency. 
      */
     Structure,
 
@@ -93,6 +115,11 @@ public enum NIFOntClasses {
      * HTML String -> experimental, a subspecialisation of String. 
      */
     HTMLString,
+
+    /**
+     * Text Annotation -> An abitrary URI (e.g. a URN) for an arbitrary string of the context. This is exactly the same as TextAnnotations are currently implemented in Stanbol.
+     */
+    ArbitraryString,
 
     /**
      * URI Scheme -> A URI Scheme for NIF, subclasses need to define guidelines on the URI Scheme as well as the text it refers to. This class is just to keep some order, please don't serialize.

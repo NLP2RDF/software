@@ -3,3 +3,4 @@ target/
 *.iml
 log/
 tools/velocity.log
+tools/velocity.log.*

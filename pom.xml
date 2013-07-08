@@ -191,6 +191,7 @@
                         <windowtitle>Annotator Stanford Javadoc</windowtitle>
                     </configuration>
                 </plugin>
+
             </plugins>
         </pluginManagement>
     </build>
@@ -280,11 +281,7 @@
                 <artifactId>lucene-snowball</artifactId>
                 <version>3.0.3</version>
             </dependency>
-            <!--dependency>
-                <groupId>org.aksw.commons</groupId>
-                <artifactId>model</artifactId>
-                <version>${aksw.version}</version>
-            </dependency-->
+
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
