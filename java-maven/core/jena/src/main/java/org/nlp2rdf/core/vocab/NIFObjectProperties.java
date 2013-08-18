@@ -42,10 +42,18 @@ public enum NIFObjectProperties {
     previousWord,
 
     /**
-     * reference context -> The reference text (called nif:Context) a nif:String occurs in.  
-    Each String instance must have exactly one reference context. 
-    Instances of nif:Context have itself as reference context (see also nif-core-inf.ttl)  . 
-    This property is functional in the validation model (nif-core-val.ttl).
+     * reference context -> Links a URI of a string to its reference context of type nif:Context.  The reference context determines the calculation of begin and end index
+    Each String that is not an instance of nif:Context MUST have exactly one reference context. 
+    
+    Inferences (nif-core-inf.ttl): 
+    Instances of nif:Context do have itself as reference context, this is inferred automatically, MAY be materialized, as well.  
+    
+    OWL validation (nif-core-val.ttl): 
+    This property is functional.
+    
+    Changelog:
+    * 1.0.0: Introduced stable version.
+    
      */
     referenceContext,
 
@@ -145,7 +153,7 @@ public enum NIFObjectProperties {
     previousSentenceTrans,
 
     /**
-     * was Converted from -> This property should be used, when mapping one NIF String URIScheme to another.
+     * was converted from -> This property should be used, when mapping one NIF String URIScheme to another.
     It mainly is used to provide provenance during a conversion process, e.g. when removing tags from XHTML and then linking XPath URIs to NIF index based URIs (e.g.  RFC 5147 with char=x,y).
     An example of the usage of this property can be found here: http://www.w3.org/TR/its20/#conversion-to-nif
     

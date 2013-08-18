@@ -9,25 +9,74 @@
 	nif:endIndex "27" ;
 	nif:isString "transport or transportation" .
 
-<http://example.com/error1.html#char=1,25>
+# t1, old vocab
+<http://example.com/warn1.html#char=0,27>
+	a <http://nlp2rdf.lod2.eu/schema/string/String> .
+
+# t2, missing RFC5147
+<http://example.com/error2.html#char=0,27>
+	a nif:Context ;
+	nif:isString "transport or transportation" .
+
+# t3 beginIndex must be zero
+<http://example.com/error3.html#char=1,25>
 	a nif:Context ;
 	a nif:RFC5147String ;
 	nif:beginIndex "1" ;
+	nif:endIndex "27" ;
+	nif:isString "transport or transportation" .
+
+# t4
+<http://example.com/error4.html#char=1,25>
+	a nif:Context ;
+	a nif:RFC5147String ;
+	nif:beginIndex "0" ;
 	nif:endIndex "25" ;
 	nif:isString "transport or transportation" .
 
-<http://example.com/error2.html#char=0,27>
+#t5 wrong substring
+#    TODO not working
+<http://example.com/error5.html#char=0,10>
+	a nif:RFC5147String ;
+	nif:beginIndex "0" ;
+	nif:endIndex "10" ;
+	nif:anchorOf "wrong substring" ;
+	nif:referenceContext <http://example.com/correct.html#char=0,27> .
+
+#t6  misspelled
+<http://example.com/error6.html#char=0,27>
 	a nif:Context ;
 	a nif:RFC147String ;
 	nif:beginIndex "0" ;
 	nif:endIndex "27" ;
 	nif:isString "transport or transportation" .
 
-<http://example.com/error3.html#char=0,27>
-	a nif:Context ;
-	nif:isString "transport or transportation" .
+# t7
+<http://example.com/error7.html#char=10,12>
+	a nif:RFC5147String ;
+	nif:beginIndex "10" ;
+	nif:endIndex "12" .
 
+# t8
+<http://example.com/error8and9.html#char=9,13>
+	a nif:RFC5147String ;
+	nif:anchorOf " or " ;
+	nif:referenceContext  <http://example.com/correct.html#char=0,27>  .
 
-<http://example.com/error4.html#char=0,9>
+#t10
+<http://example.com/error10.html#char=0,19>
+   	a nif:Context ;
+   	nif:beginIndex "0" ;
+   	nif:endIndex "19" ;
+   	nif:isString "Some other context." .
+
+# t11
+<http://example.com/error11.html#char=0,19>
+	a nif:RFC5147String ;
 	nif:beginIndex "0" ;
-	nif:endIndex "9" .
+   	nif:endIndex "-4" ;
+   	nif:isString "Some other context." ;
+   	nif:referenceContext  <http://example.com/error10.html#char=0,19> .
+
+
+

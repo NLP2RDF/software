@@ -10,6 +10,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="jena" />
+    <orderEntry type="library" name="Maven: org.nlp2rdf.ontologies:persistence.uni-leipzig.org:2.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jena:jena-core:2.10.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jena:jena-iri:0.9.6" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.0" level="project" />

@@ -3,10 +3,13 @@ package org.nlp2rdf.cli;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.vocabulary.RDF;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.SPARQLValidator;
+import org.nlp2rdf.core.vocab.RLOGOntClasses;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +33,7 @@ public class Validate {
         parser.acceptsAll(asList("i", "input"), "the actual input, per default a file with relative path with NIF RDF in turtle").withRequiredArg();
         parser.acceptsAll(asList("o", "outformat"), "specifies output format (text,rdfxml,turtle,ntriples), text, means errors are written to stdout as log messages").withRequiredArg().defaultsTo("text");
         parser.acceptsAll(asList("outfile"), "a NIF RDF file with the result of validation as RDF, only takes effect, if outformat is 'turtle' or 'rdfxml'").withRequiredArg().ofType(File.class).describedAs("RDF file");
-
+        parser.acceptsAll(asList("testsuite"), "for debugging, a local turtle file, that contains the testsuite").withRequiredArg().ofType(File.class).describedAs("Turtle file with test suite");
 
         // parse options and display a message for the user in case of problems
         OptionSet options = null;
@@ -49,7 +52,7 @@ public class Validate {
         }
 
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-        OntModel validation;
+
 
         String inputtype = "file";
         if (options.hasArgument("t")) {
@@ -70,19 +73,30 @@ public class Validate {
         if (options.hasArgument("i")) {
             File f = new File((String) options.valueOf("i"));
             model.read(new FileInputStream(f), "", Format.toJena(informat));
-
         }
 
-        SPARQLValidator sparqlValidator = new SPARQLValidator();
-
+        SPARQLValidator sparqlValidator = null;
+        String testsuite="org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl";
+        if (options.hasArgument("testsuite")) {
+            File ttt = (File) options.valueOf("testsuite");
+            if(!ttt.exists()){
+                die(parser, "testsuite ttl file does not exist: "+ttt.getAbsolutePath());
+            }
+            sparqlValidator = SPARQLValidator.getInstance(ttt);
+        } else{
+            sparqlValidator = SPARQLValidator.getInstance(testsuite);
+        }
+        System.err.println("NIF Validator for testsuite version " + sparqlValidator.getVersion() + ", " + sparqlValidator.getTests().size() + " tests total.");
 
         String outformat = "text";
         if (options.hasArgument("o")) {
             outformat = (String) options.valueOf("o");
         }
 
+        OntModel validation;
         if (outformat.equals("text")) {
             validation = sparqlValidator.validate(model);
+
         } else if (outformat.equals("turtle") || outformat.equals("rdfxml") || outformat.equals("ntriples")) {
             sparqlValidator.setQuiet(true);
             validation = sparqlValidator.validate(model);
@@ -92,7 +106,11 @@ public class Validate {
             } else {
                 validation.write(System.out, Format.toJena(outformat));
             }
+        } else {
+            validation = sparqlValidator.validate(model);
         }
+
+        System.err.println(validation.listIndividuals(validation.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " messages found.");
         // TODO: some handling for inaccessible files or overwriting existing files
         //File f = (File) options.valueOf("o");
 

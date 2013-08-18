@@ -15,6 +15,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.nlp2rdf.ontologies</groupId>
+            <artifactId>persistence.uni-leipzig.org</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
         </dependency>

@@ -25,7 +25,7 @@ public enum NIFOntClasses {
     NormalizedCollectionOccurrence,
 
     /**
-     * phrase -> A nif:Phrase can be a nif:String, that is a chunk of several words or a word itself (e.g. a NounPhrase as a Named Entity). The term is underspecified and can be compatible with many defintitions of phrase. Please subClass it to specify the meaning (e.g. for Chunking or Phrase Structure Grammar). Example: ((My dog)(also)(likes)(eating (sausage))) 
+     * a Phrase -> A nif:Phrase can be a nif:String, that is a chunk of several words or a word itself (e.g. a NounPhrase as a Named Entity). The term is underspecified and can be compatible with many defintitions of phrase. Please subClass it to specify the meaning (e.g. for Chunking or Phrase Structure Grammar). Example: ((My dog)(also)(likes)(eating (sausage))) 
      */
     Phrase,
 
@@ -35,7 +35,7 @@ public enum NIFOntClasses {
     OccuringWord,
 
     /**
-     * sentence -> a sentence.
+     * a Sentence -> a sentence.
      */
     Sentence,
 
@@ -50,7 +50,7 @@ public enum NIFOntClasses {
     RFC5147String,
 
     /**
-     * String ->  see http://svn.aksw.org/papers/2013/ISWC_NIF/public.pdf This is a subclass of Annotation, because it "annotates" strings for example with begin and end index. It is also very similar to fise:TextAnnotation
+     * String -> This is a subclass of Annotation, because it "annotates" strings for example with begin and end index. The class is similar to fise:TextAnnotation
      */
     String,
 
@@ -65,7 +65,7 @@ public enum NIFOntClasses {
     Annotation,
 
     /**
-     * paragraph -> a paragraph.
+     * a Paragraph -> a Paragraph.
      */
     Paragraph,
 
@@ -82,7 +82,8 @@ public enum NIFOntClasses {
     /**
      * word -> 
     Assigning this class to a nif:String This class has definitory 
-    A string that can be considered a word or a punctuation mark, the sentence 'He enters the room.' for example has 5 words. In general, the division into nif:Word is done by a tokenizer. Instances of this class should be a string, that is a 'meaningful' unit of characters. The class has not been named 'Token' as the NLP definition of 'Token' is more similar to our definition of nif:String in general. For NIF we assume, that the Token 
+    A string that can be considered a word or a punctuation mark, the sentence 'He enters the room.' for example has 5 words. In general, the division into nif:Word is done by a tokenizer. Instances of this class are defined as a string, that is a 'meaningful' unit of characters. The class is not descriptive, but prescriptive. All NIF tools are supposed to either honor the current assignment of nif:Word or possibly correct it, if that is intended by the developer. 
+    The class has not been named 'Token' as the NLP definition of 'Token' is more similar to our definition of nif:String in general, e.g. "can't" could be one, two or three tokens.
      */
     Word,
 
@@ -112,7 +113,7 @@ public enum NIFOntClasses {
     Structure,
 
     /**
-     * HTML String -> experimental, a subspecialisation of String. 
+     * HTML String -> experimental, a subspecialisation of String (a string with HTML markup). 
      */
     HTMLString,
 

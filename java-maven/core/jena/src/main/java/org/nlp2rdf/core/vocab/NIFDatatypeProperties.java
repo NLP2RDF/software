@@ -27,6 +27,10 @@ public enum NIFDatatypeProperties {
     Note: RFC 5147 is re-used for the definition of character ranges. RFC 5147 is assuming a text/plain MIME type. NIF builds upon Unicode and is content agnostic. 
     Requirement (1): This property has the same value the "Character position" of RFC 5147 and it must therefore be an xsd:nonNegativeInteger .  
     Requirement (2): The index of the subject string MUST be calculated relative to the nif:referenceContext of the subject. If available, this is the rdf:Literal of the nif:isString property.
+    
+    Changelog: 
+    * 1.0.0: Introduced stable version.
+    
      */
     beginIndex,
 

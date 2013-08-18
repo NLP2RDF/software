@@ -10,7 +10,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 public enum RLOGObjectProperties {
 
     /**
-     * an associated resource -> If we mix normal and log output, this can be used to refer to the resource. 
+     * an associated resource -> If we mix normal and log output, this can be used to refer to the resource in the RDF the error is connected to. 
      */
     resource,
 
