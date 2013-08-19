@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.nlp2rdf</groupId>
-    <artifactId>nlp2rdf-parent</artifactId>
-    <version>1.9-SNAPSHOT</version>
+    <artifactId>nif-2.0-parent</artifactId>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>NLP2RDF Parent Pom</name>
     <url>http://nlp2rdf.org</url>
@@ -25,8 +25,8 @@
 
     <modules>
         <module>core</module>
-        <module>implementation</module>
         <module>vocabularymodule</module>
+        <module>implementation</module>
         <module>tools</module>
         <!--module>ontologies/utilities/owl2java</module-->
     </modules>

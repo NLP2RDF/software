@@ -3,8 +3,6 @@ package org.nlp2rdf.core;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFWriter;
-import org.apache.jena.riot.adapters.JenaReadersWriters;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -22,12 +20,12 @@ public class SPARQLValidatorTest {
         OntModel output = null;
         OntModel correct = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
         correct.read(SPARQLValidator.class.getClassLoader().getResourceAsStream("nif-correct-model.ttl"), "", "Turtle");
-        output = new SPARQLValidator().validate(correct);
+        output = SPARQLValidator.getInstance().validate(correct);
         assertTrue(output.isEmpty());
 
         OntModel erroneous = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
         erroneous.read(SPARQLValidator.class.getClassLoader().getResourceAsStream("nif-erroneous-model.ttl"), "", "Turtle");
-        output = new SPARQLValidator().validate(erroneous);
+        output = SPARQLValidator.getInstance().validate(erroneous);
         assertFalse(output.isEmpty());
 
         //RDFWriter rw = new JenaReadersWriters.RDFWriterRIOT_Turtle();

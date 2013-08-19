@@ -4,3 +4,4 @@ target/
 log/
 tools/velocity.log
 tools/velocity.log.*
+java-maven/tools/velocity.log
