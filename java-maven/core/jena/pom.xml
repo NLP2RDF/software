@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>nif-2.0-parent</artifactId>
-        <groupId>org.nlp2rdf</groupId>
+        <groupId>org.nlp2rdf.software</groupId>
         <version>2.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -10,7 +10,11 @@
     <artifactId>jena</artifactId>
     <packaging>jar</packaging>
 
-    <name>Core - NIF Ontology Bindings and API</name>
+    <properties>
+        <main.basedir>${project.parent.parent.basedir}</main.basedir>
+    </properties>
+
+    <name>Jena Implementation</name>
 
     <dependencies>
         <dependency>

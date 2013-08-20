@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.nlp2rdf</groupId>
+    <groupId>org.nlp2rdf.software</groupId>
     <artifactId>nif-2.0-parent</artifactId>
     <version>2.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -15,12 +15,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!--This is the SCM information, which needs to be here so we can use the
-		maven release plugin -->
     <scm>
-        <connection>scm:hg:https://nlp2rdf.googlecode.com/hg/</connection>
-        <developerConnection>scm:hg:https://nlp2rdf.googlecode.com/hg/</developerConnection>
-        <url>https://nlp2rdf.googlecode.com/hg</url>
+        <connection>scm:git:git@github.com:NLP2RDF/software.git</connection>
+        <!-- developerConnection></developerConnection -->
+        <!-- url>https://my-project.googlecode.com/svn</url -->
     </scm>
 
     <modules>
@@ -385,13 +383,12 @@
         <repository>
             <id>maven.aksw.internal</id>
             <name>AKSW Internal Release Repository</name>
-            <url>http://maven.aksw.org/repository/internal</url>
+            <url>http://maven.aksw.org/archiva/repository/internal</url>
         </repository>
         <snapshotRepository>
             <id>maven.aksw.snapshots</id>
             <name>AKSW Snapshot Repository</name>
-            <url>http://maven.aksw.org/repository/snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
+            <url>http://maven.aksw.org/archiva/repository/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
     <profiles>
