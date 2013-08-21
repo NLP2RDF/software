@@ -45,9 +45,10 @@ public class SPARQLValidator {
     }
 
     public static SPARQLValidator getInstance(String suiteresource) {
-        // load the test cases
+        InputStream is = SPARQLValidator.class.getClassLoader().getResourceAsStream(suiteresource);
+        // load the test cases into Jena
         OntModel testsuite = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-        testsuite.read(SPARQLValidator.class.getClassLoader().getResourceAsStream(suiteresource), "", "N3");
+        testsuite.read(is, "", "N3");
         return new SPARQLValidator(testsuite, RLOGSLF4JBinding.defaultlogprefix);
     }
 
@@ -110,7 +111,7 @@ public class SPARQLValidator {
                 rli = RLOGIndividuals.ALL;
             }
 
-            model.add(RLOGSLF4JBinding.log(logPrefix, (message==null)?"null at "+relatedResource:message.getString(), rli, relatedResource.getURI(), (quiet) ? null : log));
+            model.add(RLOGSLF4JBinding.log(logPrefix, (message == null) ? "null at " + relatedResource : message.getString(), rli, relatedResource.getURI(), (quiet) ? null : log));
 
         }
         return model;
@@ -123,10 +124,10 @@ public class SPARQLValidator {
 
 
         for (String q : tests) {
-            try{
-            output.add(validate(toBeValidated, q));
-            }catch (RiotException re){
-                log.error(q,re);
+            try {
+                output.add(validate(toBeValidated, q));
+            } catch (RiotException re) {
+                log.error(q, re);
             }
         }
         return output;
