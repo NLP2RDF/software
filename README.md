@@ -22,6 +22,8 @@ java -jar validate.jar --input=java-maven/core/jena/src/test/resources/nif-erron
 # short version -i turtle and -o text are default
 java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl 
 java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl -o turtle 
+# test URLs
+java -jar validate.jar -i http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core/example.ttl -intype url
 ```
 
 ### Use directly with Maven

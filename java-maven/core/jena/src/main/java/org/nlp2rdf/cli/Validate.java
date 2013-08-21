@@ -3,18 +3,15 @@ package org.nlp2rdf.cli;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.vocabulary.RDF;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.SPARQLValidator;
 import org.nlp2rdf.core.vocab.RLOGOntClasses;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static java.util.Arrays.asList;
 
@@ -33,7 +30,7 @@ public class Validate {
         parser.acceptsAll(asList("i", "input"), "the actual input, per default a file with relative path with NIF RDF in turtle").withRequiredArg();
         parser.acceptsAll(asList("o", "outformat"), "specifies output format (text,rdfxml,turtle,ntriples), text, means errors are written to stdout as log messages").withRequiredArg().defaultsTo("text");
         parser.acceptsAll(asList("outfile"), "a NIF RDF file with the result of validation as RDF, only takes effect, if outformat is 'turtle' or 'rdfxml'").withRequiredArg().ofType(File.class).describedAs("RDF file");
-        parser.acceptsAll(asList("testsuite"), "for debugging, a local turtle file, that contains the testsuite").withRequiredArg().ofType(File.class).describedAs("Turtle file with test suite");
+        parser.acceptsAll(asList("testsuite"), "for debugging the testsuite, a local turtle file, that contains the testsuite").withRequiredArg().ofType(File.class).describedAs("a .ttl file with a test suite");
 
         // parse options and display a message for the user in case of problems
         OptionSet options = null;
@@ -57,8 +54,8 @@ public class Validate {
         String inputtype = "file";
         if (options.hasArgument("t")) {
             inputtype = (String) options.valueOf("t");
-            if (inputtype.equals("url") || inputtype.equals("direct")) {
-                die(parser, "intype=url|direct not implemented yet");
+            if (inputtype.equals("direct")) {
+                die(parser, "intype=direct (that is via command line) not implemented yet");
             }
         }
 
@@ -71,19 +68,38 @@ public class Validate {
         }
 
         if (options.hasArgument("i")) {
-            File f = new File((String) options.valueOf("i"));
-            model.read(new FileInputStream(f), "", Format.toJena(informat));
+            String format = Format.toJena(informat);
+            String input = (String) options.valueOf("i");
+            InputStream is = null;
+            try {
+                if (inputtype.equals("file")) {
+                    is = new FileInputStream(new File(input));
+                } else if (inputtype.equals("url")) {
+                    is = new URI(input).toURL().openStream();
+                }else{
+                    die(parser,"Option --intype="+inputtype+" not known, use file|url");
+                }
+            } catch (FileNotFoundException fne) {
+                fne.printStackTrace();
+                die(parser, "ERROR: file not found, maybe you have to switch --intype=url, file=" + input);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+                die(parser, "ERROR: malformed URL in parameter input=" + input);
+            }
+            model.read(is, "", format);
+        } else {
+            die(parser, "input paramater required");
         }
 
         SPARQLValidator sparqlValidator = null;
-        String testsuite="org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl";
+        String testsuite = "org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl";
         if (options.hasArgument("testsuite")) {
             File ttt = (File) options.valueOf("testsuite");
-            if(!ttt.exists()){
-                die(parser, "testsuite ttl file does not exist: "+ttt.getAbsolutePath());
+            if (!ttt.exists()) {
+                die(parser, "testsuite ttl file does not exist: " + ttt.getAbsolutePath());
             }
             sparqlValidator = SPARQLValidator.getInstance(ttt);
-        } else{
+        } else {
             sparqlValidator = SPARQLValidator.getInstance(testsuite);
         }
         System.err.println("NIF Validator for testsuite version " + sparqlValidator.getVersion() + ", " + sparqlValidator.getTests().size() + " tests total.");
