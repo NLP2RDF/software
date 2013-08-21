@@ -1,0 +1,11 @@
+PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+Select * { 
+		# length of isString must equal endIndex
+		?s a nif:Context .
+		?s nif:isString ?string . 
+		?s nif:endIndex ?length . 
+		LET (?a := xsd:nonNegativeInteger(strlen(?string)) ) .
+		LET (?b := xsd:nonNegativeInteger(?length) ) .
+		FILTER ( ?a != ?b  )
+}

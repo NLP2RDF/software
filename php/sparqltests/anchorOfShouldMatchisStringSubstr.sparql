@@ -1,0 +1,12 @@
+PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+Select * { 
+		# all RFC5147String that aren't contexts must have an explicit referenceContext
+		?s a nif:RFC5147String .
+		?s nif:anchorOf ?anchorOf .
+		?s nif:beginIndex ?beginIndex .
+		?s nif:endIndex ?endIndex .
+		?s nif:referenceContext [ nif:isString ?referenceString ]  .
+		LET (?test := SUBSTR(?referenceContext, ?beginIndex , (?endIndex - ?beginIndex) ) ) .
+		FILTER (str(?test) != str(?anchorOf )) .
+}
