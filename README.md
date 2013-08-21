@@ -6,8 +6,10 @@ This repository contains software and tools using and implementing NIF 2.0.
 * See here for an overview of resources: [License, Persistence, Versioning and Resource List](http://persistence.uni-leipzig.org/nlp2rdf/specification/version.html)  
 
 ## NIF Validator
-An up-to-date validator is supplied at root level: validate.jar
+An up-to-date validator is supplied at root level in this repository and can be dowloaded:
+https://github.com/NLP2RDF/software/raw/master/validate.jar
 Parameters are specified here: http://persistence.uni-leipzig.org/nlp2rdf/specifications/api.html
+
 ### Use the Jar
 ```Shell
 # the file is executable, so you can run either "./validate.jar" or "java -jar validate.jar"
