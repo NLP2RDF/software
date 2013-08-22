@@ -45,7 +45,7 @@ public class RLOGSLF4JBinding {
         r.addProperty(RLOGObjectProperties.level.getObjectProperty(model), model.createResource(level.getUri()));
         r.addProperty(RLOGDatatypeProperties.message.getDatatypeProperty(model), message);
         XSDDateTime date = new XSDDateTime(Calendar.getInstance());
-        r.addProperty(RLOGDatatypeProperties.date.getDatatypeProperty(model), date.timeLexicalForm(), date.getNarrowedDatatype());
+        r.addProperty(RLOGDatatypeProperties.date.getDatatypeProperty(model), date.toString(), date.getNarrowedDatatype());
 
         if (resourceURI != null) {
             r.addProperty(RLOGObjectProperties.resource.getObjectProperty(model), model.createResource(resourceURI));
