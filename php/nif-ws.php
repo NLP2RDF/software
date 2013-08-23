@@ -8,6 +8,8 @@ $defaultPrefix = "http://localhost/text/" ;
 $defaultLogPrefix = "" ;
 $defaultPrefix = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."#";
 
+
+
 /*******
  * Implementation
  * *****/
@@ -17,6 +19,14 @@ $informat = (isset($_REQUEST['informat']))?$_REQUEST['informat']:"turtle";
 
 //TODO
 $outformat = (isset($_REQUEST['outformat']))?$_REQUEST['outformat']:"turtle";
+
+if (stristr($_SERVER['HTTP_ACCEPT'], "text/plain")){
+	$outformat = "text";
+}else if(stristr($_SERVER['HTTP_ACCEPT'], "text/turtle")){
+	$outformat = "turtle";
+}else if(stristr($_SERVER['HTTP_ACCEPT'], "application/rdf+xml")){
+	$outformat = "rdfxml";
+	}
 
 /*intype NIF-CLI default: file NIF-WS default: direct 	Determines how the input is accessed or retrieved. Possible values are:
 *    direct - input is read from stdin or HTTP parameter (GET) or body (POST).
@@ -87,12 +97,11 @@ if($intype === "direct") {
  * Out
  * ****/
  $ns = array(
-       'prefix' => trim($prefix) ,
+       'p' => trim($prefix) ,
        'nif' => 'http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#',
        'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
        'owl' => 'http://www.w3.org/2002/07/owl#'
       );
- 
  
 if ($outformat == "turtle"){
         $ser = ARC2::getTurtleSerializer(array('ns' => $ns));
@@ -106,7 +115,7 @@ else if ($outformat == "rdfxml"){
         $output = $ser->getSerializedTriples($triples);
         header("Content-Type: application/rdf+xml");
 	
-        echo $outformat;
+        echo $output;
 }
 else if ($outformat == "json"){
         $ser = ARC2::getRDFJSONSerializer(array('ns' => $ns));
