@@ -79,4 +79,19 @@
    	nif:referenceContext  <http://example.com/error10.html#char=0,19> .
 
 
+# t12
+<http://example.com/error12.html#char=0,19>
+	a nif:CString ;
+	nif:beginIndex "0" ;
+   	nif:endIndex "19" ;
+   	nif:isString "Some other context." ;
+   	nif:referenceContext  <http://example.com/error10.html#char=0,19> .
+
+
+<http://example.com/korean.html#char=0,$LENGTH>
+    a nif:Context ;
+    a nif:RFC5147String ;
+    nif:beginIndex "0" ;
+    nif:endIndex "$LENGTH" ;
+    nif:isString "$STRING" .
 

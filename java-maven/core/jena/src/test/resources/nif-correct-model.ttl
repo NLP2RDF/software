@@ -30,9 +30,3 @@
 	nif:referenceContext <http://example.com/exampledoc.html#char=0,178>.
 
 
-<http://example.com/korean.html#char=0,$LENGTH>
-	a nif:Context ;
-	a nif:RFC5147String ;
-	nif:beginIndex "0" ;
-	nif:endIndex "$LENGTH" ;
-	nif:isString "$STRING" .
