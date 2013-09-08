@@ -11,9 +11,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 public enum NIFDatatypeProperties {
 
-    /**
-     * Part of speech tag -> To include the pos tag as it comes out of the NLP tool as RDF Literal. This property is discouraged to use alone, please use oliaLink and oliaCategory.  
-     */
+
     posTag,
 
     /**
@@ -25,7 +23,7 @@ public enum NIFDatatypeProperties {
      * begin index -> The begin index of a character range as defined in http://tools.ietf.org/html/rfc5147#section-2.2.1 and http://tools.ietf.org/html/rfc5147#section-2.2.2, measured as the gap between two characters, starting to count from 0 (the position before the first character of a text). 
     Example: Index "2" is the postion between "Mr" and "."  in "Mr. Sandman".
     Note: RFC 5147 is re-used for the definition of character ranges. RFC 5147 is assuming a text/plain MIME type. NIF builds upon Unicode and is content agnostic. 
-    Requirement (1): This property has the same value the "Character position" of RFC 5147 and it must therefore be an xsd:nonNegativeInteger .  
+    Requirement (1): This property has the same value the "Character position" of RFC 5147 and it MUST therefore be castable to xsd:nonNegativeInteger, i.e. it MUST not have negative values.  
     Requirement (2): The index of the subject string MUST be calculated relative to the nif:referenceContext of the subject. If available, this is the rdf:Literal of the nif:isString property.
     
     Changelog: 
@@ -54,31 +52,21 @@ public enum NIFDatatypeProperties {
     stem,
 
     /**
-     * contextAsLiteral -> 
-      The string that the nif:anchorOf is embedded in. FILTER ( strlen (nif:referenceContext [ nif:isString ] ) ) 
-    
-     */
-    contextAsLiteral,
-
-    /**
-     * confidence -> The confidence of the nif:Annotation. If this property is attached to a nif:String, this property indicates the likelyness that the assigned indices and the nif:Structures are correct. If there are problems with URI minting use nif:ArbitraryString
-     */
-    confidence,
-
-    /**
      * before -> For each string you can include a snippet (e.g. 10-40 characters of text), that occurs immediately before the subject string.
      */
     before,
 
     /**
      * literalAnnotation -> 
-      see Towards Web-Scale Collaborative Knowledge Extraction  http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 5 .
+      see Towards Web-Scale Collaborative Knowledge Extraction  http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 21 .
+      Changelog:
+      * 0.1.1 Fixed page number
     
      */
     literalAnnotation,
 
     /**
-     * anchor of -> The string, which the uri is representing as an RDF Literal. Some use cases require this property, as it is necessary for certain sparql queries. 
+     * anchor of -> The string, which the URI is representing as an RDF Literal. Some use cases require this property, as it is necessary for certain sparql queries. 
      */
     anchorOf,
 

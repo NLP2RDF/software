@@ -25,12 +25,12 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.nlp2rdf</groupId>
+                <groupId>org.nlp2rdf.software</groupId>
                 <artifactId>stanford-core-wrapper</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.nlp2rdf</groupId>
+                <groupId>org.nlp2rdf.software</groupId>
                 <artifactId>stanford-core-webservice</artifactId>
                 <version>${project.version}</version>
             </dependency>

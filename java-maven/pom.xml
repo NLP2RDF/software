@@ -11,7 +11,7 @@
     <url>http://nlp2rdf.org</url>
     <properties>
         <!--  tell the compiler we can use 1.6 -->
-        <compiler.version>1.6</compiler.version>
+        <compiler.version>1.7</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -212,16 +212,10 @@
       as version is retrieved from the parent. - - Remember, default scope is compile
       in Maven. -->
         <dependencies>
-            <!--Junits-->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.8.1</version>
-                <scope>test</scope>
-            </dependency>
+
             <!--Dependencies that are generated as part of this parent pom-->
             <dependency>
-                <groupId>org.nlp2rdf</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>jena</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -230,6 +224,15 @@
                 <artifactId>persistence.uni-leipzig.org</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
             </dependency>
+
+            <!--Junits-->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.1</version>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>net.sf.jopt-simple</groupId>
                 <artifactId>jopt-simple</artifactId>

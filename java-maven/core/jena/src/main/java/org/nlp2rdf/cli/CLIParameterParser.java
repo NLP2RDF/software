@@ -7,8 +7,9 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.urischemes.RFC5147String;
+import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.URIScheme;
+import org.nlp2rdf.core.urischemes.URISchemeHelper;
 
 import java.io.*;
 import java.net.URI;
@@ -28,9 +29,9 @@ public class CLIParameterParser {
         OptionParser parser = new OptionParser();
         parser.acceptsAll(asList("h", "help"), "Show help.");
         parser.acceptsAll(asList("f", "informat"), "specifies input format (text,rdfxml,turtle,ntriples)").withRequiredArg().defaultsTo("turtle");
-        parser.acceptsAll(asList("t", "intype"), "specifies input type (direct,file,url)").withRequiredArg().defaultsTo("file");
+        parser.acceptsAll(asList("t", "intype"), "specifies input type (direct,file,url)").withRequiredArg().defaultsTo("direct");
         parser.acceptsAll(asList("i", "input"), "the actual input, per default a file with relative path with NIF RDF in turtle").withRequiredArg();
-        parser.acceptsAll(asList("o", "outformat"), "specifies output format (text, rdfxml, turtle, ntriples), text, means errors are written to stdout as log messages").withRequiredArg().defaultsTo("text");
+        parser.acceptsAll(asList("o", "outformat"), "specifies output format (text, rdfxml, turtle, ntriples), text, means errors are written to stdout as log messages").withRequiredArg().defaultsTo("turtle");
         parser.acceptsAll(asList("outfile"), "a NIF RDF file with the result of validation as RDF, only takes effect, if outformat is 'turtle' or 'rdfxml'").withRequiredArg().ofType(File.class).describedAs("RDF file");
         parser.acceptsAll(asList("testsuite"), "for debugging the testsuite, a local turtle file, that contains the testsuite").withRequiredArg().ofType(File.class).describedAs("a .ttl file with a test suite");
         //TODO:
@@ -63,59 +64,49 @@ public class CLIParameterParser {
     }
 
     public static NIFParameters parseOptions(OptionParser parser, OptionSet options) throws IOException {
-
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
 
 
-        //String inputtype = "file";
         String inputtype = (String) options.valueOf("t");
         String outformat = (String) options.valueOf("o");
-        // String outformat = "text";
-        // if (options.hasArgument("o")) {
-        //    outformat = (String) options.valueOf("o");
-        // }
-        /* if (options.hasArgument("t")) {
-            inputtype = (String) options.valueOf("t");
-            if (inputtype.equals("direct")) {
-                die(parser, "intype=direct (that is via command line) not implemented yet");
-            }
-        }*/
+        String informat = (String) options.valueOf("f");
+        URIScheme uriScheme = URISchemeHelper.getInstance((String) options.valueOf("f"));
+        if (informat.equals("json") || informat.equals("json-ld")) {
+            die(parser, "informat=json|json-ld not implemented yet");
+        }
+        String format = Format.toJena(informat);
+        String input = (String) options.valueOf("i");
 
-        String informat = "turtle";
-        if (options.hasArgument("f")) {
-            informat = (String) options.valueOf("f");
-            if (informat.equals("json") || informat.equals("text")) {
-                die(parser, "informat=json|text not implemented yet");
+
+        InputStream is = null;
+        try {
+            if (inputtype.equals("file")) {
+                is = new FileInputStream(new File(input));
+            } else if (inputtype.equals("url")) {
+                is = new URI(input).toURL().openStream();
+            } else if (inputtype.equals("direct")) {
+                is = new BufferedInputStream(System.in);
+            } else {
+                die(parser, "Option --intype=" + inputtype + " not known, use file|url");
             }
+        } catch (FileNotFoundException fne) {
+            fne.printStackTrace();
+            die(parser, "ERROR: file not found, maybe you have to switch --intype=url, file=" + input);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            die(parser, "ERROR: malformed URL in parameter input=" + input);
         }
 
-        if (options.hasArgument("i")) {
-            String format = Format.toJena(informat);
-            String input = (String) options.valueOf("i");
-            InputStream is = null;
-            try {
-                if (inputtype.equals("file")) {
-                    is = new FileInputStream(new File(input));
-                } else if (inputtype.equals("url")) {
-                    is = new URI(input).toURL().openStream();
-                } else if (inputtype.equals("direct")) {
-                    is = System.in;
-                } else {
-                    die(parser, "Option --intype=" + inputtype + " not known, use file|url");
-                }
-            } catch (FileNotFoundException fne) {
-                fne.printStackTrace();
-                die(parser, "ERROR: file not found, maybe you have to switch --intype=url, file=" + input);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                die(parser, "ERROR: malformed URL in parameter input=" + input);
-            }
-            model.read(is, "", format);
+        if (format.equals("text")) {
+            new Text2RDF().createContextIndividual((String) options.valueOf("p"), toString(System.in), uriScheme, model);
         } else {
-            die(parser, "input parameter required");
+            try {
+                model.read(is, "", format);
+            } catch (NullPointerException e) {
+                die(parser, "input parameter required");
+            }
         }
-        options.valueOf("u");
-        URIScheme uriScheme = new RFC5147String();
+
 
         return new NIFParameters(model, options, (String) options.valueOf("p"), (String) options.valueOf("lp"), uriScheme, null, outformat);
     }
@@ -126,6 +117,25 @@ public class CLIParameterParser {
         System.out.println();
         System.out.println(addHelp);
         System.exit(0);
+    }
+
+
+    public static String toString(InputStream in)
+            throws IOException {
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+            out.flush();
+        } finally {
+            in.close();
+            out.close();
+        }
+        return out.toString();
     }
 
 

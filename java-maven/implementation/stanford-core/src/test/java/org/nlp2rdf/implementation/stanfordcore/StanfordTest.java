@@ -69,7 +69,7 @@ public class StanfordTest {
         OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
         URIScheme uriScheme = new OffsetBasedString();
 
-        new StanfordCoreWrapper().processText("http://test/test/", "This is a sentence. ", uriScheme, m);
+       // new StanfordCoreWrapper().processText("http://test/test/", "This is a sentence. ", uriScheme, m);
         logger.info(m.toString());
 		//Assert.assertEquals(expected, m.toString());
     }

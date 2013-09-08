@@ -43,32 +43,38 @@ import java.util.TreeMap;
 public class Text2RDF {
     private static Logger log = LoggerFactory.getLogger(Text2RDF.class);
 
-    public Individual createContextIndividual(String prefix, String context, URIScheme uriScheme, OntModel model) {
-        Individual contextIndividual = createNIFIndividual(prefix, context, new Span(0, context.length()), uriScheme, model);
-        contextIndividual.addOntClass(NIFOntClasses.Context.getOntClass(model));
-        contextIndividual.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(model), context);
-        return contextIndividual;
+    public Individual createContextIndividual(String prefix, String contextString, URIScheme uriScheme, OntModel model) {
+        Span[] spans = new Span[]{new Span(0, contextString.length())};
+        String uri = uriScheme.generate(prefix, contextString, spans);
+        Individual context = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
+        context.addOntClass(NIFOntClasses.Context.getOntClass(model));
+        context.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(model), contextString);
+        return context;
     }
 
-    public static Individual createNIFIndividual(String prefix, String context, Span span, URIScheme uriScheme, OntModel model) {
+    public Individual createNIFIndividual(String prefix, Individual context, Span span, URIScheme uriScheme, OntModel model) {
         return createNIFIndividual(prefix, context, new Span[]{span}, uriScheme, model);
     }
 
-    public static Individual createNIFIndividual(String prefix, String context, Span[] spans, URIScheme uriScheme, OntModel model) {
-        //make the uri and add the class for the URI recipe
-        String uri = uriScheme.generate(prefix, context, spans);
-        Individual string = model.createIndividual(uri, NIFOntClasses.String.getOntClass(model));
-        string.addOntClass(model.createClass( uriScheme.getOWLClassURI()));
-        for (String text : URISchemeHelper.getCoveredTexts(spans, context)) {
+    public Individual createNIFIndividual(String prefix, Individual context, Span[] spans, URIScheme uriScheme, OntModel model) {
+        String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
+        String uri = uriScheme.generate(prefix, contextString, spans);
+        Individual string = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
+        for (String text : URISchemeHelper.getCoveredTexts(spans, contextString)) {
             string.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(model), text);
         }
+        for (Span s : spans) {
+            string.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), s.getStart() + "");
+            string.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), s.getEnd() + "");
+        }
+        string.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
         return string;
     }
 
-    public OntModel generateNIFModel(String prefix, String context, URIScheme uriScheme, OntModel model, TreeMap<Span, List<Span>> tokenizedText) {
+    public OntModel generateNIFModel(String prefix, Individual context, URIScheme uriScheme, OntModel model, TreeMap<Span, List<Span>> tokenizedText) {
         assert tokenizedText != null && context != null && uriScheme != null && prefix != null;
 
-        Individual contextIndividual = createContextIndividual(prefix, context, uriScheme, model);
+        String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
 
         //some stats
         Monitor mon = MonitorFactory.getTimeMonitor("generateNIFModel").start();
@@ -76,10 +82,9 @@ public class Text2RDF {
         int wordCount = 0;
         try {
             for (Span sentenceSpan : tokenizedText.descendingKeySet()) {
-                String sentenceUri = uriScheme.generate(prefix, context, sentenceSpan);
-                Individual sentenceIndividual = createNIFIndividual(prefix, context, sentenceSpan, uriScheme, model);
-                sentenceIndividual.addOntClass(NIFOntClasses.Sentence.getOntClass(model));
-                sentenceIndividual.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
+                //String sentenceUri = uriScheme.generate(prefix, contextString, sentenceSpan);
+                Individual sentence = createNIFIndividual(prefix, context, sentenceSpan, uriScheme, model);
+                sentence.addOntClass(NIFOntClasses.Sentence.getOntClass(model));
 
                 //detect words
                 List<Span> wordSpans = new ArrayList<Span>(tokenizedText.get(sentenceSpan));
@@ -89,11 +94,11 @@ public class Text2RDF {
                     Individual wordIndividual = createNIFIndividual(prefix, context, wordSpan, uriScheme, model);
                     wordIndividual.addOntClass(NIFOntClasses.Word.getOntClass(model));
                     wordIndividual.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
-                    wordIndividual.addProperty(NIFObjectProperties.sentence.getObjectProperty(model), sentenceIndividual);
+                    wordIndividual.addProperty(NIFObjectProperties.sentence.getObjectProperty(model), sentence);
 
                     if (log.isTraceEnabled()) {
                         StringBuilder logging = new StringBuilder();
-                        logging.append("\nword: " + wordSpan.getCoveredText(context));
+                        logging.append("\nword: " + wordSpan.getCoveredText(contextString));
                         logging.append("\nabsolute sentence position [start|end]: " + sentenceSpan.getStart() + "|" + sentenceSpan.getEnd());
                         logging.append("\nabsolute word position [start|end]: " + wordSpan.getStart() + "|" + wordSpan.getEnd());
                         log.trace(logging.toString());
@@ -103,7 +108,7 @@ public class Text2RDF {
             return model;
         } finally {
             mon.stop();
-            log.debug("Finished creating " + tokenizedText.size() + " sentence with " + wordCount + " words, " + mon.getLastValue() + " ms.) ");
+            log.debug("Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s), " + mon.getLastValue() + " ms.) ");
         }
     }
 

@@ -12,10 +12,12 @@
 
     <name>Stanford CoreNLP</name>
     <dependencies>
+
         <dependency>
-            <groupId>org.nlp2rdf</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>jena</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
@@ -99,6 +101,19 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.nlp2rdf.implementation.stanfordcore.StanfordCoreCLI</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
             </plugin>
 
         </plugins>

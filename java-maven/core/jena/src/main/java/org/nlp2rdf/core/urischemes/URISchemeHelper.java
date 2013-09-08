@@ -21,6 +21,7 @@
 
 package org.nlp2rdf.core.urischemes;
 
+import org.nlp2rdf.core.NIFNamespaces;
 import org.nlp2rdf.core.Span;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,29 @@ import java.net.URLEncoder;
  */
 public class URISchemeHelper {
     private static final Logger log = LoggerFactory.getLogger(URISchemeHelper.class);
+
+    /**
+     * transform the uriScheme parameter according to:
+     * http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html#urischeme
+     *
+     * @param uriSchemeParameter
+     */
+    public static URIScheme getInstance(String uriSchemeParameter) {
+
+        uriSchemeParameter = uriSchemeParameter.replace(NIFNamespaces.NIF, "");
+
+        switch (uriSchemeParameter) {
+            case "RFC5147String":
+                return new RFC5147String();
+            case "OffsetBasedString":
+                return new OffsetBasedString();
+            case "ContextHashBasedString":
+                return new ContextHashBasedString();
+            default:
+                return new RFC5147String();
+        }
+
+    }
 
     public static String[] getCoveredTexts(Span[] spans, String context) {
         String[] texts = new String[]{};

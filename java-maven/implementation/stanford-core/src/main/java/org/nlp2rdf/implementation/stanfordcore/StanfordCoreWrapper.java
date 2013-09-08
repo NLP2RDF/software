@@ -28,12 +28,16 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.trees.semgraph.SemanticGraph;
+import edu.stanford.nlp.trees.semgraph.SemanticGraphCoreAnnotations;
+import edu.stanford.nlp.trees.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
-import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.Span;
 import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.URIScheme;
-import org.nlp2rdf.vocabularymodule.olia.OLiAVocabulary;
+import org.nlp2rdf.core.vocab.NIFAnnotationProperties;
+import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
+import org.nlp2rdf.core.vocab.NIFObjectProperties;
 import org.nlp2rdf.vocabularymodule.olia.models.Penn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +62,8 @@ import java.util.TreeMap;
 public class StanfordCoreWrapper {
     private static Logger log = LoggerFactory.getLogger(StanfordCoreWrapper.class);
 
-    public void processText(String prefix, String context, URIScheme urischeme, OntModel model) {
-
+    public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model) {
+        String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
         /**
          * Prepare Stanford
          **/
@@ -72,7 +76,7 @@ public class StanfordCoreWrapper {
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
         // create an empty Annotation just with the given text
-        Annotation document = new Annotation(context);
+        Annotation document = new Annotation(contextString);
 
         // run all Annotators on this text
         pipeline.annotate(document);
@@ -94,15 +98,13 @@ public class StanfordCoreWrapper {
             tokenizedText.put(sentenceSpan, wordSpans);
         }
 
+
         /**
          * Basic Model Setup
          **/
         //get parameters for the URIGenerator
         Text2RDF text2RDF = new Text2RDF();
-        Individual contextIndividual = text2RDF.createContextIndividual(prefix, context, urischeme, model);
-
         text2RDF.generateNIFModel(prefix, context, urischeme, model, tokenizedText);
-
 
         // traversing the words in the current sentence
         // a CoreLabel is a CoreMap with additional token-specific methods
@@ -112,10 +114,10 @@ public class StanfordCoreWrapper {
             for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                 Span wordSpan = new Span(token.get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), token.get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
                 //the word should exist already
-                Individual wordIndividual = model.getIndividual(urischeme.generate(prefix, context, wordSpan));
+                Individual wordIndividual = model.getIndividual(urischeme.generate(prefix, contextString, wordSpan));
 
                 if (wordIndividual == null) {
-                    log.error("SKIPPING: word was not found in the model: " + urischeme.generate(prefix, context, wordSpan));
+                    log.error("SKIPPING: word was not found in the model: " + urischeme.generate(prefix, contextString, wordSpan));
                     continue;
                 }
                 /********************************
@@ -132,42 +134,138 @@ public class StanfordCoreWrapper {
                 String posTag = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
 
                 List<String> oliaIndividual = (List<String>) Penn.hasTag.get(posTag);
-                List<String> oliaClasses = (List<String>) Penn.hasTag.get(posTag);
 
                 for (String s : oliaIndividual) {
-                    wordIndividual.addProperty(OLiAVocabulary.getOliaIndividualProperty(model), model.createIndividual(oliaIndividual.get(0), OWL.Thing));
-                }
-
-                for (String s : oliaClasses) {
-                    wordIndividual.addProperty(OLiAVocabulary.getOliCategoryProperty(model), s);
+                    wordIndividual.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(model), model.createIndividual(oliaIndividual.get(0), OWL.Thing));
+                    for (String oc : (List<String>) Penn.links.get(s)) {
+                        wordIndividual.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), oc);
+                    }
+                    if (((List<String>) Penn.links.get(s)).isEmpty()) {
+                        log.error("missing links for: " + s);
+                    }
                 }
             }
-            // word.addPosTag(posTag);
-            //String oliaIndividual = null;
-            //if ((oliaIndividual = penn.getIndividualURIForTag(posTag)) != null) {
-            //    word.addOliaLink(Thing.create(oliaIndividual, model));
+
+
+            SemanticGraph dependencies = sentence.get(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class);
+
+            if (dependencies != null) {
+                // create relation annotations for each Stanford dependency
+                for (SemanticGraphEdge stanfordEdge : dependencies.edgeIterable()) {
+
+                    Span govSpan = new Span(stanfordEdge.getGovernor().get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), stanfordEdge.getGovernor().get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
+                    Span depSpan = new Span(stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
+                    String relationType = stanfordEdge.getRelation().toString();
+                    Individual gov = text2RDF.createNIFIndividual(prefix, context, govSpan, urischeme, model);
+                    Individual dep = text2RDF.createNIFIndividual(prefix, context, depSpan, urischeme, model);
+
+
+                    if (gov == null || dep == null) {
+                        log.error("SKIPPING Either gov or dep was null for the dependencies");
+                        log.error("gov: " + gov);
+                        log.error("dep: " + dep);
+                        continue;
+                    }
+
+                    /* Individual relation = null;//dependency.getOLiAIndividualForTag(relationType);
+
+           //in an ideal world, all used tags should also be in OLiA, this tends to be null sometimes
+           if (relation == null) {
+               log.error("reltype was null for: " + relationType);
+               continue;
+           }
+
+           ObjectProperty dependencyRelation = model.createObjectProperty(relation.getURI());
+           //add the property from governer to dependent
+           gov.addProperty(dependencyRelation, dep);
+
+
+           Set<String> classUris = dependency.getClassURIsForTag(relationType);
+           for (String cl : classUris) {
+               if (!cl.startsWith("http://purl.org/olia/stanford.owl")) {
+                   continue;
+               }
+               //add the property from governer to dependent
+               ObjectProperty nn = model.createObjectProperty(cl);
+               gov.addProperty(nn, dep);
+               dependencyRelation.addSuperProperty(nn);
+
+               //copy and transform the hierarchy
+               //removed for 2.0
+               //OLiAOntology.classHierarchy2PropertyHierarchy(dependency.getHierarchy(cl), model, "http://purl.org/olia/stanford.owl");
+           }
+       }             */
+
+                }
+            }//end sentences
+            /**************
+             * Syntax Tree
+             * */
+
+            //Tree tree = sentence.get(TreeAnnotation.class);
+            //if (tree != null) {
+            //removed for 2.0
+            //processTree(tree, urigenerator, prefix, text, model);
             //}
 
-            //adding pos classes from olia and olia-top
-            /* THIS WAS MOVED TO AN EXTRA MODULE
-            Set<String> classes = penn.getClassURIsForTag(posTag);
-            for (String classUri : classes) {
-                log.info("found: " + classUri + " for: " + posTag);
-                OntModel hierarchy = penn.getHierarchy(classUri);
-                for (ExtendedIterator<OntClass> it = hierarchy.listClasses(); it.hasNext(); ) {
-                    OntClass oc = it.next();
-                //use all classes
-                //if (oc.getURI().startsWith("http://purl.org/olia/olia-top.owl") || oc.getURI().startsWith("http://purl.org/olia/olia.owl")) {
-                    w.addOntClass(diff.createResource(oc.getURI()));
-                //}
-                }
-                //Copy the hierarchy
-                diff.add(hierarchy);
-            }
-            */
-
-        }//end token
+        }
     }
 }
 
+//log.info("Added lemma, pos, olia having " + (diff.size() - size) + " more triples.");
+//size = diff.size();
+//log.info("Added dependencies: " + (diff.size() - size) + " more triples.");
+//size = diff.size();
 
+
+/**public void processTree(Tree currentNode, URIGenerator uriGenerator, String prefix, String text, OntModel model) {
+ // String tag = currentNode.label().value();
+ //log.info("Current Node :" + currentNode);
+ //log.info("Label: " + currentNode.label() + "");
+ //log.info("Label Value: " + currentNode.label().value() + "");
+ //log.info("Preterminal: " + currentNode.isPreTerminal() + "");
+ //log.info("Index: " + ((CoreLabel) currentNode.label()).get(CharacterOffsetBeginAnnotation.class) + "");
+
+
+ if (currentNode.isLeaf()) {
+ //the node is a leaf and belongs in the realm of pos tagging
+ } else {
+ Phrase p = new Text2RDF().createStringAnnotationForClass(Phrase.class, prefix, text, getSpan(currentNode), uriGenerator, model);
+ List<Tree> children = currentNode.getChildrenAsList();
+ for (Tree child : children) {
+
+
+ /* if (false && child.isPreTerminal()) {
+ //skip preterminals
+ log.debug("skipping preterminal: "+currentNode);
+ log.debug("label: "+currentNode.label());
+ child = child.getChild(0);
+ Word childTerminal = new Text2RDF().createStringAnnotationForClass(Word.class, prefix, text, getSpan(child), uriGenerator, model);
+ p.addChild(childTerminal);
+ *
+ Phrase childPhrase = new Text2RDF().createStringAnnotationForClass(Phrase.class, prefix, text, getSpan(child), uriGenerator, model);
+ p.addChild(childPhrase);
+ processTree(child, uriGenerator, prefix, text, model);
+
+ log.info("Current Node :" + currentNode);
+ log.info("Label: " + currentNode.label() + "");
+ log.info("Label Value: " + currentNode.label().value() + "");
+ log.info("Preterminal: " + currentNode.isPreTerminal() + "");
+ //log.info("Index: " + ((CoreLabel) currentNode.label()).get(CharacterOffsetBeginAnnotation.class) + "");
+
+ //adding syntax classes from olia and olia-top
+ String tag = ((CoreLabel) currentNode.label()).get(CategoryAnnotation.class);
+ Set<String> classes = penn_syntax.getClassURIsForTag(tag);
+ for (String classUri : classes) {
+ log.info("found: " + classUri + " for: " + tag);
+ OntModel hierarchy = penn_syntax.getHierarchy(classUri);
+ for (ExtendedIterator<OntClass> it = hierarchy.listClasses(); it.hasNext(); ) {
+ OntClass oc = it.next();
+ p.addOntClass(model.createResource(oc.getURI()));
+ }
+ //Copy the hierarchy
+ model.add(hierarchy);
+ }
+ }
+ }
+ } */

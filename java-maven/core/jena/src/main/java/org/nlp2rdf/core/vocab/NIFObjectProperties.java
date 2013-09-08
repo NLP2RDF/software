@@ -25,13 +25,15 @@ public enum NIFObjectProperties {
     sourceUrl,
 
     /**
-     * TODO add label -> This property links a URI of type OccuringWord to other nif:String, that occur in the same context.
+     * TODO add label -> This property links a URI of type OccurringString to other nif:String, that occur in the same context.
      */
     occurrence,
 
     /**
      * annotation -> 
-      see Towards Web-Scale Collaborative Knowledge Extraction  http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 5 .
+      see Towards Web-Scale Collaborative Knowledge Extraction  http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 21 .
+      Changelog:
+      * 0.1.1 Fixed page number
     
      */
     annotation,
@@ -63,11 +65,6 @@ public enum NIFObjectProperties {
     superString,
 
     /**
-     * confidence level -> the level of confidence for this Annotation (introduced by STANBOL-631).
-     */
-    confidence_level,
-
-    /**
      * TODO add label -> see nif:nextSentence
      */
     previousWordTrans,
@@ -84,6 +81,9 @@ public enum NIFObjectProperties {
 
     /**
      * OLiA link -> This property links a string to a URI from one of the OLiA Annotation model, e.g. http://purl.org/olia/penn.owl#NNP 
+    Changelog:
+    0.1.1 - added subproperty of nif:annotation as per http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 21 
+    
      */
     oliaLink,
 
@@ -93,9 +93,20 @@ public enum NIFObjectProperties {
     firstWord,
 
     /**
-     * transitive version of superString -> see nif:subString
+     * transitive version of superString -> see nif:subStringTrans
      */
     superStringTrans,
+
+    /**
+     * inter -> 
+		This object property models a relation between two nif:Strings. The name "inter" is kept generic and can be used to express any kind of relation in between (inter) two nif:Strings. Extensions can create rdfs:subPropertyOf for "head", "dependent", nif:substring and nif:nextWord.  
+		
+		Changelog: 
+		* 0.1.0 initial commit of property "dependency"
+		* 0.2.0 changed name to "inter" which is more general than "dependency".
+    
+     */
+    inter,
 
     /**
      * narrower Context -> The inverse of nif:narrowerContext
@@ -118,17 +129,22 @@ public enum NIFObjectProperties {
     nextSentenceTrans,
 
     /**
-     * extracted from -> links a nif:String to a nif:Annotation .
-     */
-    extractedFrom,
-
-    /**
-     * has first word -> This property links sentences to their last word.
+     * has last word -> This property links sentences to their last word.
+	 Changelog:
+	 0.1.1 fixed label
+    
      */
     lastWord,
 
     /**
-     * transitive version of subString -> see nif:subString
+     * transitive version of subString -> transitive version of subString
+    
+    Inferences (nif-core-inf.ttl): 
+    Transitive definition kept in a different ontology
+    
+    Changelog:
+    * 0.1.0: Initial version.
+    
      */
     subStringTrans,
 

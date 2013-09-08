@@ -119,7 +119,7 @@ public class Generate {
         context.put("objectProperties", doit(model.listObjectProperties(), context));
         context.put("ontClasses", doit(model.listClasses(), context));
         context.put("individuals", doit(model.listIndividuals(), context));
-
+        context.put("annotationProperties", doit(model.listAnnotationProperties(), context));
         //StringWriter st = new StringWriter();
         //template.merge(context, st);
         //System.out.println(st.toString());

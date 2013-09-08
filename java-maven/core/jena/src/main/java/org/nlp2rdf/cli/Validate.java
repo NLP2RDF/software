@@ -28,7 +28,8 @@ public class Validate {
 
 
         SPARQLValidator sparqlValidator = null;
-        String testsuite = "org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl";
+        String defaultTestsuiteFile = "org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl";
+
         if (options.hasArgument("testsuite")) {
             File ttt = (File) options.valueOf("testsuite");
             if (!ttt.exists()) {
@@ -36,9 +37,9 @@ public class Validate {
             }
             sparqlValidator = SPARQLValidator.getInstance(ttt);
         } else {
-            sparqlValidator = SPARQLValidator.getInstance(testsuite);
+            sparqlValidator = SPARQLValidator.getInstance(defaultTestsuiteFile);
         }
-        System.err.println("NIF Validator for testsuite version " + sparqlValidator.getVersion() + ", " + sparqlValidator.getTests().size() + " tests total.");
+        System.err.println("NIF Validator for defaultTestsuiteFile version " + sparqlValidator.getVersion() + ", " + sparqlValidator.getTests().size() + " tests total.");
 
 
         OntModel validation;

@@ -20,7 +20,7 @@ public enum RLOGOntClasses {
     Level,
 
     /**
-     * Log Entry ->  An entry in a log. 
+     * Log Entry -> An entry in a log.
      */
     Entry;
 
