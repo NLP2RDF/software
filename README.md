@@ -29,7 +29,7 @@ java -jar validate.jar -i http://persistence.uni-leipzig.org/nlp2rdf/ontologies/
 ### Use directly with Maven
 ```Shell
 cd java-maven/core/jena
-mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.cli.Validate" -Dexec.args="-i nif-erroneous-model.ttl -o turtle"
+mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.cli.Validate" -Dexec.args="-i src/test/resources/nif-erroneous-model.ttl -o turtle"
 ```
 
 ### Build Validator Jar 

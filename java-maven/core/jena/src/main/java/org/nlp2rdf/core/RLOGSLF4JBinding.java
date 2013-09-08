@@ -15,6 +15,7 @@ import org.nlp2rdf.core.vocab.RLOGOntClasses;
 import org.slf4j.Logger;
 
 import java.util.Calendar;
+import java.util.UUID;
 
 /**
  * @author kurzum
@@ -40,7 +41,8 @@ public class RLOGSLF4JBinding {
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
         model.setNsPrefix("rlog", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#");
 
-        Resource r = model.createResource(logPrefix + level.name() + "_" + getCounter() + "_" + System.currentTimeMillis());
+        // urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6
+        Resource r = model.createResource(logPrefix + level.name() + "_" + UUID.randomUUID() + "_" + System.currentTimeMillis());
         r.addProperty(RDF.type, model.createResource(RLOGOntClasses.Entry.getUri()));
         r.addProperty(RLOGObjectProperties.level.getObjectProperty(model), model.createResource(level.getUri()));
         r.addProperty(RLOGDatatypeProperties.message.getDatatypeProperty(model), message);

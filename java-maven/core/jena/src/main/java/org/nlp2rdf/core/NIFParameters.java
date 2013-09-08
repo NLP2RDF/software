@@ -22,6 +22,7 @@
 package org.nlp2rdf.core;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import joptsimple.OptionSet;
 import org.nlp2rdf.core.urischemes.URIScheme;
 
 import java.util.Arrays;
@@ -33,7 +34,8 @@ import java.util.Map;
 public class NIFParameters {
 
     private final OntModel inputModel;
-    private final Map<String, String> parameterMap;
+    private Map<String, String> parameterMap;
+    private OptionSet options;
 
     private final String prefix;
     private final String logPrefix;
@@ -44,15 +46,26 @@ public class NIFParameters {
 
     //TODO add text and context[] list
     public NIFParameters(OntModel inputModel, Map<String, String> parameterMap, String prefix, String logPrefix, URIScheme uriScheme, String[] uriSchemeParameters, String outputFormat) {
-        this.inputModel = inputModel;
+        this(inputModel, prefix, logPrefix, uriScheme, uriSchemeParameters, outputFormat);
         this.parameterMap = parameterMap;
+        this.options = null;
+    }
+
+    public NIFParameters(OntModel inputModel, OptionSet options, String prefix, String logPrefix, URIScheme uriScheme, String[] uriSchemeParameters, String outputFormat) {
+        this(inputModel, prefix, logPrefix, uriScheme, uriSchemeParameters, outputFormat);
+        this.options = options;
+        this.parameterMap = null;
+    }
+
+
+    public NIFParameters(OntModel inputModel, String prefix, String logPrefix, URIScheme uriScheme, String[] uriSchemeParameters, String outputFormat) {
+        this.inputModel = inputModel;
         this.prefix = prefix;
         this.logPrefix = logPrefix;
         this.uriScheme = uriScheme;
         this.uriSchemeParameters = uriSchemeParameters;
         this.outputFormat = outputFormat;
     }
-
 
     @Override
     public String toString() {
@@ -96,5 +109,7 @@ public class NIFParameters {
         return outputFormat;
     }
 
-
+    public OptionSet getOptions() {
+        return options;
+    }
 }
