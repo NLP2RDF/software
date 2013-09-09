@@ -30,6 +30,7 @@ import org.nlp2rdf.core.urischemes.URISchemeHelper;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.vocab.NIFObjectProperties;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
+import org.nlp2rdf.core.vocab.RLOGIndividuals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +109,8 @@ public class Text2RDF {
             return model;
         } finally {
             mon.stop();
-            log.debug("Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s), " + mon.getLastValue() + " ms.) ");
+            model.add(RLOGSLF4JBinding.log("Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s), " + mon.getLastValue() + " ms.) ", RLOGIndividuals.DEBUG));
+            //log.debug();
         }
     }
 

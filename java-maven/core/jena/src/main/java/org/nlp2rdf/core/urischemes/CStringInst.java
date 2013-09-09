@@ -34,6 +34,7 @@ public class CStringInst extends AbstractURIScheme implements URIScheme {
     @Override
     public String generate(String prefix, String context, Span[] spans) {
         StringBuilder sb = new StringBuilder(prefix);
+        sb.append("uuid-");
         sb.append(UUID.randomUUID());
         return sb.toString();
     }

@@ -155,7 +155,6 @@ public class StanfordCoreWrapper {
             if (dependencies != null) {
                 // create relation annotations for each Stanford dependency
                 for (SemanticGraphEdge stanfordEdge : dependencies.edgeIterable()) {
-                    System.out.println(stanfordEdge);
 
                     Span govSpan = new Span(stanfordEdge.getGovernor().get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), stanfordEdge.getGovernor().get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
                     Span depSpan = new Span(stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
