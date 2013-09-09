@@ -39,6 +39,15 @@ public enum NIFObjectProperties {
     annotation,
 
     /**
+     * dependency -> 
+		A dependency relation pointing from gov to dep.
+		Changelog: 
+		* 0.1.0 initial commit of property "dependency"
+    
+     */
+    dependency,
+
+    /**
      * TODO add label -> see nif:nextSentence
      */
     previousWord,

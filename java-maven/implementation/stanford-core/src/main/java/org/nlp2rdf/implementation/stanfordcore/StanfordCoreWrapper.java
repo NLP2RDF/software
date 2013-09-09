@@ -22,6 +22,7 @@
 package org.nlp2rdf.implementation.stanfordcore;
 
 import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.vocabulary.OWL;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -34,11 +35,13 @@ import edu.stanford.nlp.trees.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
 import org.nlp2rdf.core.Span;
 import org.nlp2rdf.core.Text2RDF;
+import org.nlp2rdf.core.urischemes.CStringInst;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.NIFAnnotationProperties;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.vocab.NIFObjectProperties;
 import org.nlp2rdf.vocabularymodule.olia.models.Penn;
+import org.nlp2rdf.vocabularymodule.olia.models.Stanford;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +75,7 @@ public class StanfordCoreWrapper {
         //props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
         //props.put("annotators", "tokenize, ssplit, pos, lemma, parse, ner"); // ner,  dcoref");
         //props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
-        props.put("annotators", "tokenize, ssplit, pos, lemma"); // ner,  dcoref");
+        props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
         // create an empty Annotation just with the given text
@@ -136,7 +139,7 @@ public class StanfordCoreWrapper {
                 List<String> oliaIndividual = (List<String>) Penn.hasTag.get(posTag);
 
                 for (String s : oliaIndividual) {
-                    wordIndividual.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(model), model.createIndividual(oliaIndividual.get(0), OWL.Thing));
+                    wordIndividual.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(model), model.createIndividual(s, OWL.Thing));
                     for (String oc : (List<String>) Penn.links.get(s)) {
                         wordIndividual.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), oc);
                     }
@@ -152,13 +155,18 @@ public class StanfordCoreWrapper {
             if (dependencies != null) {
                 // create relation annotations for each Stanford dependency
                 for (SemanticGraphEdge stanfordEdge : dependencies.edgeIterable()) {
+                    System.out.println(stanfordEdge);
 
                     Span govSpan = new Span(stanfordEdge.getGovernor().get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), stanfordEdge.getGovernor().get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
                     Span depSpan = new Span(stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
-                    String relationType = stanfordEdge.getRelation().toString();
+                    //String relationType = stanfordEdge.getRelation().toString();
+
+                    ObjectProperty relation = model.createObjectProperty(new CStringInst().generate(prefix, contextString, new Span[]{}));
                     Individual gov = text2RDF.createNIFIndividual(prefix, context, govSpan, urischeme, model);
                     Individual dep = text2RDF.createNIFIndividual(prefix, context, depSpan, urischeme, model);
-
+                    gov.addProperty(relation,dep);
+                    relation.addSubProperty(NIFObjectProperties.inter.getObjectProperty(model));
+                    relation.addSubProperty(NIFObjectProperties.dependency.getObjectProperty(model));
 
                     if (gov == null || dep == null) {
                         log.error("SKIPPING Either gov or dep was null for the dependencies");
@@ -167,34 +175,48 @@ public class StanfordCoreWrapper {
                         continue;
                     }
 
+                    List<String> oliaIndividual = (List<String>) Stanford.hasTag.get(stanfordEdge.getRelation().getShortName());
+
+                    for (String s : oliaIndividual) {
+
+                        relation.addProperty(NIFAnnotationProperties.oliaPropLink.getAnnotationProperty(model),model.createIndividual(s, OWL.Thing));
+                        for (String oc : (List<String>) Stanford.links.get(s)) {
+                            relation.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), oc);
+                        }
+                        if (((List<String>) Stanford.links.get(s)).isEmpty()) {
+                            log.error("missing links for: " + s);
+                        }
+                    }
+
+
                     /* Individual relation = null;//dependency.getOLiAIndividualForTag(relationType);
 
-           //in an ideal world, all used tags should also be in OLiA, this tends to be null sometimes
-           if (relation == null) {
-               log.error("reltype was null for: " + relationType);
-               continue;
-           }
+                        //in an ideal world, all used tags should also be in OLiA, this tends to be null sometimes
+                        if (relation == null) {
+                            log.error("reltype was null for: " + relationType);
+                            continue;
+                        }
 
-           ObjectProperty dependencyRelation = model.createObjectProperty(relation.getURI());
-           //add the property from governer to dependent
-           gov.addProperty(dependencyRelation, dep);
+                        ObjectProperty dependencyRelation = model.createObjectProperty(relation.getURI());
+                        //add the property from governer to dependent
+                        gov.addProperty(dependencyRelation, dep);
 
 
-           Set<String> classUris = dependency.getClassURIsForTag(relationType);
-           for (String cl : classUris) {
-               if (!cl.startsWith("http://purl.org/olia/stanford.owl")) {
-                   continue;
-               }
-               //add the property from governer to dependent
-               ObjectProperty nn = model.createObjectProperty(cl);
-               gov.addProperty(nn, dep);
-               dependencyRelation.addSuperProperty(nn);
+                        Set<String> classUris = dependency.getClassURIsForTag(relationType);
+                        for (String cl : classUris) {
+                            if (!cl.startsWith("http://purl.org/olia/stanford.owl")) {
+                                continue;
+                            }
+                            //add the property from governer to dependent
+                            ObjectProperty nn = model.createObjectProperty(cl);
+                            gov.addProperty(nn, dep);
+                            dependencyRelation.addSuperProperty(nn);
 
-               //copy and transform the hierarchy
-               //removed for 2.0
-               //OLiAOntology.classHierarchy2PropertyHierarchy(dependency.getHierarchy(cl), model, "http://purl.org/olia/stanford.owl");
-           }
-       }             */
+                            //copy and transform the hierarchy
+                            //removed for 2.0
+                            //OLiAOntology.classHierarchy2PropertyHierarchy(dependency.getHierarchy(cl), model, "http://purl.org/olia/stanford.owl");
+                        }
+                    }*/
 
                 }
             }//end sentences

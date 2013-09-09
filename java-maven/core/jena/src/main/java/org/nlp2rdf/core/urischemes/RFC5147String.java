@@ -2,6 +2,7 @@ package org.nlp2rdf.core.urischemes;
 
 import org.nlp2rdf.core.NIFNamespaces;
 import org.nlp2rdf.core.Span;
+import org.nlp2rdf.core.vocab.NIFOntClasses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class RFC5147String extends AbstractURIScheme implements URIScheme {
 
     @Override
     public String getOWLClassURI() {
-        return NIFNamespaces.NIF + "RFC5147String";
+        return NIFOntClasses.RFC5147String.getUri();
     }
 
     @Override

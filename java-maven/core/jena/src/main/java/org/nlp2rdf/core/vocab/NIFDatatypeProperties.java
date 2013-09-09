@@ -11,7 +11,9 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 public enum NIFDatatypeProperties {
 
-
+    /**
+     * Part of speech tag -> To include the pos tag as it comes out of the NLP tool as RDF Literal. This property is discouraged to use alone, please use oliaLink and oliaCategory.  We included it, because some people might still want it and will even create their own property, if the string variant is missing 
+     */
     posTag,
 
     /**
