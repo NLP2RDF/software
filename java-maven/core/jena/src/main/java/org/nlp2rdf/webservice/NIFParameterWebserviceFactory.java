@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * User: Sebastian Hellmann
@@ -45,11 +47,10 @@ public class NIFParameterWebserviceFactory {
      * @param httpServletRequest
      * @return
      */
-    public static NIFParameters getInstance(HttpServletRequest httpServletRequest, String defaultPrefix) throws Exception {
-
+    public static NIFParameters getInstance(HttpServletRequest httpServletRequest, String defaultPrefix) throws ParameterException, IOException {
         NIFParameters nifParameters = null;
 
-        String[] args = new String[httpServletRequest.getParameterMap().size()];
+        String[] args = new String[httpServletRequest.getParameterMap().size()*2];
         int x = 0;
         for (Object key : httpServletRequest.getParameterMap().keySet()) {
             String pname = (String) key;
@@ -60,25 +61,20 @@ public class NIFParameterWebserviceFactory {
         }
 
         OptionParser parser = ParameterParser.getParser(args, defaultPrefix);
-        try {
-            OptionSet options = ParameterParser.getOption(parser, args);
+        OptionSet options = ParameterParser.getOption(parser, args);
 
 
-            // print help screen
-            if (options.has("h")) {
-                String addHelp = "";
-                throw new ParameterException(addHelp);
-            }
-
-            nifParameters = ParameterParser.parseOptions(options, false);
-            return nifParameters;
-        } catch (ParameterException e) {
-            //TODO
-            ParameterParser.die(parser, e.getMessage());
-            // main script
+        // print help screen
+        if (options.has("h")) {
+            String addHelp = "";
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            parser.printHelpOn(baos);
+            throw new ParameterException(baos.toString());
         }
 
+        nifParameters = ParameterParser.parseOptions(options, false);
         return nifParameters;
+
 
     }
 

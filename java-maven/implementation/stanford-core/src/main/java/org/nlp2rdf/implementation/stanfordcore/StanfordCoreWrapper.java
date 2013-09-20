@@ -45,6 +45,7 @@ import org.nlp2rdf.vocabularymodule.olia.models.Stanford;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -66,9 +67,14 @@ public class StanfordCoreWrapper {
     private static Logger log = LoggerFactory.getLogger(StanfordCoreWrapper.class);
 
 
-
     public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, String config) {
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
+
+        if(prefix==null || urischeme ==null || context == null || model == null || contextString==null)  {
+            System.out.println("jjadsdj");
+        System.exit(0);            ;
+        }
+
         /**
          * Prepare Stanford
          **/

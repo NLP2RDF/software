@@ -71,6 +71,7 @@ public abstract class NIFServlet extends HttpServlet {
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+            writeError(e.getMessage(),httpServletResponse);
             /*String msg = e.getMessage() + printParameterMap(httpServletRequest);
             log.error(msg);
             eu.lod2.nlp2rdf.schema.error.Error fatalerror = ErrorHandling.createError(true, requestUrl, msg, model);
@@ -83,6 +84,7 @@ public abstract class NIFServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
+            writeError(e.getMessage(),httpServletResponse);
             /*String msg = "An error occured: " + e.getMessage() + printParameterMap(httpServletRequest);
             log.error(msg, e);
             eu.lod2.nlp2rdf.schema.error.Error fatalerror = ErrorHandling.createError(true, requestUrl, msg, model);
@@ -112,6 +114,17 @@ public abstract class NIFServlet extends HttpServlet {
             throw new InvalidParameterException("There is no " + format + " output implemented at the moment. Sorry!");
         }
 
+
+    }
+
+    protected void writeError(String error, HttpServletResponse httpServletResponse) throws IOException {
+        httpServletResponse.setContentType("text/plain");
+        httpServletResponse.setCharacterEncoding("UTF-8");
+
+        //this is the printer where the output has to be on
+        PrintWriter pw = httpServletResponse.getWriter();
+        pw.println(error);
+        pw.close();
 
     }
 

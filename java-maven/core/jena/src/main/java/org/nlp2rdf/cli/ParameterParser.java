@@ -5,6 +5,7 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.apache.jena.riot.RiotParseException;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.Text2RDF;
@@ -106,7 +107,7 @@ public class ParameterParser {
                 is = new URI(input).toURL().openStream();
             } else if (inputtype.equals("direct")) {
                 if (input == null) {
-                    throw new ParameterException("input can not be empty, use '-I -  for stdin'");
+                    throw new ParameterException("input can not be empty, on CLI use '-I -  for stdin' or curl --data-urlencode @-");
                 } else if (input.equals("-")) {
                     is = new BufferedInputStream(System.in);
                 } else {
@@ -130,6 +131,8 @@ public class ParameterParser {
                 model.read(is, "", Format.toJena(informat));
             } catch (NullPointerException e) {
                 throw new ParameterException(" an error has occured while reading informat=" + informat + ", intype=" + inputtype + " and input=" + input.substring(0, 20) + "...", e);
+            } catch (RiotParseException rpe) {
+                throw new ParameterException("The RDF in the format " + informat + "is not well formed, please check parameter intype and informat", rpe);
             }
         }
 

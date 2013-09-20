@@ -119,6 +119,8 @@
                 <plugin>
                     <groupId>org.mortbay.jetty</groupId>
                     <artifactId>maven-jetty-plugin</artifactId>
+
+
                     <configuration>
                         <stopKey>stopKey</stopKey>
                         <stopPort>9999</stopPort>
@@ -130,6 +132,12 @@
                             <extended>false</extended>
                             <logTimeZone>GMT</logTimeZone>
                         </requestLog>
+                        <systemProperties>
+                            <systemProperty>
+                                <name>jetty.port</name>
+                                <value>8899</value>
+                            </systemProperty>
+                        </systemProperties>
                     </configuration>
                     <!--execution is used for testing-->
                     <!--executions>

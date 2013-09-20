@@ -6,7 +6,7 @@
     <display-name>NLP2RDF</display-name>
     <servlet>
         <servlet-name>stanfordcore</servlet-name>
-        <servlet-class>org.nlp2rdf.implementation.stanfordcore.NIFStanfordCoreWS</servlet-class>
+        <servlet-class>org.nlp2rdf.implementation.stanfordcore.StanfordCoreWS</servlet-class>
     </servlet>
 
     <servlet-mapping>
