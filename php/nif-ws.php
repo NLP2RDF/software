@@ -36,7 +36,7 @@ NIF-WS must accept values "url" and "direct" */
 $intype = (isset($_REQUEST['intype']))?$_REQUEST['intype']:"direct";
 //input required 	Determines the input in accordance with the intype and informat parameter.
 if(!isset($_REQUEST['input'])){
-	die("todo error");
+	die("input not set");
 }else{
 	$input = $_REQUEST['input'];
 }

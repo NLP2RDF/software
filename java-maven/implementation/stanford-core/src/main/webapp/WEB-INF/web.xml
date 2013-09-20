@@ -5,13 +5,13 @@
 <web-app>
     <display-name>NLP2RDF</display-name>
     <servlet>
-        <servlet-name>NIFStanfordCore</servlet-name>
-        <servlet-class>org.nlp2rdf.implementation.stanfordcore.NIFStanfordCore</servlet-class>
+        <servlet-name>stanfordcore</servlet-name>
+        <servlet-class>org.nlp2rdf.implementation.stanfordcore.NIFStanfordCoreWS</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>NIFStanfordCore</servlet-name>
-        <url-pattern>/NIFStanfordCore</url-pattern>
+        <servlet-name>stanfordcore</servlet-name>
+        <url-pattern>/stanfordcore</url-pattern>
     </servlet-mapping>
 
 </web-app>

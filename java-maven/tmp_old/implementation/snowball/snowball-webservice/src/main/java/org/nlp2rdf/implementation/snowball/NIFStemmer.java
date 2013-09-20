@@ -19,7 +19,7 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.   */
 /***************************************************************************/
 
-package org.nlp2rdf.implementation.snowball;
+package org.nlp2rdf.implementation.stanfordcore;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import org.nlp2rdf.core.ErrorHandling;

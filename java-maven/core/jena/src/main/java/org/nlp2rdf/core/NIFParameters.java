@@ -41,8 +41,10 @@ public class NIFParameters {
     private final String logPrefix;
     private final URIScheme uriScheme;
     private final String[] uriSchemeParameters;
-
     private final String outputFormat;
+
+    private String config;
+    private String configFile;
 
     //TODO add text and context[] list
     public NIFParameters(OntModel inputModel, Map<String, String> parameterMap, String prefix, String logPrefix, URIScheme uriScheme, String[] uriSchemeParameters, String outputFormat) {
@@ -60,6 +62,8 @@ public class NIFParameters {
 
     public NIFParameters(OntModel inputModel, String prefix, String logPrefix, URIScheme uriScheme, String[] uriSchemeParameters, String outputFormat) {
         this.inputModel = inputModel;
+        NIFNamespaces.addNifPrefix(inputModel);
+        NIFNamespaces.addRLOGPrefix(inputModel);
         this.prefix = prefix;
         this.logPrefix = logPrefix;
         this.uriScheme = uriScheme;
@@ -111,5 +115,21 @@ public class NIFParameters {
 
     public OptionSet getOptions() {
         return options;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    public String getConfigFile() {
+        return configFile;
+    }
+
+    public void setConfigFile(String configFile) {
+        this.configFile = configFile;
     }
 }

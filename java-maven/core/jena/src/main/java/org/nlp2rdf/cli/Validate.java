@@ -20,54 +20,77 @@ public class Validate {
 
     public static void main(String[] args) throws IOException {
 
-        OptionParser parser = CLIParameterParser.getParser(args, "http://cli.nlp2rdf.org/validate#");
-        OptionSet options = CLIParameterParser.getOption(parser, args);
-        NIFParameters nifParameters = CLIParameterParser.parseOptions(parser, options);
-        String outformat = nifParameters.getOutputFormat();
-        OntModel model = nifParameters.getInputModel();
+        OptionParser parser = ParameterParser.getParser(args, "http://cli.nlp2rdf.org/validate#");
+        try {
+            OptionSet options = ParameterParser.getOption(parser, args);
 
 
-        SPARQLValidator sparqlValidator = null;
-        String defaultTestsuiteFile = "org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl";
-
-        if (options.hasArgument("testsuite")) {
-            File ttt = (File) options.valueOf("testsuite");
-            if (!ttt.exists()) {
-                CLIParameterParser.die(parser, "testsuite ttl file does not exist: " + ttt.getAbsolutePath());
+            // print help screen
+            if (options.has("h")) {
+                String addHelp = "";
+                throw new ParameterException(addHelp);
             }
-            sparqlValidator = SPARQLValidator.getInstance(ttt);
-        } else {
-            sparqlValidator = SPARQLValidator.getInstance(defaultTestsuiteFile);
-        }
-        System.err.println("NIF Validator for defaultTestsuiteFile version " + sparqlValidator.getVersion() + ", " + sparqlValidator.getTests().size() + " tests total.");
+
+            //check whether web service and start, if necessary
+            if (options.has("start")) {
+                int portNumber = (Integer) options.valueOf("port");
+                System.err.println("Starting Web service at port " + portNumber);
+                System.err.println("web service not implemented yet");
+                System.exit(0);
+
+            }
+
+            NIFParameters nifParameters = ParameterParser.parseOptions(options, false);
+            String outformat = nifParameters.getOutputFormat();
+            OntModel model = nifParameters.getInputModel();
 
 
-        OntModel validation;
-        if (outformat.equals("text")) {
-            validation = sparqlValidator.validate(model);
+            SPARQLValidator sparqlValidator = null;
+            String defaultTestsuiteFile = "org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl";
 
-        } else if (outformat.equals("turtle") || outformat.equals("rdfxml") || outformat.equals("ntriples")) {
-            sparqlValidator.setQuiet(true);
-            validation = sparqlValidator.validate(model);
-            if (options.hasArgument("outfile")) {
-                File outfile = (File) options.valueOf("outfile");
-                validation.write(new FileOutputStream(outfile), Format.toJena(outformat));
+            if (options.hasArgument("testsuite")) {
+                File ttt = (File) options.valueOf("testsuite");
+                if (!ttt.exists()) {
+                    ParameterParser.die(parser, "testsuite ttl file does not exist: " + ttt.getAbsolutePath());
+                }
+                sparqlValidator = SPARQLValidator.getInstance(ttt);
             } else {
-                validation.write(System.out, Format.toJena(outformat));
+                sparqlValidator = SPARQLValidator.getInstance(defaultTestsuiteFile);
             }
-        } else {
-            validation = sparqlValidator.validate(model);
+            System.err.println("NIF Validator for defaultTestsuiteFile version " + sparqlValidator.getVersion() + ", " + sparqlValidator.getTests().size() + " tests total.");
+
+
+
+            if (outformat.equals("text")) {
+                model.add(sparqlValidator.validate(model));
+
+            } else if (outformat.equals("turtle") || outformat.equals("rdfxml") || outformat.equals("ntriples")) {
+                sparqlValidator.setQuiet(true);
+                model.add(sparqlValidator.validate(model));
+                if (options.hasArgument("outfile")) {
+                    File outfile = (File) options.valueOf("outfile");
+                    model.write(new FileOutputStream(outfile), Format.toJena(outformat));
+                } else {
+                    model.write(System.out, Format.toJena(outformat));
+                }
+            } else {
+                model.add(sparqlValidator.validate(model));
+            }
+
+            System.err.println(model.listIndividuals(model.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " messages found.");
+            // TODO: some handling for inaccessible files or overwriting existing files
+            //File f = (File) options.valueOf("o");
+
+            // if plain and file option is given, redirect System.out to a file
+            /*if (options.has("o") && (!options.has("f") || options.valueOf("f").equals("plain"))) {
+               PrintStream printStream = new PrintStream(new FileOutputStream(f));
+               System.setOut(printStream);
+           } */
+        } catch (ParameterException e) {
+            ParameterParser.die(parser, e.getMessage());
+            // main script
         }
 
-        System.err.println(validation.listIndividuals(validation.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " messages found.");
-        // TODO: some handling for inaccessible files or overwriting existing files
-        //File f = (File) options.valueOf("o");
-
-        // if plain and file option is given, redirect System.out to a file
-        /*if (options.has("o") && (!options.has("f") || options.valueOf("f").equals("plain"))) {
-           PrintStream printStream = new PrintStream(new FileOutputStream(f));
-           System.setOut(printStream);
-       } */
 
     }
 

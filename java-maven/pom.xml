@@ -26,6 +26,7 @@
         <module>vocabularymodule</module>
         <module>implementation</module>
         <module>tools</module>
+        <!--module>untitled</module-->
         <!--module>ontologies/utilities/owl2java</module-->
     </modules>
 
@@ -335,6 +336,11 @@
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-snowball</artifactId>
+                <version>3.0.3</version>
             </dependency>
 
 

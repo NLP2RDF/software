@@ -65,7 +65,9 @@ import java.util.TreeMap;
 public class StanfordCoreWrapper {
     private static Logger log = LoggerFactory.getLogger(StanfordCoreWrapper.class);
 
-    public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model) {
+
+
+    public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, String config) {
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
         /**
          * Prepare Stanford
@@ -75,7 +77,13 @@ public class StanfordCoreWrapper {
         //props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
         //props.put("annotators", "tokenize, ssplit, pos, lemma, parse, ner"); // ner,  dcoref");
         //props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
-        props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
+        if(config==null){
+            props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
+        }  else{
+            //TODO implement parsing
+            props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
+        }
+
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
         // create an empty Annotation just with the given text
@@ -161,8 +169,8 @@ public class StanfordCoreWrapper {
                     //String relationType = stanfordEdge.getRelation().toString();
 
                     ObjectProperty relation = model.createObjectProperty(new CStringInst().generate(prefix, contextString, new Span[]{}));
-                    Individual gov = text2RDF.createNIFIndividual(prefix, context, govSpan, urischeme, model);
-                    Individual dep = text2RDF.createNIFIndividual(prefix, context, depSpan, urischeme, model);
+                    Individual gov = text2RDF.createCStringIndividual(prefix, context, govSpan, urischeme, model);
+                    Individual dep = text2RDF.createCStringIndividual(prefix, context, depSpan, urischeme, model);
                     gov.addProperty(relation,dep);
                     relation.addSubProperty(NIFObjectProperties.inter.getObjectProperty(model));
                     relation.addSubProperty(NIFObjectProperties.dependency.getObjectProperty(model));

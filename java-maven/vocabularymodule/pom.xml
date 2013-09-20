@@ -14,7 +14,7 @@
     <modules>
         <!--module>opennlp</module-->
         <module>OLiA</module>
-        <!--module>snowball</module-->
+        <!--module>stanfordcore</module-->
         <!--module>demo</module-->
         <!--module>lexo</module-->
         <!--module>sample</module-->

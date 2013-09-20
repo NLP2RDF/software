@@ -1,0 +1,182 @@
+package org.nlp2rdf.cli;
+
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import org.nlp2rdf.core.Format;
+import org.nlp2rdf.core.NIFParameters;
+import org.nlp2rdf.core.Text2RDF;
+import org.nlp2rdf.core.urischemes.URIScheme;
+import org.nlp2rdf.core.urischemes.URISchemeHelper;
+
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import static java.util.Arrays.asList;
+
+/**
+ * User: hellmann
+ * Date: 07.09.13
+ */
+public class ParameterParser {
+
+
+    public static OptionParser getParser(String[] args, String defaultPrefix) throws IOException {
+
+        // all default and required options according to:
+        // http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html
+        OptionParser parser = new OptionParser();
+        parser.acceptsAll(asList("h", "help"), "Show help.");
+        parser.acceptsAll(asList("info"), "Display implementation information.");
+
+        // web service
+        parser.acceptsAll(asList("start"), "Starts the Web Service, if implemented.");
+        parser.acceptsAll(asList("port"), "If start is called, this param specifies the port number. ").withRequiredArg().ofType(Integer.class).defaultsTo(8896);
+        parser.acceptsAll(asList("c", "config"), "a string specifying the config of the component.").withRequiredArg();
+
+
+        //  parameter that are expected to exist
+        parser.acceptsAll(asList("f", "informat"), "specifies input format  as turtle, json-ld or text (or optionally as rdfxml, ntriples, html, ...)").withRequiredArg().defaultsTo("turtle");
+        parser.acceptsAll(asList("t", "intype"), "specifies input type (direct,url, file)").withRequiredArg().defaultsTo("direct");
+        parser.acceptsAll(asList("i", "input"), "the actual input data, retrieved (a) via stdin (intype=direct, --input - ,  NIF-CLI), (b) given directly (--input \"\", NIF-CLI) ,  via POST/GET (intype=direct, NIF-WS), via URL (intype=url) or via file (intype=file, NIF-CLI)").withRequiredArg();
+        parser.acceptsAll(asList("o", "outformat"), "specifies output format as turtle, json-ld or text (or optionally ntriples, rdfxml, html, etc.)").withRequiredArg().defaultsTo("turtle");
+        parser.acceptsAll(asList("p", "prefix"), "specifies the prefix of the generated URIs").withRequiredArg().defaultsTo(defaultPrefix);
+        parser.acceptsAll(asList("lp", "logprefix"), "specifies the prefix of the generated log URIs").withRequiredArg().defaultsTo("text");
+        parser.acceptsAll(asList("u", "urischeme"), "specifies the syntax of the identifier of the URIs").withRequiredArg().defaultsTo("RFC5147String");
+
+
+        //TODO:
+
+        // parse options and display a message for the user in case of problems
+
+        return parser;
+
+    }
+
+    public static void addTestsuiteParameter(OptionParser parser) {
+        parser.acceptsAll(asList("testsuite"), "for debugging the testsuite, a local turtle file, that contains the testsuite").withRequiredArg().ofType(File.class).describedAs("a .ttl file with a test suite");
+
+    }
+
+    public static void addOutFileParameter(OptionParser parser) {
+        parser.acceptsAll(asList("outfile"), "a NIF RDF file with the result of validation as RDF, only takes effect, if outformat is 'turtle' or 'rdfxml'").withRequiredArg().ofType(File.class).describedAs("RDF file");
+    }
+
+
+    /**
+     * Parses the NIF options into an object, note that "start" and "port" have to be treated separately
+     *
+     * @param options
+     * @return
+     * @throws IOException
+     * @throws ParameterException
+     */
+    public static NIFParameters parseOptions(OptionSet options, boolean isWebService) throws IOException, ParameterException {
+        OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+
+        String inputtype = (String) options.valueOf("t");
+        String outformat = (String) options.valueOf("o");
+        String informat = (String) options.valueOf("f");
+        URIScheme uriScheme = URISchemeHelper.getInstance((String) options.valueOf("f"));
+
+        /** Implementation check **/
+        switch (informat) {
+            case "turtle":
+                break;
+            case "text":
+                break;
+            default:
+                throw new ParameterException("informat=" + informat + " not implemented yet");
+        }
+
+        String input = (String) options.valueOf("i");
+        if (isWebService && (input == null || !options.hasArgument("i"))) {
+            throw new ParameterException("Parameter input=$data was not set properly");
+        }
+
+
+        InputStream is = null;
+        try {
+            if (inputtype.equals("file")) {
+                is = new FileInputStream(new File(input));
+            } else if (inputtype.equals("url")) {
+                is = new URI(input).toURL().openStream();
+            } else if (inputtype.equals("direct")) {
+                if (input == null) {
+                    throw new ParameterException("input can not be empty, use '-I -  for stdin'");
+                } else if (input.equals("-")) {
+                    is = new BufferedInputStream(System.in);
+                } else {
+                    is = new ByteArrayInputStream(input.getBytes());
+                }
+            } else {
+                throw new ParameterException("Option --intype=\" + inputtype + \" not known, use direct|file|url");
+            }
+        } catch (FileNotFoundException fne) {
+            fne.printStackTrace();
+            throw new ParameterException("ERROR: file not found, maybe you have to switch --intype=url, file=" + input);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            throw new ParameterException("ERROR: malformed URL in parameter input=" + input);
+        }
+
+        if (informat.equals("text")) {
+            new Text2RDF().createContextIndividual((String) options.valueOf("p"), toString(is), uriScheme, model);
+        } else {
+            try {
+                model.read(is, "", Format.toJena(informat));
+            } catch (NullPointerException e) {
+                throw new ParameterException(" an error has occured while reading informat=" + informat + ", intype=" + inputtype + " and input=" + input.substring(0, 20) + "...", e);
+            }
+        }
+
+        NIFParameters np = new NIFParameters(model, options, (String) options.valueOf("p"), (String) options.valueOf("lp"), uriScheme, null, outformat);
+        // set additional parameters
+        np.setConfig((String) options.valueOf("config"));
+        return np;
+    }
+
+    public static OptionSet getOption(OptionParser parser, String[] args) throws IOException, ParameterException {
+        OptionSet options = null;
+        try {
+            options = parser.parse(args);
+        } catch (Exception e) {
+            throw new ParameterException("Error: " + e.getMessage() + ". Use -h to get help.", e);
+        }
+
+
+        return options;
+    }
+
+
+    public static void die(OptionParser parser, String addHelp) throws IOException {
+        parser.printHelpOn(System.out);
+        System.out.println();
+        System.out.println(addHelp);
+        System.exit(0);
+    }
+
+
+    public static String toString(InputStream in)
+            throws IOException {
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+            out.flush();
+        } finally {
+            in.close();
+            out.close();
+        }
+        return out.toString();
+    }
+
+
+}

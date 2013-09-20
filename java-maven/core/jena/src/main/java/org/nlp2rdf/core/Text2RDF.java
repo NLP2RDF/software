@@ -45,32 +45,30 @@ public class Text2RDF {
     private static Logger log = LoggerFactory.getLogger(Text2RDF.class);
 
     public Individual createContextIndividual(String prefix, String contextString, URIScheme uriScheme, OntModel model) {
-        Span[] spans = new Span[]{new Span(0, contextString.length())};
-        String uri = uriScheme.generate(prefix, contextString, spans);
+        Span span = new Span(0, contextString.length());
+        String uri = uriScheme.generate(prefix, contextString, span);
         Individual context = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
         context.addOntClass(NIFOntClasses.Context.getOntClass(model));
         context.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(model), contextString);
+        context.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "");
+        context.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "");
         return context;
     }
 
-    public Individual createNIFIndividual(String prefix, Individual context, Span span, URIScheme uriScheme, OntModel model) {
-        return createNIFIndividual(prefix, context, new Span[]{span}, uriScheme, model);
-    }
 
-    public Individual createNIFIndividual(String prefix, Individual context, Span[] spans, URIScheme uriScheme, OntModel model) {
+    public Individual createCStringIndividual(String prefix, Individual context, Span span, URIScheme uriScheme, OntModel model) {
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
-        String uri = uriScheme.generate(prefix, contextString, spans);
+        String uri = uriScheme.generate(prefix, contextString, new Span[]{span});
         Individual string = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
-        for (String text : URISchemeHelper.getCoveredTexts(spans, contextString)) {
+        for (String text : URISchemeHelper.getCoveredTexts(new Span[]{span}, contextString)) {
             string.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(model), text);
         }
-        for (Span s : spans) {
-            string.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), s.getStart() + "");
-            string.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), s.getEnd() + "");
-        }
+        string.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "");
+        string.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "");
         string.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
         return string;
     }
+
 
     public OntModel generateNIFModel(String prefix, Individual context, URIScheme uriScheme, OntModel model, TreeMap<Span, List<Span>> tokenizedText) {
         assert tokenizedText != null && context != null && uriScheme != null && prefix != null;
@@ -84,7 +82,7 @@ public class Text2RDF {
         try {
             for (Span sentenceSpan : tokenizedText.descendingKeySet()) {
                 //String sentenceUri = uriScheme.generate(prefix, contextString, sentenceSpan);
-                Individual sentence = createNIFIndividual(prefix, context, sentenceSpan, uriScheme, model);
+                Individual sentence = createCStringIndividual(prefix, context, sentenceSpan, uriScheme, model);
                 sentence.addOntClass(NIFOntClasses.Sentence.getOntClass(model));
 
                 //detect words
@@ -92,7 +90,7 @@ public class Text2RDF {
                 wordCount += wordSpans.size();
                 for (int i = 0; i < wordSpans.size(); i++) {
                     Span wordSpan = wordSpans.get(i);
-                    Individual wordIndividual = createNIFIndividual(prefix, context, wordSpan, uriScheme, model);
+                    Individual wordIndividual = createCStringIndividual(prefix, context, wordSpan, uriScheme, model);
                     wordIndividual.addOntClass(NIFOntClasses.Word.getOntClass(model));
                     wordIndividual.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
                     wordIndividual.addProperty(NIFObjectProperties.sentence.getObjectProperty(model), sentence);

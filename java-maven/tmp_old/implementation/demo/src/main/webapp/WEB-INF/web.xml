@@ -10,7 +10,7 @@
     </servlet>
     <servlet>
         <servlet-name>NIFStemmer</servlet-name>
-        <servlet-class>org.nlp2rdf.implementation.snowball.NIFStemmer</servlet-class>
+        <servlet-class>org.nlp2rdf.implementation.stanfordcore.NIFStemmer</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>NIFOpenNLP</servlet-name>

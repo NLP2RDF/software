@@ -19,7 +19,7 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.   */
 /***************************************************************************/
 
-package org.nlp2rdf.implementation.snowball;
+package org.nlp2rdf.implementation.stanfordcore;
 
 /**
  * User: Sebastian Hellmann - http://bis.informatik.uni-leipzig.de/SebastianHellmann

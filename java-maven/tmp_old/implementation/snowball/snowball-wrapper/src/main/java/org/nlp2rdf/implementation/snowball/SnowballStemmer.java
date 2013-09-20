@@ -19,7 +19,7 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.   */
 /***************************************************************************/
 
-package org.nlp2rdf.implementation.snowball;
+package org.nlp2rdf.implementation.stanfordcore;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -38,8 +38,8 @@ import java.util.*;
 
 /**
  * A Wrapper for Tartarus' Snowball Stemmer.
- * The name of a class from org.tartarus.snowball.ext.  can be given to initialize the stemmer
- * see: http://lucene.apache.org/java/2_4_0/api/contrib-snowball/index.html
+ * The name of a class from org.tartarus.stanfordcore.ext.  can be given to initialize the stemmer
+ * see: http://lucene.apache.org/java/2_4_0/api/contrib-stanfordcore/index.html
  * <p/>
  * This decorator attaches the stem to each :Word it finds.
  * <p/>
@@ -63,14 +63,14 @@ public class SnowballStemmer extends SnowballProgram {
     }
 
     /**
-     * @param stemmerClass a class from the following list http://lucene.apache.org/java/2_4_0/api/contrib-snowball/index.html
+     * @param stemmerClass a class from the following list http://lucene.apache.org/java/2_4_0/api/contrib-stanfordcore/index.html
      */
     public SnowballStemmer(String stemmerClass) {
         openNLPTokenizer = new OpenNLPTokenizer();
         try {
-            decoratee = (SnowballProgram) Class.forName("org.tartarus.snowball.ext." + stemmerClass).newInstance();
+            decoratee = (SnowballProgram) Class.forName("org.tartarus.stanfordcore.ext." + stemmerClass).newInstance();
         } catch (Exception e) {
-            String msg = "Correct class was not given please use e.g. \"PorterStemmer\"  from: http://lucene.apache.org/java/2_4_0/api/contrib-snowball/index.html\n" + "Received: " + stemmerClass + " transformed to org.tartarus.snowball.ext." + stemmerClass;
+            String msg = "Correct class was not given please use e.g. \"PorterStemmer\"  from: http://lucene.apache.org/java/2_4_0/api/contrib-stanfordcore/index.html\n" + "Received: " + stemmerClass + " transformed to org.tartarus.stanfordcore.ext." + stemmerClass;
             log.error(msg, e);
             throw new InvalidParameterException(msg);
         }

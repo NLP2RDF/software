@@ -6,7 +6,7 @@
     <display-name>NIF Wrapper Snowball</display-name>
     <servlet>
         <servlet-name>NIFStemmer</servlet-name>
-        <servlet-class>org.nlp2rdf.implementation.snowball.NIFStemmer</servlet-class>
+        <servlet-class>org.nlp2rdf.implementation.stanfordcore.NIFStemmer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>NIFStemmer</servlet-name>
