@@ -48,18 +48,24 @@ public class NIFParameterWebserviceFactory {
      * @return
      */
     public static NIFParameters getInstance(HttpServletRequest httpServletRequest, String defaultPrefix) throws ParameterException, IOException {
-        NIFParameters nifParameters = null;
 
-        String[] args = new String[httpServletRequest.getParameterMap().size()*2];
+        //twice the size to split key value
+        String[] args = new String[httpServletRequest.getParameterMap().size() * 2];
+
         int x = 0;
+
         for (Object key : httpServletRequest.getParameterMap().keySet()) {
             String pname = (String) key;
+            //transform key to CLI style
             pname = (pname.length() == 1) ? "-" + pname : "--" + pname;
+
+            //collect CLI args
             args[x++] = pname;
             args[x++] = (String) httpServletRequest.getParameter((String) key);
 
         }
 
+        //parse CLI args
         OptionParser parser = ParameterParser.getParser(args, defaultPrefix);
         OptionSet options = ParameterParser.getOption(parser, args);
 
@@ -72,11 +78,6 @@ public class NIFParameterWebserviceFactory {
             throw new ParameterException(baos.toString());
         }
 
-        nifParameters = ParameterParser.parseOptions(options, false);
-        return nifParameters;
-
-
+        return ParameterParser.parseOptions(options, false);
     }
-
-
 }
