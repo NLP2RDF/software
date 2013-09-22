@@ -7,6 +7,7 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.nlp2rdf.core.vocab.RLOGDatatypeProperties;
 import org.nlp2rdf.core.vocab.RLOGIndividuals;
@@ -22,32 +23,45 @@ import java.util.UUID;
  */
 public class RLOGSLF4JBinding {
     private static int counter = 0;
-    public static String defaultlogprefix = "http://nlp2rdf.lod2.eu/instance/log/id_";
+    public static String defaultlogprefix = "urn:uuid:";
+    //public static String defaultlogprefix = "http://nlp2rdf.lod2.eu/instance/log/id_";
 
     public static Model log(String message, RLOGIndividuals level) {
-        return log(defaultlogprefix, message, level, null, null);
-    }
-
-    public static Model log(String message, RLOGIndividuals level, Logger logger) {
-        return log(defaultlogprefix, message, level, null, logger);
-    }
-
-    public static Model log(String logPrefix, String message, RLOGIndividuals level, Logger logger) {
-        return log(logPrefix, message, level, null, logger);
+        return log(defaultlogprefix, message, level, null, null, null);
     }
 
 
-    public static OntModel log(String logPrefix, String message, RLOGIndividuals level, String resourceURI, Logger logger) {
+
+
+    /**
+     * the last three can be null
+     * log( message, level, null, null, null);
+     * log(defaultlogprefix, message, level, null, null, null);
+     *
+     * @param logPrefix
+     * @param message
+     * @param level
+     * @param dc_creator
+     * @param resourceURI
+     * @param logger
+     * @return
+     */
+    public static OntModel log(String logPrefix, String message, RLOGIndividuals level, String dc_creator, String resourceURI, Logger logger) {
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
         model.setNsPrefix("rlog", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#");
 
         // urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6
-        Resource r = model.createResource(logPrefix + level.name() + "_" + UUID.randomUUID() + "_" + System.currentTimeMillis());
+//        Resource r = model.createResource(logPrefix + level.name() + "_" + UUID.randomUUID() + "_" + System.currentTimeMillis());
+        Resource r = model.createResource(logPrefix + UUID.randomUUID());
         r.addProperty(RDF.type, model.createResource(RLOGOntClasses.Entry.getUri()));
         r.addProperty(RLOGObjectProperties.level.getObjectProperty(model), model.createResource(level.getUri()));
-        r.addProperty(RLOGDatatypeProperties.message.getDatatypeProperty(model), message);
+        r.addProperty(RLOGDatatypeProperties.message.getDatatypeProperty(model), model.createLiteral(message));
         XSDDateTime date = new XSDDateTime(Calendar.getInstance());
         r.addProperty(RLOGDatatypeProperties.date.getDatatypeProperty(model), date.toString(), date.getNarrowedDatatype());
+
+        if (dc_creator != null) {
+            r.addProperty(DC.creator, model.createLiteral(dc_creator));
+        }
 
         if (resourceURI != null) {
             r.addProperty(RLOGObjectProperties.resource.getObjectProperty(model), model.createResource(resourceURI));

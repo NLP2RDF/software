@@ -77,7 +77,9 @@ public class Validate {
                 model.add(sparqlValidator.validate(model));
             }
 
-            System.err.println(model.listIndividuals(model.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " messages found.");
+
+
+            System.err.println(model.listIndividuals(model.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " log messages found (could be debug messages, errors are displayed separately).");
             // TODO: some handling for inaccessible files or overwriting existing files
             //File f = (File) options.valueOf("o");
 

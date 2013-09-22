@@ -26,11 +26,9 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.urischemes.URIScheme;
-import org.nlp2rdf.core.urischemes.URISchemeHelper;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.vocab.NIFObjectProperties;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
-import org.nlp2rdf.core.vocab.RLOGIndividuals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +47,7 @@ public class Text2RDF {
         String uri = uriScheme.generate(prefix, contextString, span);
         Individual context = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
         context.addOntClass(NIFOntClasses.Context.getOntClass(model));
-        context.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(model), contextString);
+        context.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(model), model.createLiteral(contextString));
         context.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "");
         context.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "");
         return context;
@@ -60,9 +58,7 @@ public class Text2RDF {
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
         String uri = uriScheme.generate(prefix, contextString, new Span[]{span});
         Individual string = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
-        for (String text : URISchemeHelper.getCoveredTexts(new Span[]{span}, contextString)) {
-            string.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(model), text);
-        }
+        string.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(model), model.createLiteral(span.getCoveredText(contextString).toString()));
         string.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "");
         string.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "");
         string.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
@@ -70,7 +66,7 @@ public class Text2RDF {
     }
 
 
-    public OntModel generateNIFModel(String prefix, Individual context, URIScheme uriScheme, OntModel model, TreeMap<Span, List<Span>> tokenizedText) {
+    public void generateNIFModel(String prefix, Individual context, URIScheme uriScheme, OntModel model, TreeMap<Span, List<Span>> tokenizedText) {
         assert tokenizedText != null && context != null && uriScheme != null && prefix != null;
 
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
@@ -104,11 +100,8 @@ public class Text2RDF {
                     }
                 }
             }
-            return model;
         } finally {
             mon.stop();
-            model.add(RLOGSLF4JBinding.log("Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s), " + mon.getLastValue() + " ms.) ", RLOGIndividuals.DEBUG));
-            //log.debug();
         }
     }
 

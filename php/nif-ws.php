@@ -1,147 +1,244 @@
 <?php
+define("NIF","http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#");
+define("RLOG","http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#");
+define("RDF","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+
+// example:
+// curl  -H "Content Type: text/plain" -H "Accept: application/rdf+xml" "http://localhost/nif-ws.php?input=This+is+a+sentence."
+
 /********
  * Configuration
  * *****/
-
-$dynamicPrefix = false;
-$defaultPrefix = "http://localhost/text/" ;
-$defaultLogPrefix = "" ;
 $defaultPrefix = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."#";
+$now = microtime(true);
+
+/******
+ * INFO or HELP
+ */
+$help = "This is the NIF 2.0 implementation of http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html . Note that the implementation is neither complete nor correct:
+Implemented:
+- outformat=html will produce some data categories from ITS 2.0 
+- in/out can also be ntriples/rdfxml/json
 
 
 
+Not implemented:
+- only urischeme=RFC5147String is implemented
+- for intype=url , informat=text is not implemented
+- ld+json
+ ";
+ //- rewrite = true replace the prefix, please use oldprefix parameter: str_replace($oldprefix,$prefix,$uri);
+ 
+if(isset($_REQUEST['help']) || isset($_REQUEST['h']) || isset($_REQUEST['info']) ){
+	die($help)	;
+}
 /*******
  * Implementation
  * *****/
  
-//informat default: turtle 	Determines in which format the input is given. NIF-SI must accept values "text", "turtle", "rdfxml", "ntriples". NIF-SI may additionally accept "json", "html", "pdf" and others.
+//Normalize paramenters to long form
+$_REQUEST['informat'] = (isset($_REQUEST['f']))?$_REQUEST['f']:@$_REQUEST['informat'];
+$_REQUEST['input'] = (isset($_REQUEST['i']))?$_REQUEST['i']:@$_REQUEST['input'];
+$_REQUEST['intype'] = (isset($_REQUEST['t']))?$_REQUEST['i']:@$_REQUEST['intype'];
+$_REQUEST['outformat'] = (isset($_REQUEST['o']))?$_REQUEST['o']:@$_REQUEST['outformat'];
+$_REQUEST['urischeme'] = (isset($_REQUEST['u']))?$_REQUEST['u']:@$_REQUEST['urischeme'];
+$_REQUEST['prefix'] = (isset($_REQUEST['p']))?$_REQUEST['p']:@$_REQUEST['prefix'];
+ 
+ 
+//defaults
 $informat = (isset($_REQUEST['informat']))?$_REQUEST['informat']:"turtle";
-
-//TODO
-$outformat = (isset($_REQUEST['outformat']))?$_REQUEST['outformat']:"turtle";
-
-if (stristr($_SERVER['HTTP_ACCEPT'], "text/plain")){
-	$outformat = "text";
-}else if(stristr($_SERVER['HTTP_ACCEPT'], "text/turtle")){
-	$outformat = "turtle";
-}else if(stristr($_SERVER['HTTP_ACCEPT'], "application/rdf+xml")){
-	$outformat = "rdfxml";
-	}
-
-/*intype NIF-CLI default: file NIF-WS default: direct 	Determines how the input is accessed or retrieved. Possible values are:
-*    direct - input is read from stdin or HTTP parameter (GET) or body (POST).
-*    url - NIF-SI retrieves the input from the URL.
-*    file - input is read from a local file (relative or absolute path) .
-NIF-WS must accept values "url" and "direct" */
 $intype = (isset($_REQUEST['intype']))?$_REQUEST['intype']:"direct";
-//input required 	Determines the input in accordance with the intype and informat parameter.
-if(!isset($_REQUEST['input'])){
-	die("input not set");
-}else{
-	$input = $_REQUEST['input'];
-}
-
-//urischeme default: RFC5147String 	Determines the urischeme to be used. Must be the full URI of the scheme of the OWL class. In case the namespace is "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#" it can be omitted for brevity. Allowed values: "RFC5147String", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#RFC5147String", etc.
-//TODO implement this
+$outformat = (isset($_REQUEST['outformat']))?$_REQUEST['outformat']:"turtle";
 $urischeme = (isset($_REQUEST['urischeme']))?$_REQUEST['urischeme']:"RFC5147String";
-//urischemeparameters optional 	Some parameters for certain urischemes, e.g. contextlength 
-
-//prefix 	A prefix, which is used to create any URIs. Therefore the client should ensure, that the prefix is valid, when used at the start of the uri, e.g. http://test.de/test#. It is recommended that the client matches the prefix to the previously used prefix. If the parameter is missing it should be substituted by a sensible default (e.g. the web service uri).
 $prefix = (isset($_REQUEST['prefix']))?$_REQUEST['prefix']:$defaultPrefix;
-$logPrefix = (isset($_REQUEST['logPrefix']))?$_REQUEST['logPrefix']:$defaultLogPrefix;
+//$rewrite = (isset($_REQUEST['rewrite']))?$_REQUEST['rewrite']:false;
+//$oldprefix = (isset($_REQUEST['oldprefix']))?$_REQUEST['oldprefix']:;
 
-if($dynamicPrefix === true && $informat==="text"){
-	$prefix .= urlencode($input)."#";
+if (stristr(@$_SERVER['HTTP_ACCEPT'], "text/plain")){
+	$outformat = "text";
+}if (stristr(@$_SERVER['HTTP_ACCEPT'], "text/html")){
+	$outformat = "html";
+}else if(stristr(@$_SERVER['HTTP_ACCEPT'], "text/turtle")){
+	$outformat = "turtle";
+}else if(stristr(@$_SERVER['HTTP_ACCEPT'], "application/rdf+xml")){
+	$outformat = "rdfxml";
+}else if(stristr(@$_SERVER['HTTP_ACCEPT'], "application/ld+json")){
+	die($help);
+}else if(stristr(@$_SERVER['HTTP_ACCEPT'], "application/n-triples")){
+	$outformat = "ntriples";
 }
 
+if (stristr(@$_SERVER['HTTP_CONTENT_TYPE'], "text/plain")){
+	$informat = "text";
+}if (stristr(@$_SERVER['HTTP_CONTENT_TYPE'], "text/html")){
+	$informat = "html";
+	die($help);
+}else if(stristr(@$_SERVER['HTTP_CONTENT_TYPE'], "text/turtle")){
+	$informat = "turtle";
+}else if(stristr(@$_SERVER['HTTP_CONTENT_TYPE'], "application/rdf+xml")){
+	$informat = "rdfxml";
+}else if(stristr(@$_SERVER['HTTP_CONTENT_TYPE'], "application/ld+json")){
+	die($help);
+}else if(stristr(@$_SERVER['HTTP_CONTENT_TYPE'], "application/n-triples")){
+	$informat = "ntriples";
+}
 
-//notimplemented
-if($intype != "direct" || $urischeme != "RFC5147String" ) {
-	die("only intype=direct and urischeme=RFC5147String implemented at the moment.") ;
-	}
+// some validation
+if(!isset($_REQUEST['input'])){
+	die("input not set see: http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html");
+}
+if($urischeme != "RFC5147String" ){
+	die($help);
+}
+if($intype === "url" && $informat==="text" ){
+	die($help);	
+}
+
+$input = $_REQUEST['input'];
 
 include("ARC2/ARC2.php");
-
-$nifdata = null;
-$text = null;
-$parser = null;
-$triples = null;
-if($intype === "direct") {
-	if($informat==="text"){ 
-		$length = strlen($input);
-		$nifdata = "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
-		<".$prefix."char=0,$length> 
-			a nif:RFC5147String , nif:Context ;
-			nif:beginIndex \"0\";
-			nif:endIndex \"$length\";
-			nif:isString \"\"\"$input\"\"\". ";
-
-		$parser = ARC2::getTurtleParser();
-		$parser->parse($prefix, $nifdata);
-		$triples = $parser->getTriples();
-		$text = $input;
-	}else if($informat==="turtle"){
-		$parser = ARC2::getTurtleParser();
-		$parser->parse($prefix, $input);
-		$triples = $parser->getTriples();
-		$text = getTextFromTriples($triples);
-	}else if($informat==="rdfxml"){
-		$parser = ARC2::getRDFXMLParser();
-		$parser->parse($prefix, $input);
-		$triples = $parser->getTriples();
-		$text = getTextFromTriples($triples);
-	} 
+$logmessage = "";
+// treat text
+if($intype === "direct" && $informat==="text"){ 
+	$length = strlen($input);
+	$input = "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
+	@prefix prefix: <".$prefix."> .
+	<".$prefix."char=0,$length> 
+		a nif:RFC5147String , nif:Context ;
+		nif:beginIndex \"0\";
+		nif:endIndex \"$length\";
+		nif:isString \"\"\"$input\"\"\". ";
+	$logmessage.="Converted text to NIF.\n";
 }
+//now it's turtle
+$informat = "turtle";
+$parser = ARC2::getRDFParser();;
+if($intype === "direct") {
+	$triples = $parser->parse($prefix, $input);
+}else if ($intype === "url"){
+	$triples = $parser->parse($input);
+	}
+$triples = $parser->getTriples();
+$logmessage.="Retrieved ".count($triples)." triples. ";
+$newtriples = array();
+$newtriples = expand($parser);
+//write a log
+$logmessage.="Created ".count($newtriples)." new triples. Used ".round(memory_get_peak_usage()/1000000,2)."mb max memory. Needed ".round((microtime(true)-$now),2)."ms";
+$loguri =  uniqid ("urn:php:",true);
+$log=array();
+$log[]=addTripleAllURIs($loguri,RLOG.'level',RLOG.'DEBUG' );
+$log[]=addTripleLiteral($loguri,RLOG.'message',$logmessage );
+$log[]=addTripleLiteral($loguri,'http://purl.org/dc/elements/1.1/creator',"http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+$log[]=addTripleAllURIs($loguri,RDF.'type',RLOG.'Entry' );
+$objDateTime = new DateTime('NOW');
+$time= $objDateTime->format(DateTime::W3C ); 
+$log[]=array('type'=>'triple','s'=>$loguri, 'p'=>NIF."date",'o'=>$time, 's_type' => 'uri', 'p_type'=> 'uri', 'o_type' => 'literal', 'o_datatype'=>'http://www.w3.org/2001/XMLSchema#dateTime');
+
+$triples = array_merge($triples, $newtriples,$log);
 
 /****
  * Out
  * ****/
  $ns = array(
        'p' => trim($prefix) ,
-       'nif' => 'http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#',
+       'nif' => NIF,
        'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-       'owl' => 'http://www.w3.org/2002/07/owl#'
+       'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+       'owl' => 'http://www.w3.org/2002/07/owl#',
+       'rlog' => 'http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#',
+       'dc'  => 'http://purl.org/dc/elements/1.1/' 
       );
+      
+
+$ser = null;
+switch ($outformat){
+	case "turtle": $ser = ARC2::getTurtleSerializer(array('ns' => $ns)); break;
+	case "rdfxml":  $ser = ARC2::getRDFXMLSerializer(array('ns' => $ns)); break;
+	case "json":  $ser = ARC2::getRDFJSONSerializer(array('ns' => $ns)); break;
+	case "ntriples":  $ser = ARC2::getNTriplesSerializer(array('ns' => $ns)); break;
+	
+} 
  
 if ($outformat == "turtle"){
-        $ser = ARC2::getTurtleSerializer(array('ns' => $ns));
         $output = $ser->getSerializedTriples($triples);
         header("Content-Type: text/turtle");
-
-        echo $output;
-}
-else if ($outformat == "rdfxml"){
-        $ser = ARC2::getRDFXMLSerializer(array('ns' => $ns));
+}else if ($outformat == "rdfxml"){
         $output = $ser->getSerializedTriples($triples);
         header("Content-Type: application/rdf+xml");
-	
-        echo $output;
-}
-else if ($outformat == "json"){
+}else if ($outformat == "json"){
         $ser = ARC2::getRDFJSONSerializer(array('ns' => $ns));
         $output = $ser->getSerializedTriples($triples);
-        header("Content-Type: application/json");
-	
-        echo $output;
-}
-else if ($outformat == "ntriples"){
-        $ser = ARC2::getNTriplesSerializer(array('ns' => $ns));
+}else if ($outformat == "ntriples"){
         $output = $ser->getSerializedTriples($triples);
         header("Content-Type: text/plain");
-	
-        echo $output;
 }else if ($outformat == "text"){
+		$output = getTextFromTriples($triples);
         header("Content-Type: text/plain");
-	
-        echo $text;
 }
-
+ echo $output;
 
 
 function getTextFromTriples($triples){
 	foreach( $triples as $t ){
-			if($t['p'] === "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"){
+			if($t['p'] === NIF."isString"){
 				return 	$t['o'];
 			}
 	}
 }
+
+function expand($parser){
+	$index = $parser->getSimpleIndex(0);
+	$triples=array();
+	$sentences=array();
+	foreach ($index as $uri=>$array){
+		if(isset($array[NIF.'beginIndex'])){
+			$beginIndex = $array[NIF.'beginIndex'][0]['value'];
+			$endIndex = $array[NIF.'endIndex'][0]['value'];
+			$referenceContext = $array[NIF.'referenceContext'][0]['value'];
+			$anchorOf =  substr($index[$referenceContext][NIF.'isString'][0]['value'],$beginIndex,$endIndex-$beginIndex);
+			$triples[]=addTripleLiteral($uri, NIF.'anchorOf',$anchorOf); 
+			
+			if(isset($array[NIF.'sentence'])){
+				$sentence = $array[NIF.'sentence'][0]['value'];
+				$sentences[$sentence][$beginIndex] = $uri; 
+			}	
+		}
+	}
+	
+	// sort them
+	foreach ($sentences as $sentence=>$words){
+			ksort($words);
+			$sentences[$sentence]=$words;
+	}
+	
+	foreach ($sentences as $sentence=>$words){
+		$first=true;
+		$previous = "";
+		foreach($words as $beginIndex=>$uri){
+			
+			$triples[]=addTripleAllURIs($sentence, NIF."word",$uri);
+			if(!$first){
+				$triples[]=addTripleAllURIs($previous, NIF."nextWord",$uri);
+				$triples[]=addTripleAllURIs($uri, NIF."nextWord",$previous);
+			}else{
+				$triples[]=addTripleAllURIs($sentence, NIF."firstWord",$uri);
+				$first=false;
+			}
+			$previous=$uri;
+		}
+		$triples[]=addTripleAllURIs($sentence, NIF."lastWord",$uri);
+	}
+	return $triples;
+}
+
+function addTripleAllURIs($s_uri, $p_uri, $o_uri){
+		return array('type'=>'triple','s'=>$s_uri, 'p'=>$p_uri,'o'=>$o_uri, 's_type' => 'uri', 'p_type'=> 'uri', 'o_type' => 'uri');
+	}
+
+function addTripleLiteral($s_uri, $p_uri, $literal){
+		return array('type'=>'triple','s'=>$s_uri, 'p'=>$p_uri,'o'=>$literal, 's_type' => 'uri', 'p_type'=> 'uri', 'o_type' => 'literal');
+	}
+
+
+
+

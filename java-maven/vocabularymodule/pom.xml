@@ -12,14 +12,7 @@
     <name>Vocabulary Module for NIF</name>
 
     <modules>
-        <!--module>opennlp</module-->
         <module>OLiA</module>
-        <!--module>stanfordcore</module-->
-        <!--module>demo</module-->
-        <!--module>lexo</module-->
-        <!--module>sample</module-->
-        <!--module>lingpipe</module-->
-
     </modules>
 
     <dependencyManagement>

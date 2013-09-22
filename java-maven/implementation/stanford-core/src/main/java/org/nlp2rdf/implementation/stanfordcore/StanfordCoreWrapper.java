@@ -33,19 +33,20 @@ import edu.stanford.nlp.trees.semgraph.SemanticGraph;
 import edu.stanford.nlp.trees.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.trees.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
+import org.nlp2rdf.core.NIFParameters;
+import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.Span;
 import org.nlp2rdf.core.Text2RDF;
-import org.nlp2rdf.core.urischemes.CStringInst;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.NIFAnnotationProperties;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.vocab.NIFObjectProperties;
-import org.nlp2rdf.vocabularymodule.olia.models.Penn;
-import org.nlp2rdf.vocabularymodule.olia.models.Stanford;
+import org.nlp2rdf.core.vocab.RLOGIndividuals;
+import org.nlp2rdf.vm.dep.StanfordSimple;
+import org.nlp2rdf.vm.olia.models.Penn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -59,6 +60,8 @@ import java.util.TreeMap;
  * The original file by Steven Bethard can be found here:
  * http://code.google.com/p/cleartk/source/browse/trunk/cleartk-stanford-corenlp/src/main/java/org/cleartk/stanford/StanfordCoreNLPAnnotator.java
  * Licence http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * <p/>
+ * Debug with  echo -n "This is a sentence." | mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.stanfordcore.StanfordCoreCLI" -Dexec.args="-f text -i -" | less
  *
  * @author Sebastian Hellmann - http://bis.informatik.uni-leipzig.de/SebastianHellmann
  */
@@ -67,13 +70,9 @@ public class StanfordCoreWrapper {
     private static Logger log = LoggerFactory.getLogger(StanfordCoreWrapper.class);
 
 
-    public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, String config) {
+    public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, NIFParameters nifParameters) {
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
 
-        if(prefix==null || urischeme ==null || context == null || model == null || contextString==null)  {
-            System.out.println("jjadsdj");
-        System.exit(0);            ;
-        }
 
         /**
          * Prepare Stanford
@@ -83,9 +82,9 @@ public class StanfordCoreWrapper {
         //props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
         //props.put("annotators", "tokenize, ssplit, pos, lemma, parse, ner"); // ner,  dcoref");
         //props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
-        if(config==null){
+        if (nifParameters.getConfig() == null) {
             props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
-        }  else{
+        } else {
             //TODO implement parsing
             props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
         }
@@ -122,6 +121,7 @@ public class StanfordCoreWrapper {
         //get parameters for the URIGenerator
         Text2RDF text2RDF = new Text2RDF();
         text2RDF.generateNIFModel(prefix, context, urischeme, model, tokenizedText);
+        //                                                                            model.add(RLOGSLF4JBinding.log("Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s), " + mon.getLastValue() + " ms.) ", RLOGIndividuals.DEBUG));
 
         // traversing the words in the current sentence
         // a CoreLabel is a CoreMap with additional token-specific methods
@@ -155,10 +155,10 @@ public class StanfordCoreWrapper {
                 for (String s : oliaIndividual) {
                     wordIndividual.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(model), model.createIndividual(s, OWL.Thing));
                     for (String oc : (List<String>) Penn.links.get(s)) {
-                        wordIndividual.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), oc);
+                        wordIndividual.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), model.createClass(oc));
                     }
                     if (((List<String>) Penn.links.get(s)).isEmpty()) {
-                        log.error("missing links for: " + s);
+                        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "missing oliaLinks for " + s, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
                     }
                 }
             }
@@ -167,6 +167,9 @@ public class StanfordCoreWrapper {
             SemanticGraph dependencies = sentence.get(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class);
 
             if (dependencies != null) {
+                //time to add the prefix
+                StanfordSimple.addStanfordSimplePrefix(model);
+
                 // create relation annotations for each Stanford dependency
                 for (SemanticGraphEdge stanfordEdge : dependencies.edgeIterable()) {
 
@@ -174,32 +177,34 @@ public class StanfordCoreWrapper {
                     Span depSpan = new Span(stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
                     //String relationType = stanfordEdge.getRelation().toString();
 
-                    ObjectProperty relation = model.createObjectProperty(new CStringInst().generate(prefix, contextString, new Span[]{}));
+                    String edgeURI = StanfordSimple.getURIforEdgeLabel(stanfordEdge.getRelation().getShortName());
+
+                    //ObjectProperty relation = model.createObjectProperty(new CStringInst().generate(prefix, contextString, new Span[]{}));
+                    ObjectProperty relation = model.createObjectProperty(edgeURI);
                     Individual gov = text2RDF.createCStringIndividual(prefix, context, govSpan, urischeme, model);
                     Individual dep = text2RDF.createCStringIndividual(prefix, context, depSpan, urischeme, model);
-                    gov.addProperty(relation,dep);
-                    relation.addSubProperty(NIFObjectProperties.inter.getObjectProperty(model));
-                    relation.addSubProperty(NIFObjectProperties.dependency.getObjectProperty(model));
+                    gov.addProperty(relation, dep);
+                    relation.addSuperProperty(NIFObjectProperties.inter.getObjectProperty(model));
+                    relation.addSuperProperty(NIFObjectProperties.dependency.getObjectProperty(model));
 
                     if (gov == null || dep == null) {
-                        log.error("SKIPPING Either gov or dep was null for the dependencies");
-                        log.error("gov: " + gov);
-                        log.error("dep: " + dep);
+                        String message = "SKIPPING Either gov or dep was null for the dependencies\n" + "gov: " + gov + "\ndep: " + dep;
+                        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), message, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
                         continue;
                     }
 
-                    List<String> oliaIndividual = (List<String>) Stanford.hasTag.get(stanfordEdge.getRelation().getShortName());
+                    //  List<String> oliaIndividual = (List<String>) Stanford.hasTag.get(stanfordEdge.getRelation().getShortName());
 
-                    for (String s : oliaIndividual) {
+                    /** for (String s : oliaIndividual) {
 
-                        relation.addProperty(NIFAnnotationProperties.oliaPropLink.getAnnotationProperty(model),model.createIndividual(s, OWL.Thing));
-                        for (String oc : (List<String>) Stanford.links.get(s)) {
-                            relation.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), oc);
-                        }
-                        if (((List<String>) Stanford.links.get(s)).isEmpty()) {
-                            log.error("missing links for: " + s);
-                        }
-                    }
+                     relation.addProperty(NIFAnnotationProperties.oliaPropLink.getAnnotationProperty(model), model.createIndividual(s, OWL.Thing));
+                     for (String oc : (List<String>) Stanford.links.get(s)) {
+                     relation.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), oc);
+                     }
+                     if (((List<String>) Stanford.links.get(s)).isEmpty()) {
+                     log.error("missing links for: " + s);
+                     }
+                     } **/
 
 
                     /* Individual relation = null;//dependency.getOLiAIndividualForTag(relationType);
@@ -244,6 +249,7 @@ public class StanfordCoreWrapper {
             //}
 
         }
+
     }
 }
 

@@ -111,7 +111,8 @@ public class SPARQLValidator {
                 rli = RLOGIndividuals.ALL;
             }
 
-            model.add(RLOGSLF4JBinding.log(logPrefix, (message == null) ? "null at " + relatedResource : message.getString(), rli, relatedResource.getURI(), (quiet) ? null : log));
+            String m = (message == null) ? "null at " + relatedResource : message.getString();
+            model.add(RLOGSLF4JBinding.log(logPrefix, m, rli, this.getClass().getCanonicalName(), relatedResource.getURI(), (quiet) ? null : log));
 
         }
         return model;

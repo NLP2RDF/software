@@ -8,6 +8,7 @@ import joptsimple.OptionSet;
 import org.apache.jena.riot.RiotParseException;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
+import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.urischemes.URISchemeHelper;
@@ -45,7 +46,7 @@ public class ParameterParser {
         parser.acceptsAll(asList("i", "input"), "the actual input data, retrieved (a) via stdin (intype=direct, --input - ,  NIF-CLI), (b) given directly (--input \"\", NIF-CLI) ,  via POST/GET (intype=direct, NIF-WS), via URL (intype=url) or via file (intype=file, NIF-CLI)").withRequiredArg();
         parser.acceptsAll(asList("o", "outformat"), "specifies output format as turtle, json-ld or text (or optionally ntriples, rdfxml, html, etc.)").withRequiredArg().defaultsTo("turtle");
         parser.acceptsAll(asList("p", "prefix"), "specifies the prefix of the generated URIs").withRequiredArg().defaultsTo(defaultPrefix);
-        parser.acceptsAll(asList("lp", "logprefix"), "specifies the prefix of the generated log URIs").withRequiredArg().defaultsTo("text");
+        parser.acceptsAll(asList("lp", "logprefix"), "specifies the prefix of the generated log URIs").withRequiredArg().defaultsTo(RLOGSLF4JBinding.defaultlogprefix);
         parser.acceptsAll(asList("u", "urischeme"), "specifies the syntax of the identifier of the URIs").withRequiredArg().defaultsTo("RFC5147String");
 
 
@@ -107,7 +108,7 @@ public class ParameterParser {
                 is = new URI(input).toURL().openStream();
             } else if (inputtype.equals("direct")) {
                 if (input == null) {
-                    throw new ParameterException("input can not be empty, on CLI use '-I -  for stdin' or curl --data-urlencode @-");
+                    throw new ParameterException("input can not be empty, on CLI use '-i -  for stdin' or curl --data-urlencode @-");
                 } else if (input.equals("-")) {
                     is = new BufferedInputStream(System.in);
                 } else {
@@ -130,7 +131,7 @@ public class ParameterParser {
             try {
                 model.read(is, "", Format.toJena(informat));
             } catch (NullPointerException e) {
-                throw new ParameterException(" an error has occured while reading informat=" + informat + ", intype=" + inputtype + " and input=" + input.substring(0, 20) + "...", e);
+                throw new ParameterException("an error has occured while reading informat=" + informat + ", intype=" + inputtype + " and input=" + input.substring(0, 20) + "...", e);
             } catch (RiotParseException rpe) {
                 throw new ParameterException("The RDF in the format " + informat + "is not well formed, please check parameter intype and informat", rpe);
             }
