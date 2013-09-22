@@ -10,6 +10,7 @@ define("RDF","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
  * Configuration
  * *****/
 $defaultPrefix = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."#";
+//.'?id='.md5($_REQUEST['input'])
 $now = microtime(true);
 
 /******
@@ -19,9 +20,6 @@ $help = "This is the NIF 2.0 implementation of http://persistence.uni-leipzig.or
 Implemented:
 - outformat=html will produce some data categories from ITS 2.0 
 - in/out can also be ntriples/rdfxml/json
-
-
-
 Not implemented:
 - only urischeme=RFC5147String is implemented
 - for intype=url , informat=text is not implemented
@@ -108,7 +106,7 @@ if($intype === "direct" && $informat==="text"){
 		nif:beginIndex \"0\";
 		nif:endIndex \"$length\";
 		nif:isString \"\"\"$input\"\"\". ";
-	$logmessage.="Converted text to NIF.\n";
+	$logmessage.="Converted text to NIF. ";
 }
 //now it's turtle
 $informat = "turtle";
@@ -119,11 +117,16 @@ if($intype === "direct") {
 	$triples = $parser->parse($input);
 	}
 $triples = $parser->getTriples();
-$logmessage.="Retrieved ".count($triples)." triples. ";
+
+if(count($triples)===0){
+	die($help."\n\nERROR: Could not create any triples, please check input: informat=$informat, intype=$intype\n");
+}
+
+$logmessage.="Retrieved/created ".count($triples)." triples. ";
 $newtriples = array();
 $newtriples = expand($parser);
 //write a log
-$logmessage.="Created ".count($newtriples)." new triples. Used ".round(memory_get_peak_usage()/1000000,2)."mb max memory. Needed ".round((microtime(true)-$now),2)."ms";
+$logmessage.="Created ".count($newtriples)." new triple(s). Used ".round(memory_get_peak_usage()/1000000,2)."mb max memory. Needed ".round((microtime(true)-$now),2)."ms";
 $loguri =  uniqid ("urn:php:",true);
 $log=array();
 $log[]=addTripleAllURIs($loguri,RLOG.'level',RLOG.'DEBUG' );
@@ -175,7 +178,7 @@ if ($outformat == "turtle"){
 		$output = getTextFromTriples($triples);
         header("Content-Type: text/plain");
 }
- echo $output;
+echo $output;
 
 
 function getTextFromTriples($triples){
@@ -194,10 +197,14 @@ function expand($parser){
 		if(isset($array[NIF.'beginIndex'])){
 			$beginIndex = $array[NIF.'beginIndex'][0]['value'];
 			$endIndex = $array[NIF.'endIndex'][0]['value'];
-			$referenceContext = $array[NIF.'referenceContext'][0]['value'];
-			$anchorOf =  substr($index[$referenceContext][NIF.'isString'][0]['value'],$beginIndex,$endIndex-$beginIndex);
-			$triples[]=addTripleLiteral($uri, NIF.'anchorOf',$anchorOf); 
-			
+			//test if this is the context
+			if(!isset($array[NIF.'isString'][0]['value'])){
+			//todo decide whether this is necessary, probably not
+				$referenceContext = $array[NIF.'referenceContext'][0]['value'];
+				$isString =	$index[$referenceContext][NIF.'isString'][0]['value'];
+				$anchorOf =  substr($isString,$beginIndex,$endIndex-$beginIndex);
+				$triples[]=addTripleLiteral($uri, NIF.'anchorOf',$anchorOf); 
+			}
 			if(isset($array[NIF.'sentence'])){
 				$sentence = $array[NIF.'sentence'][0]['value'];
 				$sentences[$sentence][$beginIndex] = $uri; 
