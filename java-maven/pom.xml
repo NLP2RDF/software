@@ -228,6 +228,7 @@
                 <artifactId>jena</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.nlp2rdf.ontologies</groupId>
                 <artifactId>persistence.uni-leipzig.org</artifactId>
@@ -249,7 +250,7 @@
                 <!--This version is the one released with DL-Learner 2048 -->
             </dependency>
             <dependency>
-                <groupId>org.nlp2rdf</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>OLiA</artifactId>
                 <version>${project.version}</version>
             </dependency>

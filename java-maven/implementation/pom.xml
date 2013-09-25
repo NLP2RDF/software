@@ -13,7 +13,7 @@
 
     <modules>
         <!--module>opennlp</module-->
-        <module>stanford-core</module>
+        <module>stanfordcorenlp</module>
         <!--module>snowball</module-->
         <!--module>demo</module-->
         <!--module>lexo</module-->
@@ -24,18 +24,18 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
+            <!--dependency>
                 <groupId>org.nlp2rdf.software</groupId>
-                <artifactId>stanford-core-wrapper</artifactId>
+                <artifactId>stanfordcorenlp-wrapper</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.nlp2rdf.software</groupId>
-                <artifactId>stanford-core-webservice</artifactId>
+                <artifactId>stanfordcorenlp-webservice</artifactId>
                 <version>${project.version}</version>
-            </dependency>
+            </dependency-->
 
-            <dependency>
+            <!--dependency>
                 <groupId>org.nlp2rdf</groupId>
                 <artifactId>lexo-wrapper</artifactId>
                 <version>${project.version}</version>
@@ -79,7 +79,7 @@
                 <groupId>org.nlp2rdf</groupId>
                 <artifactId>opennlp-webservice</artifactId>
                 <version>${project.version}</version>
-            </dependency>
+            </dependency-->
         </dependencies>
     </dependencyManagement>
 
