@@ -61,7 +61,7 @@ public class NIFParameterWebserviceFactory {
 
             //collect CLI args
             args[x++] = pname;
-            args[x++] = (String) httpServletRequest.getParameter((String) key);
+            args[x++] = httpServletRequest.getParameter((String) key);
 
         }
 

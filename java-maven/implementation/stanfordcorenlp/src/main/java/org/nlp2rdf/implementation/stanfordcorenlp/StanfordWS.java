@@ -18,27 +18,32 @@ import org.nlp2rdf.webservice.NIFServlet;
 public class StanfordWS extends NIFServlet {
 
 
-    private final StanfordWrapper stanfordCoreWrapper;
+    private final StanfordWrapper stanfordWrapper;
 
     public StanfordWS() {
-        this.stanfordCoreWrapper = new StanfordWrapper();
+        this.stanfordWrapper = new StanfordWrapper();
     }
 
     public OntModel execute(NIFParameters nifParameters) throws Exception {
 
         OntModel model = nifParameters.getInputModel();
         //some stats
-        Monitor mon = MonitorFactory.getTimeMonitor(stanfordCoreWrapper.getClass().getCanonicalName()).start();
-
+        Monitor mon = MonitorFactory.getTimeMonitor(stanfordWrapper.getClass().getCanonicalName()).start();
         int x = 0;
+        {
 
-        ExtendedIterator<Individual> eit = model.listIndividuals(NIFOntClasses.Context.getOntClass(model));
-        for (; eit.hasNext(); ) {
-            stanfordCoreWrapper.processText(nifParameters.getPrefix(), eit.next(), nifParameters.getUriScheme(), model, null);
-            x++;
+
+            ExtendedIterator<Individual> eit = model.listIndividuals(NIFOntClasses.Context.getOntClass(model));
+            for (; eit.hasNext(); ) {
+                stanfordWrapper.processText(nifParameters.getPrefix(), eit.next(), nifParameters.getUriScheme(), model, nifParameters);
+                x++;
+            }
         }
-        String finalMessage = "Annotated " + x + " nif:Context(s)  in " + mon.stop().getTotal() + " ms.  (avg.:" + (mon.getAvg()) + ") producing " + model.size() + " triples";
-        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, stanfordCoreWrapper.getClass().getCanonicalName(), null, null));
+        double lv = mon.stop().getLastValue();
+        double avg = lv/x;
+
+        String finalMessage = "Annotated " + x + " nif:Context(s)  in " +lv + " ms. (avg " + avg + ") producing " + model.size() + " triples";
+        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, stanfordWrapper.getClass().getCanonicalName(), null, null));
         model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
         return model;

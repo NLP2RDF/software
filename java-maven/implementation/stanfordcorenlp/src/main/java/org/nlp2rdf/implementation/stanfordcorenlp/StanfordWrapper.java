@@ -72,8 +72,6 @@ public class StanfordWrapper {
 
     public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, NIFParameters nifParameters) {
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
-
-
         /**
          * Prepare Stanford
          **/
@@ -82,18 +80,15 @@ public class StanfordWrapper {
         //props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
         //props.put("annotators", "tokenize, ssplit, pos, lemma, parse, ner"); // ner,  dcoref");
         //props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
-        if (nifParameters.getConfig() == null) {
-            props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
-        } else {
-            //TODO implement parsing
-            props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
+        props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
+        if (nifParameters.getConfig() != null) {
+            //TODO implement proper config parsing
         }
 
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
         // create an empty Annotation just with the given text
         Annotation document = new Annotation(contextString);
-
         // run all Annotators on this text
         pipeline.annotate(document);
 
@@ -114,7 +109,6 @@ public class StanfordWrapper {
             tokenizedText.put(sentenceSpan, wordSpans);
         }
 
-
         /**
          * Basic Model Setup
          **/
@@ -122,7 +116,6 @@ public class StanfordWrapper {
         Text2RDF text2RDF = new Text2RDF();
         text2RDF.generateNIFModel(prefix, context, urischeme, model, tokenizedText);
         //                                                                            model.add(RLOGSLF4JBinding.log("Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s), " + mon.getLastValue() + " ms.) ", RLOGIndividuals.DEBUG));
-
         // traversing the words in the current sentence
         // a CoreLabel is a CoreMap with additional token-specific methods
         for (CoreMap sentence : sentences) {
@@ -146,7 +139,7 @@ public class StanfordWrapper {
                 /********************************
                  * POS tag
                  ******/
-
+                model.setNsPrefix("olia", "http://purl.org/olia/olia.owl#");
                 // this is the POS tag of the token
                 String posTag = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
 

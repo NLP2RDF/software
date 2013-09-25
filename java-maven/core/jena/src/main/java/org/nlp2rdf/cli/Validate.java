@@ -36,6 +36,8 @@ public class Validate {
                 int portNumber = (Integer) options.valueOf("port");
                 System.err.println("Starting Web service at port " + portNumber);
                 System.err.println("web service not implemented yet");
+
+
                 System.exit(0);
 
             }
@@ -60,7 +62,6 @@ public class Validate {
             System.err.println("NIF Validator for defaultTestsuiteFile version " + sparqlValidator.getVersion() + ", " + sparqlValidator.getTests().size() + " tests total.");
 
 
-
             if (outformat.equals("text")) {
                 model.add(sparqlValidator.validate(model));
 
@@ -76,7 +77,6 @@ public class Validate {
             } else {
                 model.add(sparqlValidator.validate(model));
             }
-
 
 
             System.err.println(model.listIndividuals(model.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " log messages found (could be debug messages, errors are displayed separately).");

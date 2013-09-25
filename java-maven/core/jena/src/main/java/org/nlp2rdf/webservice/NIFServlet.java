@@ -56,13 +56,15 @@ public abstract class NIFServlet extends HttpServlet {
 
             //Validate and normalize input
             Monitor mon = MonitorFactory.getTimeMonitor("NIFParameters.getInstance").start();
-            nifParameters = NIFParameterWebserviceFactory.getInstance(httpServletRequest, httpServletRequest.getRequestURL().toString());
+            String defaultPrefix = httpServletRequest.getRequestURL().toString() + "#";
+            nifParameters = NIFParameterWebserviceFactory.getInstance(httpServletRequest, defaultPrefix);
             log.debug("NIFParameters Object created: " + logMonitor(mon.stop()));
 
             //execute the task
             mon = MonitorFactory.getTimeMonitor("NIFServlet.execute").start();
 
             OntModel out = execute(nifParameters);
+            out.setNsPrefix("p", defaultPrefix);
             log.debug("NIF Component executed task: " + logMonitor(mon.stop()));
             //write the response
             write(httpServletResponse, out, nifParameters.getOutputFormat());
@@ -71,7 +73,7 @@ public abstract class NIFServlet extends HttpServlet {
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            writeError(e.getMessage(),httpServletResponse);
+            writeError(e.getMessage(), httpServletResponse);
             /*String msg = e.getMessage() + printParameterMap(httpServletRequest);
             log.error(msg);
             eu.lod2.nlp2rdf.schema.error.Error fatalerror = ErrorHandling.createError(true, requestUrl, msg, model);
@@ -84,7 +86,7 @@ public abstract class NIFServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            writeError(e.getMessage(),httpServletResponse);
+            writeError(e.getMessage(), httpServletResponse);
             /*String msg = "An error occured: " + e.getMessage() + printParameterMap(httpServletRequest);
             log.error(msg, e);
             eu.lod2.nlp2rdf.schema.error.Error fatalerror = ErrorHandling.createError(true, requestUrl, msg, model);

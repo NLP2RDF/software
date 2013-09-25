@@ -15,6 +15,7 @@ import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
 import org.nlp2rdf.core.vocab.RLOGIndividuals;
+//import org.eclipse.jetty.server.Server;
 
 import java.io.IOException;
 
@@ -46,7 +47,10 @@ public class StanfordCLI {
                 int portNumber = (Integer) options.valueOf("port");
                 NIFParameters nifParameters = ParameterParser.parseOptions(options, true);
                 System.err.println("Starting Web service at port " + portNumber);
-                System.err.println("web service not implemented yet");
+                /*Server server = new Server(8080);
+                server.start();
+                server.join();
+                System.err.println("web service not implemented yet");*/
                 System.exit(0);
 
             }
@@ -74,7 +78,7 @@ public class StanfordCLI {
 
             NIFNamespaces.addNifPrefix(model);
             model.setNsPrefix("olia", "http://purl.org/olia/olia.owl#");
-            model.setNsPrefix("prefix", nifParameters.getPrefix());
+            model.setNsPrefix("p", nifParameters.getPrefix());
             model.write(System.out, Format.toJena(nifParameters.getOutputFormat()));
         } catch (ParameterException e) {
             ParameterParser.die(parser, e.getMessage());
