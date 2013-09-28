@@ -98,7 +98,7 @@ include("ARC2/ARC2.php");
 $logmessage = "";
 // treat text
 if($intype === "direct" && $informat==="text"){ 
-	$length = strlen($input);
+	$length = strlen(utf8_decode($input));
 	$input = "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
 	@prefix prefix: <".$prefix."> .
 	<".$prefix."char=0,$length> 

@@ -25,6 +25,15 @@ java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl -
 java -jar validate.jar -i http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core/example.ttl -intype url
 ```
 
+### Start a server with Jetty and Maven
+```Shell
+cd java-maven
+mvn clean install
+cd core/jena
+mvn jetty:run 
+# -Djetty.port=8899 is default and omitted
+```
+
 ### Use directly with Maven
 ```Shell
 cd java-maven/core/jena
