@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>nif-2.0-parent</artifactId>
@@ -7,10 +9,11 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>stanfordcorenlp</artifactId>
+    <artifactId>snowball</artifactId>
     <packaging>jar</packaging>
+    <name>Snowball Tartarus</name>
 
-    <name>Stanford CoreNLP</name>
+
     <dependencies>
 
         <dependency>
@@ -22,45 +25,10 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
         </dependency>
-
-        <!--
-          <dependency>
-              <groupId>edu.stanford.nlp</groupId>
-              <artifactId>stanford-corenlp-models</artifactId>
-              <version>1.3.4</version>
-          </dependency>
-      -->
         <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>1.3.4</version>
-            <classifier>models</classifier>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-snowball</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>1.3.4</version>
-        </dependency>
-
-        <!--dependency>
-            <groupId>org.nlp2rdf</groupId>
-            <artifactId>webservice</artifactId>
-        </dependency-->
-        <dependency>
-            <groupId>org.nlp2rdf.software</groupId>
-            <artifactId>OLiA</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jsp-api</artifactId>
-        </dependency>
-        <!--dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>9.0.5.v20130815</version>
-        </dependency-->
 
 
     </dependencies>
@@ -90,11 +58,6 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>maven-jetty-plugin</artifactId>
-                <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <stopKey>foo</stopKey>
-                    <stopPort>8896</stopPort>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -118,7 +81,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.nlp2rdf.implementation.stanfordcorenlp.StanfordCLI</mainClass>
+                            <mainClass>org.nlp2rdf.implementation.stanfordcore.SnowballCLI</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

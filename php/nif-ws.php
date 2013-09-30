@@ -16,7 +16,13 @@ $now = microtime(true);
 /******
  * INFO or HELP
  */
-$help = "This is the NIF 2.0 implementation of http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html . Note that the implementation is neither complete nor correct:
+$help = "
+***********************************
+This is the NIF 2.0 implementation of http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html .
+
+Note that the implementation is neither complete nor correct.
+We are working on it.
+***********************************
 Implemented:
 - outformat=html will produce some data categories from ITS 2.0 
 - in/out can also be ntriples/rdfxml/json
@@ -37,7 +43,7 @@ if(isset($_REQUEST['help']) || isset($_REQUEST['h']) || isset($_REQUEST['info'])
 //Normalize paramenters to long form
 $_REQUEST['informat'] = (isset($_REQUEST['f']))?$_REQUEST['f']:@$_REQUEST['informat'];
 $_REQUEST['input'] = (isset($_REQUEST['i']))?$_REQUEST['i']:@$_REQUEST['input'];
-$_REQUEST['intype'] = (isset($_REQUEST['t']))?$_REQUEST['i']:@$_REQUEST['intype'];
+$_REQUEST['intype'] = (isset($_REQUEST['t']))?$_REQUEST['t']:@$_REQUEST['intype'];
 $_REQUEST['outformat'] = (isset($_REQUEST['o']))?$_REQUEST['o']:@$_REQUEST['outformat'];
 $_REQUEST['urischeme'] = (isset($_REQUEST['u']))?$_REQUEST['u']:@$_REQUEST['urischeme'];
 $_REQUEST['prefix'] = (isset($_REQUEST['p']))?$_REQUEST['p']:@$_REQUEST['prefix'];
