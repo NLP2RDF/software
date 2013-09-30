@@ -88,6 +88,8 @@ public class ParameterParser {
         switch (informat) {
             case "turtle":
                 break;
+            case "rdfxml":
+                break;
             case "text":
                 break;
             default:

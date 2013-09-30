@@ -99,12 +99,14 @@ public class StanfordWrapper {
         //get all the sentences and words and read it in an intermediate structure
         //NOTE: this can be greatly optimized of course
         // for now it is just simple and cheap to implement it like this
+        int wordCount = 0;
         TreeMap<Span, List<Span>> tokenizedText = new TreeMap<Span, List<Span>>();
         for (CoreMap sentence : sentences) {
             Span sentenceSpan = new Span(sentence.get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), sentence.get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
             List<Span> wordSpans = new ArrayList<Span>();
             for (CoreLabel coreLabel : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                 wordSpans.add(new Span(coreLabel.get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), coreLabel.get(CoreAnnotations.CharacterOffsetEndAnnotation.class)));
+                wordCount++;
             }
             tokenizedText.put(sentenceSpan, wordSpans);
         }
@@ -115,7 +117,9 @@ public class StanfordWrapper {
         //get parameters for the URIGenerator
         Text2RDF text2RDF = new Text2RDF();
         text2RDF.generateNIFModel(prefix, context, urischeme, model, tokenizedText);
-        //                                                                            model.add(RLOGSLF4JBinding.log("Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s), " + mon.getLastValue() + " ms.) ", RLOGIndividuals.DEBUG));
+        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s) ", RLOGIndividuals.DEBUG, this.getClass().getCanonicalName(), null, null));
+       // text2RDF.addNextAndPreviousProperties(prefix,urischeme,model);
+
         // traversing the words in the current sentence
         // a CoreLabel is a CoreMap with additional token-specific methods
         for (CoreMap sentence : sentences) {
@@ -144,18 +148,24 @@ public class StanfordWrapper {
                 String posTag = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
 
                 List<String> oliaIndividual = (List<String>) Penn.hasTag.get(posTag);
+                if (oliaIndividual != null) {
 
-                for (String s : oliaIndividual) {
-                    wordIndividual.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(model), model.createIndividual(s, OWL.Thing));
-                    for (String oc : (List<String>) Penn.links.get(s)) {
-                        wordIndividual.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), model.createClass(oc));
+                    for (String s : oliaIndividual) {
+                        wordIndividual.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(model), model.createIndividual(s, OWL.Thing));
+                        List<String> pennlinks = (List<String>) Penn.links.get(s);
+                        if (pennlinks != null) {
+                            for (String oc : pennlinks) {
+                                wordIndividual.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), model.createClass(oc));
+                            }
+                        } else {
+                            model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "missing oliaLinks for " + s, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
+                        }
                     }
-                    if (((List<String>) Penn.links.get(s)).isEmpty()) {
-                        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "missing oliaLinks for " + s, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
-                    }
+                } else {
+                    model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "missing oliaLinks for " + posTag, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
+
                 }
             }
-
 
             SemanticGraph dependencies = sentence.get(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class);
 

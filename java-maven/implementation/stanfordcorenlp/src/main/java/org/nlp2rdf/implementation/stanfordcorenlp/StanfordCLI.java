@@ -72,6 +72,9 @@ public class StanfordCLI {
 
                 x++;
             }
+
+
+
             String finalMessage = "Annotated " + x + " nif:Context(s)  in " + mon.stop().getTotal() + " ms.  (avg.:" + (mon.getAvg()) + ") producing " + model.size() + " triples";
             model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, s.getClass().getCanonicalName(), null, null));
             model.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");

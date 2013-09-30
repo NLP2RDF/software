@@ -232,7 +232,7 @@ function expand($parser){
 			$triples[]=addTripleAllURIs($sentence, NIF."word",$uri);
 			if(!$first){
 				$triples[]=addTripleAllURIs($previous, NIF."nextWord",$uri);
-				$triples[]=addTripleAllURIs($uri, NIF."previous",$previous);
+				$triples[]=addTripleAllURIs($uri, NIF."previousWord",$previous);
 			}else{
 				$triples[]=addTripleAllURIs($sentence, NIF."firstWord",$uri);
 				$first=false;

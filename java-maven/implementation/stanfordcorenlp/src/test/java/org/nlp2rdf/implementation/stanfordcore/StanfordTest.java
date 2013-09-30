@@ -22,12 +22,21 @@
 package org.nlp2rdf.implementation.stanfordcore;
 
 
+import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import org.junit.Test;
-import org.nlp2rdf.core.urischemes.OffsetBasedString;
+import org.nlp2rdf.core.Format;
+import org.nlp2rdf.core.NIFParameters;
+import org.nlp2rdf.core.Text2RDF;
+import org.nlp2rdf.core.urischemes.RFC5147String;
 import org.nlp2rdf.core.urischemes.URIScheme;
+import org.nlp2rdf.core.vocab.NIFOntClasses;
 import org.nlp2rdf.implementation.stanfordcorenlp.StanfordWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +48,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * @author Sebastian Hellmann - http://bis.informatik.uni-leipzig.de/SebastianHellmann
@@ -48,26 +58,6 @@ public class StanfordTest {
 
     private static Logger logger = LoggerFactory.getLogger(StanfordWrapper.class);
 
-    private static String expected =
-            "<ModelCom   {"
-                    + "http://purl.org/olia/penn.owl#NN @rdf:type owl:Thing; "
-                    + "http://purl.org/olia/penn.owl#DT @rdf:type owl:Thing; "
-                    + "http://nlp2rdf.lod2.eu/schema/nif/sentence @rdf:type owl:ObjectProperty; "
-                    + "http://test/test/offset_18_19 @http://nlp2rdf.lod2.eu/schema/nif/module/olia/oliaCategory \"http://purl.org/olia/penn.owl#fullStop\"; "
-                    + "http://test/test/offset_18_19 @http://nlp2rdf.lod2.eu/schema/nif/module/olia/oliaIndividual http://purl.org/olia/penn.owl#fullStop; "
-                    + "http://test/test/offset_18_19 @http://nlp2rdf.lod2.eu/schema/nif/lemma \".\"; "
-                    + "http://test/test/offset_18_19 @http://nlp2rdf.lod2.eu/schema/nif/sentence http://test/test/offset_0_19; "
-                    + "http://test/test/offset_18_19 @http://nlp2rdf.lod2.eu/schema/nif/referenceContext \"This is a sentence. \"; "
-                    + "http://test/test/offset_18_19 @rdf:type http://nlp2rdf.lod2.eu/schema/nif/Word; "
-                    + "http://test/test/offset_18_19 @rdf:type http://nlp2rdf.lod2.eu/schema/nif/OffsetBasedString; "
-                    + "http://test/test/offset_18_19 @rdf:type http://nlp2rdf.lod2.eu/schema/nif/String; "
-                    + "http://nlp2rdf.lod2.eu/schema/nif/Sentence @rdf:type owl:Class; "
-                    + "http://nlp2rdf.lod2.eu/schema/nif/String @rdf:type owl:Class; "
-                    + "http://test/test/offset_5_7 @http://nlp2rdf.lod2.eu/schema/nif/module/olia/oliaCategory \"http://purl.org/olia/penn.owl#VBZ\"; "
-                    + "http://test/test/offset_5_7 @http://nlp2rdf.lod2.eu/schema/nif/module/olia/oliaIndividual http://purl.org/olia/penn.owl#VBZ; "
-                    + "http://test/test/offset_5_7 @http://nlp2rdf.lod2.eu/schema/nif/lemma \"be\"; "
-                    + "http://test/test/offset_5_7 @http://nlp2rdf.lod2.eu/schema/nif/sentence http://test/test/offset_0_19..."
-                    + "} | >";
 
     @Test
     public void testStanford() throws URISyntaxException, MalformedURLException {
@@ -85,15 +75,18 @@ public class StanfordTest {
                 sb.append("\n");
             }
             in.close();
-            System.out.println(sb.toString().length());
-            sb.toString().length();
-
-            //TODO
+            String input = sb.toString();
+            int targetLength = input.length();
             OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-            URIScheme uriScheme = new OffsetBasedString();
+            URIScheme uriScheme = new RFC5147String();
+            String prefix =    "http://example.org/test/";
+            Individual context = new Text2RDF().createContextIndividual(prefix,input,uriScheme,m);
+            NIFParameters nifParameters = new NIFParameters(m, new HashMap<String, String>(),prefix, null, uriScheme, null, "turtle");
 
-            // new StanfordCoreWrapper().processText("http://test/test/", "This is a sentence. ", uriScheme, m);
-            logger.info(m.toString());
+
+            new StanfordWrapper().processText(nifParameters.getPrefix(), context, uriScheme, m,nifParameters);
+            //m.write(System.out, Format.toJena(nifParameters.getOutputFormat()));
+           // logger.info(m.toString());
             //Assert.assertEquals(expected, m.toString());
         } catch (IOException ioe) {
             //if offline do nothing

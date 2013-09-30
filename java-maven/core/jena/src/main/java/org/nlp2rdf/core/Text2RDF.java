@@ -76,6 +76,7 @@ public class Text2RDF {
 
         int wordCount = 0;
         try {
+            Individual previousSentence = null;
             for (Span sentenceSpan : tokenizedText.descendingKeySet()) {
                 //String sentenceUri = uriScheme.generate(prefix, contextString, sentenceSpan);
                 Individual sentence = createCStringIndividual(prefix, context, sentenceSpan, uriScheme, model);
@@ -84,12 +85,29 @@ public class Text2RDF {
                 //detect words
                 List<Span> wordSpans = new ArrayList<Span>(tokenizedText.get(sentenceSpan));
                 wordCount += wordSpans.size();
+                Individual previousWord = null;
                 for (int i = 0; i < wordSpans.size(); i++) {
                     Span wordSpan = wordSpans.get(i);
                     Individual wordIndividual = createCStringIndividual(prefix, context, wordSpan, uriScheme, model);
                     wordIndividual.addOntClass(NIFOntClasses.Word.getOntClass(model));
                     wordIndividual.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
                     wordIndividual.addProperty(NIFObjectProperties.sentence.getObjectProperty(model), sentence);
+                    if (i == 0) {
+                        //first
+                        sentence.addProperty(NIFObjectProperties.firstWord.getObjectProperty(model), wordIndividual);
+                    } else if (i == wordSpans.size() - 1) {
+                        //last
+                        wordIndividual.addProperty(NIFObjectProperties.previousWord.getObjectProperty(model), previousWord);
+                        previousWord.addProperty(NIFObjectProperties.nextWord.getObjectProperty(model), wordIndividual);
+                        sentence.addProperty(NIFObjectProperties.lastWord.getObjectProperty(model), wordIndividual);
+                    } else {
+                        //inbetween
+                        wordIndividual.addProperty(NIFObjectProperties.previousWord.getObjectProperty(model), previousWord);
+                        previousWord.addProperty(NIFObjectProperties.nextWord.getObjectProperty(model), wordIndividual);
+                        sentence.addProperty(NIFObjectProperties.word.getObjectProperty(model), wordIndividual);
+                    }
+
+                    previousWord = wordIndividual;
 
                     if (log.isTraceEnabled()) {
                         StringBuilder logging = new StringBuilder();
@@ -99,11 +117,76 @@ public class Text2RDF {
                         log.trace(logging.toString());
                     }
                 }
+                if (previousSentence != null) {
+                    sentence.addProperty(NIFObjectProperties.previousSentence.getObjectProperty(model), previousSentence);
+                    previousSentence.addProperty(NIFObjectProperties.nextSentence.getObjectProperty(model), sentence);
+                }
+
+                previousSentence = sentence;
             }
         } finally {
             mon.stop();
         }
     }
+
+    /*public void expand(String prefix, URIScheme uriScheme, final OntModel model) {
+
+        final DatatypeProperty beginIndex = NIFDatatypeProperties.beginIndex.getDatatypeProperty(model);
+      //  final ObjectProperty beginIndex = NIFDatatypeProperties.beginIndex.getDatatypeProperty(model);
+        Monitor mon = MonitorFactory.getTimeMonitor("addNextAndPreviousProperties").start();
+
+        long previous = model.size();
+        ExtendedIterator<Individual> itw = model.listIndividuals(NIFOntClasses.Word.getOntClass(model));
+
+        SortedSet<Individual> words = new TreeSet<Individual>(new Comparator<Individual>() {
+            @Override
+            public int compare(Individual individual, Individual individual1) {
+                int a = individual.getPropertyValue(beginIndex).asLiteral().getInt();
+                int b = individual1.getPropertyValue(beginIndex).asLiteral().getInt();
+                return a - b;
+            }
+        });
+        words.addAll(itw.toSet());
+
+        Individual previousSentence = null;
+        for (Individual word : words) {
+           // Individual currentSentence = word.getPropertyValue()
+
+
+            System.out.println(word);
+        }
+
+        System.exit(0);
+
+        /**ExtendedIterator<Individual> its = model.listIndividuals(NIFOntClasses.Sentence.getOntClass(model));
+         for (Individual sentence = null; its.hasNext(); sentence = its.next()) {
+
+
+         }
+
+         List<Sentence> sentences = Sentence.list(model);
+         Collections.sort(sentences, new URIComparator(prefix, text, uriGenerator));
+         for (int x = 0; x < sentences.size(); x++) {
+         Sentence sentence = sentences.get(x);
+         List<Word> words = sentence.listWord();
+         Collections.sort(words, new URIComparator(prefix, text, uriGenerator));
+         if (x < sentences.size() - 1) {
+         //not the last one
+         sentence.setNextSentence(sentences.get(x + 1));
+         }
+
+         for (int y = 0; y < words.size(); y++) {
+         Word word = words.get(y);
+         //not the last one
+         if (y < words.size() - 1) {
+         word.setNextWord(words.get(y + 1));
+         }
+         }
+         }
+
+        mon.stop();
+        log.debug("Finished addition of next/previous properties " + (model.size() - previous) + " triples added, " + mon.getLastValue() + " ms.)");
+    }  */
 
 
 }
