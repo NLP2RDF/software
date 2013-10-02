@@ -25,7 +25,7 @@ public enum NIFObjectProperties {
     sourceUrl,
 
     /**
-     * TODO add label -> This property links a URI of type OccurringString to other nif:String, that occur in the same context.
+     * TODO add label -> (NOTE: this is a real early draft) This property links a URI of type OccurringString to other nif:String, that occur in the same context.
      */
     occurrence,
 
@@ -43,6 +43,7 @@ public enum NIFObjectProperties {
 		A dependency relation pointing from gov to dep.
 		Changelog: 
 		* 0.1.0 initial commit of property "dependency"
+		* 0.1.1 made the property subproperty of dependencyTrans
     
      */
     dependency,
@@ -128,9 +129,22 @@ public enum NIFObjectProperties {
     opinion,
 
     /**
+     * Provenance of OLiA tag -> Links to the URI describing the provenance
+     */
+    oliaProv,
+
+    /**
      * TODO add label -> see nif:nextSentence
      */
     nextWord,
+
+    /**
+     * transitive version of dependency -> 
+		Changelog: 
+		* 0.1.0 initial commit of property
+    
+     */
+    dependencyTrans,
 
     /**
      * TODO add label -> see nif:nextSentence
@@ -144,6 +158,11 @@ public enum NIFObjectProperties {
     
      */
     lastWord,
+
+    /**
+     * link to context -> Links a nif:ContextCollection to its contexts. This is often the same as a dcoument collection, but is named Context in NIF, because NIF describes on Unicode Strings. 
+     */
+    context,
 
     /**
      * transitive version of subString -> transitive version of subString

@@ -1,0 +1,179 @@
+@prefix lexo: <http://example.org/lexo#> .
+@prefix s: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#> .
+@prefix olia: <http://purl.org/olia/olia.owl#> .
+@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+
+
+lexo:and a owl:ObjectProperty ;
+    rdfs:comment "Creates intersectionOf the subject and all objects.".
+
+lexo:or a owl:ObjectProperty ;
+    rdfs:comment "Creates unionOf the subject and all objects.".
+
+lexo:IntersectiveAdjective a lexo:Preprocessing ;
+  rdfs:label "Intersective Adjective" ;
+  lexo:query """
+  CONSTRUCT
+  {
+    ?gov lexo:andand ?name .
+    ?dep lexo:handled "true" .
+   } {
+    ?gov  s:amod ?dep .
+    ?dep  nif:oliaCategory  ?adjectiveOrParticiple .
+    FILTER (?adjectiveOrParticiple IN (olia:Participle,olia:Adjective )) .
+    ?dep  nif:lemma ?lemma .
+    BIND (IRI(concat("http:/example.org/lexotype#",ucase(substr(?lemma,1,1)),substr(?lemma,2),"_Thing")) AS ?name) .
+    FILTER NOT EXISTS { ?dep lexo:adjectiveType lexo:Subsective}.
+    FILTER NOT EXISTS { ?dep lexo:adjectiveType lexo:Privative}.
+  }
+  """.
+
+lexo:ModifyingParticiple a lexo:Preprocessing ;
+  rdfs:label "Modifying Participle" ;
+  lexo:query """
+  CONSTRUCT
+  {
+    ?gov lexo:andand ?dep .
+   } {
+    ?gov  s:partmod ?dep .
+    ?dep nif:oliaCategory olia:Participle .
+  }
+  """.
+
+
+ lexo:DirectObject a lexo:Preprocessing ;
+   rdfs:label "Direct Object" ;
+   lexo:query """
+   CONSTRUCT
+   {
+        ?verb lexo:verb ?name .
+        ?verb lexo:filler ?object .
+
+    } {
+     ?verb  s:dobj ?object .
+     ?verb nif:oliaCategory olia:Verb .
+     ?verb nif:lemma ?lemma .
+      BIND (IRI(concat("http:/example.org/lexoprop#",str(?lemma))) as ?name ) .
+   }
+   """.
+
+lexo:RelativeClause a lexo:Preprocessing ;
+  rdfs:label "Relative Clause" ;
+  lexo:query """
+  CONSTRUCT
+  {
+     ?gov lexo:andor ?dep .
+   } {
+     ?gov s:rcmod ?dep .
+
+
+  }
+  """.
+
+lexo:SimpleNoun a lexo:Preprocessing ;
+    rdfs:label "Simple Noun" ;
+     lexo:query """
+     CONSTRUCT
+     {
+       ?class lexo:compound_name [ lexo:order ?order ; lexo:lemma ?name  ]
+   } {
+           ?class  nif:oliaCategory olia:Noun ;
+                   nif:beginIndex ?order ;
+                   nif:lemma ?name .
+            FILTER (NOT EXISTS { [] s:nn ?class })
+     }
+     """.
+
+
+lexo:CompoundNoun a lexo:Preprocessing ;
+  rdfs:label "Compound Noun" ;
+  lexo:query """
+  CONSTRUCT
+  {
+    ?class lexo:compound_name [ lexo:order ?order ; lexo:lemma ?name  ]  .
+    ?compound lexo:handled "true" .
+   } {
+      ?class  nif:oliaCategory olia:Noun ;
+              s:nn  ?compound    .
+      ?compound   nif:oliaCategory olia:Noun ;
+                  nif:beginIndex ?order ;
+                  nif:lemma ?name .
+  }
+  """.
+
+  lexo:CoumpoundNounSubclass a lexo:Preprocessing ;
+    lexo:query """
+    CONSTRUCT
+    {
+      ?class lexo:subclassof ?name .
+    } {
+        ?class  nif:oliaCategory olia:Noun ;
+                nif:lemma ?lemma  ;
+                s:nn  ?compound  .
+        ?compound   nif:oliaCategory olia:Noun .
+        BIND (IRI(concat("http:/example.org/lexotype#",ucase(substr(?lemma,1,1)),substr(?lemma,2))) AS ?name) .
+    }
+    """.
+
+lexo:VerbWithPreposition a lexo:Preprocessing ;
+    lexo:query """
+    CONSTRUCT
+    {
+      ?verb lexo:verb ?name .
+      ?verb lexo:filler ?object .
+    } {
+        ?verb  nif:oliaCategory olia:Verb ;
+               nif:lemma ?lemma  .
+        ?verb ?prep ?object .
+
+        BIND (IRI(concat("http:/example.org/lexoprop#",str(?lemma), substr(str(?prep),75))) as ?name ) .
+        FILTER (strStarts ( str (?prep), "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#prep_"  )) .
+    }
+    """.
+
+lexo:NounWithPreposition a lexo:Preprocessing ;
+    lexo:query """
+    CONSTRUCT
+    {
+      ?noun lexo:prep [ lexo:prepName ?name ; lexo:prepTarget ?target  ] .
+      ?target lexo:handled "true" .
+    } {
+        ?noun  nif:oliaCategory olia:Noun ;
+               nif:lemma ?lemma  .
+        ?noun ?prep ?target .
+
+        BIND (IRI(concat("http:/example.org/lexoprop#", substr(str(?prep),76))) as ?name ) .
+        FILTER (strStarts ( str (?prep), "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#prep_"  )) .
+    }
+    """.
+
+lexo:EquivalentDefinitions a lexo:Preprocessing ;
+    lexo:query """
+    CONSTRUCT
+    {
+      ?terma lexo:equivalentclass ?termb .
+    } {
+        ?definition s:nsubj ?terma .
+        ?definition s:nsubj ?termb .
+        FILTER (?terma != ?termb ) .
+    }
+    """.
+
+lexo:Copula a lexo:Preprocessing ;
+    lexo:query """
+    CONSTRUCT
+    {
+      ?term lexo:subclassof ?definition .
+      ?cop lexo:handled "true" .
+    } {
+        ?definition s:nsubj ?term .
+        ?definition s:cop ?cop .
+        ?cop nif:lemma "be" ;
+             nif:oliaCategory olia:Verb  .
+    }
+
+    """.
+
+# TODO is able to JJ with xcomp

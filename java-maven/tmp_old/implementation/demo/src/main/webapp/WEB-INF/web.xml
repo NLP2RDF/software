@@ -18,7 +18,7 @@
     </servlet>
      <servlet>
         <servlet-name>NIFLexo</servlet-name>
-        <servlet-class>org.nlp2rdf.implementation.lexo.NIFLexo</servlet-class>
+        <servlet-class>org.nlp2rdf.implementation.stanfordcorenlp.NIFLexo</servlet-class>
     </servlet>
 
    

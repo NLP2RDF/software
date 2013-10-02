@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class NIFParameters {
 
-    private final OntModel inputModel;
+    private OntModel inputModel;
     private Map<String, String> parameterMap;
     private OptionSet options;
 
@@ -131,5 +131,9 @@ public class NIFParameters {
 
     public void setConfigFile(String configFile) {
         this.configFile = configFile;
+    }
+
+    public void setInputModel(OntModel inputModel) {
+        this.inputModel = inputModel;
     }
 }

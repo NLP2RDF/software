@@ -19,7 +19,7 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.   */
 /***************************************************************************/
 
-package org.nlp2rdf.implementation.lexo;
+package org.nlp2rdf.implementation.stanfordcorenlp;
 
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -54,7 +54,7 @@ public class LExOAdditions {
 
 
     private String normUriString = "http://nlp2rdf.lod2.eu/schema/sso/normUri";
-    private String lexoprefix = "http://nlp2rdf.lod2.eu/lexo#";
+    private String lexoprefix = "http://nlp2rdf.lod2.eu/stanfordcorenlp#";
 
     private Set<String> filterLemma = new HashSet<String>(Arrays.asList(new String[]{"the", "a", ",", ".", "an"}));
 
@@ -193,7 +193,7 @@ public class LExOAdditions {
 
         StringBuilder sb = new StringBuilder();
         sb.append(lexoprefix);
-        //sb.append("lexo");
+        //sb.append("stanfordcorenlp");
         //if (prependUnderscore) {
         //    sb.append("_");
         //}

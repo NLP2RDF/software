@@ -10,12 +10,13 @@ public class StanfordSimple {
         model.setNsPrefix("stanford", NS);
     }
 
-    public static String getURIforEdgeLabel(String edgeLabel) {
+    public static String[] getURIforEdgeLabel(String edgeLabel) {
         int index = edgeLabel.indexOf("_");
+
         if (index == -1) {
-            return NS + edgeLabel;
+            return new String[] {NS + edgeLabel};
         } else {
-            return NS + edgeLabel.substring(0, index);
+            return new String[] {NS + edgeLabel, NS + edgeLabel.substring(0, index)};
         }
     }
 }

@@ -15,6 +15,11 @@ public enum RLOGOntClasses {
 // Hence the initial capital.
 
     /**
+     * Status Code -> A status code which can occur in an application. Instances of this class must put the name of the status as rdfs:label and describe it with rdfs:comment.
+     */
+    StatusCode,
+
+    /**
      * Log Level -> look here: http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/Level.html 
      */
     Level,

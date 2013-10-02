@@ -17,7 +17,12 @@ public enum RLOGObjectProperties {
     /**
      * logLevel -> TODO add comment
      */
-    level;
+    level,
+
+    /**
+     * has code -> Links a log message to a status code.
+     */
+    hasCode;
 
     String uri;
 

@@ -67,6 +67,27 @@ public class ParameterParser {
         parser.acceptsAll(asList("outfile"), "a NIF RDF file with the result of validation as RDF, only takes effect, if outformat is 'turtle' or 'rdfxml'").withRequiredArg().ofType(File.class).describedAs("RDF file");
     }
 
+    public static void handleHelpAndWS(OptionSet options) throws ParameterException, IOException {
+        // print help screen
+        if (options.has("h")) {
+            String addHelp = "";
+            throw new ParameterException(addHelp);
+        }
+
+        //check whether web service and start, if necessary
+
+        if (options.hasArgument("start")) {
+            int portNumber = (Integer) options.valueOf("port");
+            NIFParameters nifParameters = ParameterParser.parseOptions(options, true);
+            System.err.println("Starting Web service at port " + portNumber);
+            /*Server server = new Server(8080);
+        server.start();
+        server.join();
+        System.err.println("web service not implemented yet");*/
+            System.exit(0);
+
+        }
+    }
 
     /**
      * Parses the NIF options into an object, note that "start" and "port" have to be treated separately

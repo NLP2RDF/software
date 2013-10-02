@@ -9,14 +9,6 @@ import com.hp.hpl.jena.ontology.OntModel;
 public enum NIFAnnotationProperties {
 
     /**
-     * OLiA property link -> This property links a property of type inter or other to a URI from one of the OLiA Annotation model, e.g. http://purl.org/olia/stanford.owl#prep 
-    Changelog:
-    0.1.0 - added subproperty of nif:annotation as per http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 21 
-    
-     */
-    oliaPropLink,
-
-    /**
      * OLiA Category -> This property links a string to the OLiA Reference model. It provides a direct link for querying, thus it is an optimization. 
     Changelog:
     0.1.1 - added subproperty of nif:classAnnotation as per http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 21 

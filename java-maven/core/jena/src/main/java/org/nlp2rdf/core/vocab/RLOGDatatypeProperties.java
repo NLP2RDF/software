@@ -27,6 +27,11 @@ public enum RLOGDatatypeProperties {
     date,
 
     /**
+     * code id -> The numerical value of the code, e.g. 200, 404 or 42.
+     */
+    codeId,
+
+    /**
      * class name -> Outputs the fully qualified class name of the caller issuing the logging request.
      */
     className;

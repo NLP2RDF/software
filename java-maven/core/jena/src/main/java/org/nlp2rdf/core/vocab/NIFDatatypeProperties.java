@@ -49,6 +49,14 @@ public enum NIFDatatypeProperties {
     endIndex,
 
     /**
+     * Confidence of OLiA tag -> The confidence is relative to the tool and can be between 0.0 and 1.0, it is for nif:oliaLink and therefore also for nif:oliaCategory.
+    Changelog:
+    0.2.0 merged confidence for category and link
+    
+     */
+    oliaConf,
+
+    /**
      * stem -> The stem(s) of the nif:String.
      */
     stem,
@@ -84,16 +92,6 @@ public enum NIFDatatypeProperties {
      * after -> For each string you can include a snippet (e.g. 10-40 characters of text), that occurs immediately after the subject string.
      */
     after,
-
-    /**
-     * confidence of OLiA link -> The confidence is relative to the tool and can be between 0.0 and 1.0 
-     */
-    oliaLinkConf,
-
-    /**
-     * confidence of OLiA category -> The confidence is relative to the tool and can be between 0.0 and 1.0 
-     */
-    oliaCategoryConf,
 
     /**
      * is string -> The reference text as rdf:Literal for this nif:Context resource.  

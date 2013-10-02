@@ -118,7 +118,7 @@ public class StanfordWrapper {
         Text2RDF text2RDF = new Text2RDF();
         text2RDF.generateNIFModel(prefix, context, urischeme, model, tokenizedText);
         model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s) ", RLOGIndividuals.DEBUG, this.getClass().getCanonicalName(), null, null));
-       // text2RDF.addNextAndPreviousProperties(prefix,urischeme,model);
+        // text2RDF.addNextAndPreviousProperties(prefix,urischeme,model);
 
         // traversing the words in the current sentence
         // a CoreLabel is a CoreMap with additional token-specific methods
@@ -173,6 +173,8 @@ public class StanfordWrapper {
                 //time to add the prefix
                 StanfordSimple.addStanfordSimplePrefix(model);
 
+
+
                 // create relation annotations for each Stanford dependency
                 for (SemanticGraphEdge stanfordEdge : dependencies.edgeIterable()) {
 
@@ -180,10 +182,25 @@ public class StanfordWrapper {
                     Span depSpan = new Span(stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), stanfordEdge.getDependent().get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
                     //String relationType = stanfordEdge.getRelation().toString();
 
-                    String edgeURI = StanfordSimple.getURIforEdgeLabel(stanfordEdge.getRelation().getShortName());
-
+                    String[] edgeURIs = StanfordSimple.getURIforEdgeLabel(stanfordEdge.getRelation().toString());
                     //ObjectProperty relation = model.createObjectProperty(new CStringInst().generate(prefix, contextString, new Span[]{}));
-                    ObjectProperty relation = model.createObjectProperty(edgeURI);
+                    ObjectProperty relation = null;
+                    switch (edgeURIs.length) {
+                        case 1:
+                            relation = model.createObjectProperty(edgeURIs[0]);
+
+                            break;
+                        case 2:
+                            relation = model.createObjectProperty(edgeURIs[0]);
+                            relation.addSubProperty(model.createObjectProperty(edgeURIs[1]));
+                            break;
+                        default:
+                            String message = "Empty edge label, no URI written: " + edgeURIs;
+                            model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), message, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
+                            continue;
+
+                    }
+
                     Individual gov = text2RDF.createCStringIndividual(prefix, context, govSpan, urischeme, model);
                     Individual dep = text2RDF.createCStringIndividual(prefix, context, depSpan, urischeme, model);
                     gov.addProperty(relation, dep);

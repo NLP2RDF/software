@@ -5,13 +5,13 @@
 <web-app>
     <display-name>NLP2RDF</display-name>
     <servlet>
-        <servlet-name>NIFLexo</servlet-name>
-        <servlet-class>org.nlp2rdf.implementation.stanfordcorenlp.NIFLexo</servlet-class>
+        <servlet-name>stanfordcorenlp</servlet-name>
+        <servlet-class>org.nlp2rdf.implementation.lexo.StanfordWS</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>NIFLexo</servlet-name>
-        <url-pattern>/NIFLexo</url-pattern>
+        <servlet-name>stanfordcorenlp</servlet-name>
+        <url-pattern>/stanfordcorenlp</url-pattern>
     </servlet-mapping>
 
 </web-app>
