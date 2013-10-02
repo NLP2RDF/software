@@ -1,30 +1,30 @@
 @prefix lexo: <http://example.org/lexo#> .
-@prefix s: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#> .
+@prefix stanford: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#> .
 @prefix olia: <http://purl.org/olia/olia.owl#> .
 @prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
 @prefix owl: <http://www.w3.org/2002/07/owl#>.
 
 
-lexo:and a owl:ObjectProperty ;
-    rdfs:comment "Creates intersectionOf the subject and all objects.".
-
-lexo:or a owl:ObjectProperty ;
-    rdfs:comment "Creates unionOf the subject and all objects.".
-
 lexo:IntersectiveAdjective a lexo:Preprocessing ;
   rdfs:label "Intersective Adjective" ;
   lexo:query """
   CONSTRUCT
   {
-    ?gov lexo:andand ?name .
+     ?gov lexo:pragma [
+             lexo:source lexo:IntersectiveAdjective ;
+             lexo:axiomType  owl:intersectionOf ;
+             lexo:mergeType1 "and" ;
+             lexo:mergeType2 "and" ;
+             lexo:target ?dep ] .
     ?dep lexo:handled "true" .
    } {
-    ?gov  s:amod ?dep .
+    ?gov  stanford:amod ?dep .
     ?dep  nif:oliaCategory  ?adjectiveOrParticiple .
     FILTER (?adjectiveOrParticiple IN (olia:Participle,olia:Adjective )) .
     ?dep  nif:lemma ?lemma .
-    BIND (IRI(concat("http:/example.org/lexotype#",ucase(substr(?lemma,1,1)),substr(?lemma,2),"_Thing")) AS ?name) .
+    ?dep  nif:anchorOf ?anchorOf .
+    BIND (IRI(concat("http:/example.org/lexotype#",ucase(substr(?lemma,1,1)),if(?adjectiveOrParticiple=olia:Adjective, substr(?lemma,2),substr(?anchorOf,2)),"_Thing")) AS ?name) .
     FILTER NOT EXISTS { ?dep lexo:adjectiveType lexo:Subsective}.
     FILTER NOT EXISTS { ?dep lexo:adjectiveType lexo:Privative}.
   }
@@ -35,9 +35,15 @@ lexo:ModifyingParticiple a lexo:Preprocessing ;
   lexo:query """
   CONSTRUCT
   {
-    ?gov lexo:andand ?dep .
+    ?gov lexo:pragma [
+                 lexo:source lexo:ModifyingParticiple ;
+                 lexo:axiomType  owl:intersectionOf ;
+                 lexo:mergeType1 "and" ;
+                 lexo:mergeType2 "and" ;
+                 lexo:target ?dep ] .
+
    } {
-    ?gov  s:partmod ?dep .
+    ?gov stanford:partmod ?dep .
     ?dep nif:oliaCategory olia:Participle .
   }
   """.
@@ -48,11 +54,17 @@ lexo:ModifyingParticiple a lexo:Preprocessing ;
    lexo:query """
    CONSTRUCT
    {
-        ?verb lexo:verb ?name .
-        ?verb lexo:filler ?object .
+        ?verb lexo:pragma [
+                     lexo:source lexo:DirectObject ;
+                     lexo:axiomType  owl:someValuesFrom ;
+                     #TODO correct?
+                     lexo:mergeType1 "and" ;
+                     lexo:mergeType2 "or" ;
+                     lexo:property ?name ;
+                     lexo:target ?target ] .
 
     } {
-     ?verb  s:dobj ?object .
+     ?verb  stanford:dobj ?target .
      ?verb nif:oliaCategory olia:Verb .
      ?verb nif:lemma ?lemma .
       BIND (IRI(concat("http:/example.org/lexoprop#",str(?lemma))) as ?name ) .
@@ -64,11 +76,14 @@ lexo:RelativeClause a lexo:Preprocessing ;
   lexo:query """
   CONSTRUCT
   {
-     ?gov lexo:andor ?dep .
+     ?gov lexo:pragma [
+             lexo:source lexo:RelativeClause ;
+             lexo:axiomType  owl:intersectionOf ;
+             lexo:mergeType1 "and" ;
+             lexo:mergeType2 "or" ;
+             lexo:target ?dep ] .
    } {
-     ?gov s:rcmod ?dep .
-
-
+     ?gov stanford:rcmod ?dep .
   }
   """.
 
@@ -77,12 +92,13 @@ lexo:SimpleNoun a lexo:Preprocessing ;
      lexo:query """
      CONSTRUCT
      {
-       ?class lexo:compound_name [ lexo:order ?order ; lexo:lemma ?name  ]
+       ?class lexo:compound [ lexo:cnOrder ?order ; lexo:cnName ?name  ]
    } {
            ?class  nif:oliaCategory olia:Noun ;
                    nif:beginIndex ?order ;
-                   nif:lemma ?name .
-            FILTER (NOT EXISTS { [] s:nn ?class })
+                   nif:lemma ?lemma .
+            FILTER (NOT EXISTS { [] stanford:nn ?class }) .
+            BIND (concat(ucase(substr(?lemma,1,1)),substr(?lemma,2)) AS ?name) .
      }
      """.
 
@@ -92,14 +108,15 @@ lexo:CompoundNoun a lexo:Preprocessing ;
   lexo:query """
   CONSTRUCT
   {
-    ?class lexo:compound_name [ lexo:order ?order ; lexo:lemma ?name  ]  .
+    ?class lexo:compound [ lexo:cnOrder ?order ; lexo:cnName ?name  ]  .
     ?compound lexo:handled "true" .
    } {
       ?class  nif:oliaCategory olia:Noun ;
-              s:nn  ?compound    .
+              stanford:nn  ?compound    .
       ?compound   nif:oliaCategory olia:Noun ;
                   nif:beginIndex ?order ;
-                  nif:lemma ?name .
+                  nif:lemma ?lemma .
+      BIND (concat(ucase(substr(?lemma,1,1)),substr(?lemma,2)) AS ?name) .
   }
   """.
 
@@ -107,11 +124,15 @@ lexo:CompoundNoun a lexo:Preprocessing ;
     lexo:query """
     CONSTRUCT
     {
-      ?class lexo:subclassof ?name .
+      ?class lexo:pragma [
+                   lexo:source lexo:CoumpoundNounSubclass ;
+                   lexo:axiomType  rdfs:subClassOf ;
+                   lexo:mergeType1 "simple" ;
+                   lexo:target ?name ] .
     } {
         ?class  nif:oliaCategory olia:Noun ;
                 nif:lemma ?lemma  ;
-                s:nn  ?compound  .
+                stanford:nn  ?compound  .
         ?compound   nif:oliaCategory olia:Noun .
         BIND (IRI(concat("http:/example.org/lexotype#",ucase(substr(?lemma,1,1)),substr(?lemma,2))) AS ?name) .
     }
@@ -121,12 +142,18 @@ lexo:VerbWithPreposition a lexo:Preprocessing ;
     lexo:query """
     CONSTRUCT
     {
-      ?verb lexo:verb ?name .
-      ?verb lexo:filler ?object .
+      ?verb lexo:pragma [
+             lexo:source lexo:VerbWithPreposition ;
+             lexo:axiomType  owl:someValuesFrom ;
+             lexo:mergeType1 "and" ;
+             lexo:mergeType2 "or" ;
+             lexo:property ?name ;
+             lexo:target ?target ] .
+
     } {
         ?verb  nif:oliaCategory olia:Verb ;
                nif:lemma ?lemma  .
-        ?verb ?prep ?object .
+        ?verb ?prep ?target .
 
         BIND (IRI(concat("http:/example.org/lexoprop#",str(?lemma), substr(str(?prep),75))) as ?name ) .
         FILTER (strStarts ( str (?prep), "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#prep_"  )) .
@@ -137,7 +164,14 @@ lexo:NounWithPreposition a lexo:Preprocessing ;
     lexo:query """
     CONSTRUCT
     {
-      ?noun lexo:prep [ lexo:prepName ?name ; lexo:prepTarget ?target  ] .
+      #?noun lexo:prep [ lexo:prepName ?name ; lexo:prepTarget ?target  ] .
+      ?noun lexo:pragma [
+           lexo:source lexo:NounWithPreposition ;
+           lexo:axiomType  owl:someValuesFrom ;
+           lexo:mergeType1 "and" ;
+           lexo:mergeType2 "or" ;
+           lexo:property ?name ;
+           lexo:target ?target ] .
       ?target lexo:handled "true" .
     } {
         ?noun  nif:oliaCategory olia:Noun ;
@@ -153,10 +187,14 @@ lexo:EquivalentDefinitions a lexo:Preprocessing ;
     lexo:query """
     CONSTRUCT
     {
-      ?terma lexo:equivalentclass ?termb .
+      ?terma lexo:pragma [
+                     lexo:source lexo:EquivalentDefinitions ;
+                     lexo:axiomType owl:equivalentClass ;
+                     lexo:mergeType1 "simple" ;
+                     lexo:target ?termb ] .
     } {
-        ?definition s:nsubj ?terma .
-        ?definition s:nsubj ?termb .
+        ?definition stanford:nsubj ?terma .
+        ?definition stanford:nsubj ?termb .
         FILTER (?terma != ?termb ) .
     }
     """.
@@ -165,13 +203,19 @@ lexo:Copula a lexo:Preprocessing ;
     lexo:query """
     CONSTRUCT
     {
-      ?term lexo:subclassof ?definition .
+      ?term lexo:pragma [
+               lexo:source lexo:Copula ;
+               lexo:axiomType rdfs:subClassOf ;
+               lexo:mergeType1 "simple" ;
+               lexo:target ?definition ] .
       ?cop lexo:handled "true" .
     } {
-        ?definition s:nsubj ?term .
-        ?definition s:cop ?cop .
+        ?definition stanford:nsubj ?term .
+        ?definition stanford:cop ?cop .
         ?cop nif:lemma "be" ;
              nif:oliaCategory olia:Verb  .
+        #?term nif:oliaCategory ?termCat .
+        FILTER ( NOT EXISTS { ?term nif:oliaCategory olia:Determiner} )
     }
 
     """.
