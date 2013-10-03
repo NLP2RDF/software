@@ -12,6 +12,7 @@ public enum NIFAnnotationProperties {
      * OLiA Category -> This property links a string to the OLiA Reference model. It provides a direct link for querying, thus it is an optimization. 
     Changelog:
     0.1.1 - added subproperty of nif:classAnnotation as per http://svn.aksw.org/papers/2012/PeoplesWeb/public_preprint.pdf‎ page 21 
+    0.1.2 - removed domain axiom for annotationproperty
     
      */
     oliaCategory,
