@@ -11,6 +11,7 @@ public class NIFNamespaces {
     public static final String BASE = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/";
     public static final String NIF = BASE + "nif-core#";
     public static final String RLOG = BASE + "rlog#";
+    public static final String LExO = BASE + "vm/lexo#";
 
     public static void addNifPrefix(Model model) {
         model.setNsPrefix("nif", NIF);
@@ -18,6 +19,9 @@ public class NIFNamespaces {
 
     public static void addRLOGPrefix(Model model) {
         model.setNsPrefix("rlog", RLOG);
+    }
+    public static void addLExOPrefix(Model model) {
+        model.setNsPrefix("lexo", LExO);
     }
 
 }

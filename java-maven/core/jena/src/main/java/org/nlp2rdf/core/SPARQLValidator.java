@@ -41,7 +41,7 @@ public class SPARQLValidator {
 
 
     public static SPARQLValidator getInstance() {
-        return getInstance("org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl");
+        return getInstance("org/uni-leipzig/persistence/nlp2rdf/ontologies/testcase/lib/nif-2.0-suite.ttl");
     }
 
     public static SPARQLValidator getInstance(String suiteresource) {

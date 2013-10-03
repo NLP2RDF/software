@@ -22,35 +22,23 @@
 package org.nlp2rdf.implementation.lexo;
 
 import com.hp.hpl.jena.ontology.*;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DC;
+import org.nlp2rdf.core.NIFNamespaces;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.urischemes.URIScheme;
-import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.implementation.stanfordcorenlp.StanfordWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.text.NumberFormat;
 import java.util.*;
 
 
 /**
- * The basic code was taken from the ClearTK Project
- * http://code.google.com/p/cleartk
- * who have written a UIMA wrapper.
- * The original file by Steven Bethard can be found here:
- * http://code.google.com/p/cleartk/source/browse/trunk/cleartk-stanford-corenlp/src/main/java/org/cleartk/stanford/StanfordCoreNLPAnnotator.java
- * Licence http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * <p/>
  * Debug with  echo -n "This is a sentence." | mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.stanfordcore.StanfordCoreCLI" -Dexec.args="-f text -i -" | less
  *
  * @author Sebastian Hellmann - http://bis.informatik.uni-leipzig.de/SebastianHellmann
@@ -62,33 +50,41 @@ public class LExO {
 
     private static OntModel nifmodel = null;
     private static List<String> queries = null;
-    private static final String sparqlPrefix = "PREFIX lexo: <http://example.org/lexo#> \n" +
+    private static final String sparqlPrefix = "PREFIX lexo: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/lexo#> \n" +
             "PREFIX stanford: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#> \n" +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n" +
             "PREFIX olia: <http://purl.org/olia/olia.owl#> \n" +
             "PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> \n";
 
-    private static String lexons = "http://example.org/lexo#";
-    private static String lexotypens = "http://example.org/lexotype#";
+    private static String lexotypens = "http://example.org/type#";
 
-    private synchronized List<String> getQueries() {
+
+    private static synchronized List<String> getQueries() {
         if (queries == null) {
             queries = new ArrayList<String>();
             OntModel suite = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-            InputStream aa = LExO.class.getClassLoader().getResourceAsStream("preprocess.ttl");
+            InputStream aa = LExO.class.getClassLoader().getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/ontologies/lexo/lexo.ttl");
             suite.read(aa, "", "N3");
-            String lexp = "http://example.org/lexo#";
-            ExtendedIterator<Individual> eit = suite.listIndividuals(suite.createClass(lexp + "Preprocessing"));
+            //TODO throw out
+            ExtendedIterator<Individual> eit = suite.listIndividuals(suite.createClass(NIFNamespaces.LExO + "GenRule"));
             Individual current = null;
-            for (; eit.hasNext(); ) {
+            while (eit.hasNext()) {
                 current = eit.next();
-                queries.add(sparqlPrefix + current.getPropertyValue(suite.createDatatypeProperty(lexp + "query")).toString());
+                String query = sparqlPrefix + current.getPropertyValue(suite.createDatatypeProperty(NIFNamespaces.LExO  + "construct")).toString();
+                try {
+                    QueryFactory.create(query);
+                } catch (Exception qe) {
+                    System.out.println(current);
+                    System.out.println(query);
+                    qe.printStackTrace();
+                    System.exit(0);
+                }
+                queries.add(query);
             }
+            System.err.println("Parsing all queries was successfull");
         }
-
         return queries;
-
     }
 
     synchronized OntModel getNIFModel() {
@@ -107,57 +103,92 @@ public class LExO {
     }
 
     public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, NIFParameters nifParameters) {
-        String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
+        List<String> queries = getQueries();
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.ENGLISH);
+        nf.setMinimumFractionDigits(2);
+        OntModel intermediate = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+
+        //String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
+
+        /*
+        * NLP is happening here
+        * */
         stanfordWrapper.processText(prefix, context, urischeme, model, nifParameters);
         model.addSubModel(getNIFModel());
         model.prepare();
 
 
-        OntModel intermediate = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+        /*
+       *  Rule processing
+       *  stored in intermediate
+       * */
 
-        for (String query : getQueries()) {
+        for (String query : queries) {
             QueryExecution qe = QueryExecutionFactory.create(query, model);
             qe.execConstruct(intermediate);
         }
 
+        /*
+        * Calculate coverage among nodes
+        * */
 
-        QueryExecution getremaininganchors = QueryExecutionFactory.create(sparqlPrefix + "SELECT ?res ?anchor  {?s nif:dependencyTrans ?res  . ?res nif:anchorOf ?anchor . FILTER (NOT EXISTS {[] stanford:det ?res }) }", model);
-        ResultSet rs = getremaininganchors.execSelect();
-        Set<Resource> res1 = new HashSet<>();
+        /*
+       * get all available nodes
+       * */
+        Set<Resource> uncoveredNodes = new HashSet<>();
+        String avnq = sparqlPrefix + "SELECT ?s ?anchorOf  {" +
+                "{ ?s nif:dependencyTrans [] ; nif:anchorOf ?anchorOf . }" +
+                "UNION " +
+                "{ [] nif:dependencyTrans ?s . ?s nif:anchorOf ?anchorOf . }}";
+        QueryExecution getUCNodes = QueryExecutionFactory.create(avnq, model);
+        ResultSet rsavng = getUCNodes.execSelect();
         Map<Resource, String> anchorOf = new HashMap<>();
-        while (rs.hasNext()) {
-            QuerySolution qs = rs.next();
-            Resource s = qs.getResource("res");
-            res1.add(s);
-            anchorOf.put(s, qs.getLiteral("anchor").toString());
-        }
-
-        int totalIDs = res1.size();
-        QueryExecution qe2 = QueryExecutionFactory.create(sparqlPrefix + "SELECT ?s  {?s ?p ?o. FILTER (!isBlank(?s))  } ", intermediate);
-        ResultSet rs2 = qe2.execSelect();
-        while (rs2.hasNext()) {
-            QuerySolution qs = rs2.next();
+        while (rsavng.hasNext()) {
+            QuerySolution qs = rsavng.next();
             Resource s = qs.getResource("s");
-            res1.remove(s);
+            String uncovanch =   qs.getLiteral("anchorOf").toString();
+            uncoveredNodes.add(s);
+            anchorOf.put(s, uncovanch);
+
         }
 
-        int covered = totalIDs - res1.size();
+        int totalNodes = uncoveredNodes.size();
 
-
-        //print debug output
-        for (Resource r : res1) {
-            System.err.print(anchorOf.get(r));
-            System.err.println(" [" + r + "]");
+        ResIterator rit = intermediate.listSubjects();
+        while (rit.hasNext()) {
+            uncoveredNodes.remove(rit.nextResource());
         }
 
-        // remove all "handled" statements  once
-        List<Statement> handled = intermediate.listStatements(null, intermediate.createDatatypeProperty(lexons + "handled"), (String) null).toList();
-        for (Statement s : handled) {
-            intermediate.remove(s);
+
+        int covered = totalNodes - uncoveredNodes.size();
+
+        //print all uncovered nodes for debugging
+        if (!uncoveredNodes.isEmpty()) {
+            System.err.println("Uncovered nodes found:");
+            for (Resource r : uncoveredNodes) {
+                System.err.println("- UNCOV: " + anchorOf.get(r) + " [" + r + "]");
+            }
         }
+
+        // print all "skipped" statements  once
+        List<Statement> skipped = intermediate.listStatements(null, intermediate.createDatatypeProperty(NIFNamespaces.LExO + "skipped"), (String) null).toList();
+        if (!skipped.isEmpty()) {
+            System.err.println("Skipped nodes found:");
+            for (Statement s : skipped) {
+                Resource r = s.getSubject();
+                System.err.println("- SKIP: " + anchorOf.get(r) + ", Reason: " + s.getObject().asLiteral().toString() + " [" + r + "]");
+                //intermediate.remove(s);
+            }
+        }
+
+        intermediate.write(System.out, "N3");
+        System.out.println(skipped.size());
+        System.err.println("Coverage: " + " " + covered + " of " + totalNodes + " (" + nf.format(100 * (double) covered / totalNodes) + "%)");
+        System.exit(0);
+
 
         compound_names(intermediate);
-        intermediate.removeAll(null, model.createObjectProperty(lexons + "compound"), null);
+        intermediate.removeAll(null, model.createObjectProperty(NIFNamespaces.LExO + "compound"), null);
 
         /**String ready = "Select ?s { ?s ?p ?o . FILTER (strstarts(str(?s),\"" + nifParameters.getPrefix() + "\" )) . " +
          "FILTER ( " +
@@ -184,7 +215,8 @@ public class LExO {
          }  */
 
         intermediate.write(System.out, "N3");
-        System.err.println("Left: " + " " + res1.size() + " of " + totalIDs + ". Coverage: " + ((double) covered / totalIDs));
+
+
         System.exit(0);
         /*
       List<Resource> resources = intermediate.listSubjects().toList();
@@ -201,16 +233,16 @@ public class LExO {
     }
 
     public void handle(Resource r, OntModel model) {
-        ObjectProperty name = model.createObjectProperty(lexons + "name");
+        ObjectProperty name = model.createObjectProperty(NIFNamespaces.LExO + "name");
 
     }
 
 
     public void compound_names(OntModel model) {
-        ObjectProperty cn = model.createObjectProperty(lexons + "compound");
-        ObjectProperty name = model.createObjectProperty(lexons + "name");
-        DatatypeProperty cnOrder = model.createDatatypeProperty(lexons + "cnOrder");
-        DatatypeProperty cnName = model.createDatatypeProperty(lexons + "cnName");
+        ObjectProperty cn = model.createObjectProperty(NIFNamespaces.LExO + "compound");
+        ObjectProperty name = model.createObjectProperty(NIFNamespaces.LExO + "name");
+        DatatypeProperty cnOrder = model.createDatatypeProperty(NIFNamespaces.LExO + "cnOrder");
+        DatatypeProperty cnName = model.createDatatypeProperty(NIFNamespaces.LExO + "cnName");
         List<Resource> resources = model.listSubjectsWithProperty(cn).toList();
 
         List<Resource> bns = new ArrayList<>();
