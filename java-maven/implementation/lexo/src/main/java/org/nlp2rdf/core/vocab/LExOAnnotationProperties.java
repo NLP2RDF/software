@@ -16,7 +16,7 @@ public enum LExOAnnotationProperties {
     String uri;
 
     LExOAnnotationProperties() {
-        this.uri = "$preferredNamespaceUri" + name();
+        this.uri = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/lexo#" + name();
     }
 
     public String getUri() {
@@ -25,7 +25,7 @@ public enum LExOAnnotationProperties {
 
     @Override
     public String toString() {
-        return "$preferredNamespacePrefix:" + name();
+        return "lexo:" + name();
     }
 
 

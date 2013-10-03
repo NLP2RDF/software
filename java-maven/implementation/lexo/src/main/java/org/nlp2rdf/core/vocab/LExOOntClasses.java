@@ -43,7 +43,7 @@ public enum LExOOntClasses {
     String uri;
 
     LExOOntClasses() {
-        this.uri = "$preferredNamespaceUri" + name();
+        this.uri = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/lexo#" + name();
     }
 
     public String getUri() {
@@ -52,7 +52,7 @@ public enum LExOOntClasses {
 
     @Override
     public String toString() {
-        return "$preferredNamespacePrefix:" + name();
+        return "lexo:" + name();
     }
 
     public OntClass getOntClass(OntModel model) {

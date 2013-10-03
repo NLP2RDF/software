@@ -29,7 +29,7 @@ public enum LExODatatypeProperties {
     String uri;
 
     LExODatatypeProperties() {
-        this.uri = "$preferredNamespaceUri" + name();
+        this.uri = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/lexo#" + name();
     }
 
     public String getUri() {
@@ -38,7 +38,7 @@ public enum LExODatatypeProperties {
 
     @Override
     public String toString() {
-        return "$preferredNamespacePrefix:" + name();
+        return "lexo:" + name();
     }
 
     public DatatypeProperty getDatatypeProperty(OntModel model) {

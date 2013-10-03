@@ -21,17 +21,21 @@
 
 package org.nlp2rdf.implementation.lexo;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
+import com.hp.hpl.jena.datatypes.xsd.impl.XSDDouble;
 import com.hp.hpl.jena.ontology.*;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.NIFNamespaces;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.urischemes.URIScheme;
-import org.nlp2rdf.core.vocab.LExODatatypeProperties;
-import org.nlp2rdf.core.vocab.LExOOntClasses;
-import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
+import org.nlp2rdf.core.vocab.*;
 import org.nlp2rdf.implementation.stanfordcorenlp.StanfordWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +56,7 @@ public class LExO {
     private static StanfordWrapper stanfordWrapper = new StanfordWrapper();
 
     private static OntModel nifmodel = null;
-    private static List<String> queries = null;
+    private static Map<String, String> queries = null;
     private static final String sparqlPrefix = "PREFIX lexo: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/lexo#> \n" +
             "PREFIX stanford: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#> \n" +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
@@ -63,13 +67,13 @@ public class LExO {
     private static String lexotypens = "http://example.org/type#";
 
 
-    private static synchronized List<String> getQueries() {
+    private static synchronized Map<String, String> getQueries() {
         if (queries == null) {
-            queries = new ArrayList<String>();
+            queries = new HashMap<>();
             OntModel suite = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-            InputStream aa = LExO.class.getClassLoader().getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/ontologies/lexo/lexo.ttl");
+            InputStream aa = LExO.class.getClassLoader().getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/ontologies/vm/lexo/lexo.ttl");
+
             suite.read(aa, "", "N3");
-            //TODO throw out
             ExtendedIterator<Individual> eit = suite.listIndividuals(LExOOntClasses.GenRule.getOntClass(suite));
             Individual current = null;
             while (eit.hasNext()) {
@@ -83,9 +87,9 @@ public class LExO {
                     qe.printStackTrace();
                     System.exit(0);
                 }
-                queries.add(query);
+                queries.put(current.getURI(), query);
             }
-            System.err.println("Parsing all queries was successfull");
+            System.err.println("Parsing of " + queries.size() + " queries was successful");
         }
         return queries;
     }
@@ -93,8 +97,8 @@ public class LExO {
     synchronized OntModel getNIFModel() {
         if (nifmodel == null) {
 
-            String nif_core_owl = "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.owl";
-            String nif_core_inf_owl = "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core-inf.owl";
+            String nif_core_owl = "org/uni-leipzig/persistence/nlp2rdf/ontologies/nif-core/nif-core.owl";
+            String nif_core_inf_owl = "org/uni-leipzig/persistence/nlp2rdf/ontologies/nif-core/nif-core-inf.owl";
             InputStream is1 = LExO.class.getClassLoader().getResourceAsStream(nif_core_owl);
             InputStream is2 = LExO.class.getClassLoader().getResourceAsStream(nif_core_inf_owl);
             nifmodel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
@@ -106,10 +110,18 @@ public class LExO {
     }
 
     public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, NIFParameters nifParameters) {
-        List<String> queries = getQueries();
+        Map<String, String> queries = getQueries();
         NumberFormat nf = NumberFormat.getNumberInstance(Locale.ENGLISH);
         nf.setMinimumFractionDigits(2);
         OntModel intermediate = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+
+        //the logging event
+        Resource logRes = intermediate.createResource(nifParameters.getLogPrefix() + UUID.randomUUID());
+        logRes.addProperty(RDF.type, intermediate.createResource(RLOGOntClasses.Entry.getUri()));
+        logRes.addProperty(RLOGObjectProperties.level.getObjectProperty(intermediate), intermediate.createResource(RLOGIndividuals.INFO.getUri()));
+        XSDDateTime date = new XSDDateTime(Calendar.getInstance());
+        logRes.addProperty(RLOGDatatypeProperties.date.getDatatypeProperty(intermediate), date.toString(), date.getNarrowedDatatype());
+        StringBuilder logmessage = new StringBuilder();
 
         //String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
 
@@ -126,14 +138,18 @@ public class LExO {
        *  stored in intermediate
        * */
 
-        for (String query : queries) {
+        for (Object key : queries.keySet()) {
+            Monitor mon = MonitorFactory.getTimeMonitor((String) key).start();
+            String query = queries.get(key);
             QueryExecution qe = QueryExecutionFactory.create(query, model);
             qe.execConstruct(intermediate);
+            logRes.addProperty(intermediate.createProperty((String) key + "_time"),model.createTypedLiteral(mon.stop().getLastValue(), XSDDatatype.XSDdouble));
         }
 
+
         /*
-        * Calculate coverage among nodes
-        * */
+       * Calculate coverage among nodes
+       * */
 
         /*
        * get all available nodes
@@ -184,13 +200,16 @@ public class LExO {
             }
         }
 
+
+        determine_name(intermediate);
+
+        logRes.addProperty(RLOGDatatypeProperties.message.getDatatypeProperty(model), model.createLiteral(logmessage.toString()));
         intermediate.write(System.out, "N3");
         System.out.println(skipped.size());
         System.err.println("Coverage: " + " " + covered + " of " + totalNodes + " (" + nf.format(100 * (double) covered / totalNodes) + "%)");
         System.exit(0);
 
 
-        compound_names(intermediate);
         intermediate.removeAll(null, model.createObjectProperty(NIFNamespaces.LExO + "compound"), null);
 
         /**String ready = "Select ?s { ?s ?p ?o . FILTER (strstarts(str(?s),\"" + nifParameters.getPrefix() + "\" )) . " +
@@ -236,9 +255,7 @@ public class LExO {
     }
 
 
-
-
-    public void compound_names(OntModel model) {
+    public void determine_name(OntModel model) {
         ObjectProperty cn = model.createObjectProperty(NIFNamespaces.LExO + "compound");
         ObjectProperty name = model.createObjectProperty(NIFNamespaces.LExO + "name");
         DatatypeProperty cnOrder = model.createDatatypeProperty(NIFNamespaces.LExO + "cnOrder");
