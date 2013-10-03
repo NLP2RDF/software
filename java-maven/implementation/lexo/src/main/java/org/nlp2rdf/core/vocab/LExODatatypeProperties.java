@@ -12,6 +12,16 @@ import com.hp.hpl.jena.ontology.OntModel;
 public enum LExODatatypeProperties {
 
     /**
+     * TODO add label -> A reason, why this part was not yet covered.
+     */
+    uncovered,
+
+    /**
+     * TODO add label -> a simple marker to check whether this part was used
+     */
+    skipped,
+
+    /**
      * SPARQL construct query -> Put the valid SPARQL construct queries here.
      */
     construct;

@@ -29,6 +29,9 @@ import com.hp.hpl.jena.vocabulary.DC;
 import org.nlp2rdf.core.NIFNamespaces;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.urischemes.URIScheme;
+import org.nlp2rdf.core.vocab.LExODatatypeProperties;
+import org.nlp2rdf.core.vocab.LExOOntClasses;
+import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.implementation.stanfordcorenlp.StanfordWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,11 +70,11 @@ public class LExO {
             InputStream aa = LExO.class.getClassLoader().getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/ontologies/lexo/lexo.ttl");
             suite.read(aa, "", "N3");
             //TODO throw out
-            ExtendedIterator<Individual> eit = suite.listIndividuals(suite.createClass(NIFNamespaces.LExO + "GenRule"));
+            ExtendedIterator<Individual> eit = suite.listIndividuals(LExOOntClasses.GenRule.getOntClass(suite));
             Individual current = null;
             while (eit.hasNext()) {
                 current = eit.next();
-                String query = sparqlPrefix + current.getPropertyValue(suite.createDatatypeProperty(NIFNamespaces.LExO  + "construct")).toString();
+                String query = sparqlPrefix + current.getPropertyValue(LExODatatypeProperties.construct.getDatatypeProperty(suite)).toString();
                 try {
                     QueryFactory.create(query);
                 } catch (Exception qe) {
@@ -146,7 +149,7 @@ public class LExO {
         while (rsavng.hasNext()) {
             QuerySolution qs = rsavng.next();
             Resource s = qs.getResource("s");
-            String uncovanch =   qs.getLiteral("anchorOf").toString();
+            String uncovanch = qs.getLiteral("anchorOf").toString();
             uncoveredNodes.add(s);
             anchorOf.put(s, uncovanch);
 
@@ -171,7 +174,7 @@ public class LExO {
         }
 
         // print all "skipped" statements  once
-        List<Statement> skipped = intermediate.listStatements(null, intermediate.createDatatypeProperty(NIFNamespaces.LExO + "skipped"), (String) null).toList();
+        List<Statement> skipped = intermediate.listStatements(null, LExODatatypeProperties.skipped.getDatatypeProperty(intermediate), (String) null).toList();
         if (!skipped.isEmpty()) {
             System.err.println("Skipped nodes found:");
             for (Statement s : skipped) {
@@ -232,10 +235,7 @@ public class LExO {
         System.exit(0);
     }
 
-    public void handle(Resource r, OntModel model) {
-        ObjectProperty name = model.createObjectProperty(NIFNamespaces.LExO + "name");
 
-    }
 
 
     public void compound_names(OntModel model) {
