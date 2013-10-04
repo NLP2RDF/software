@@ -23,16 +23,16 @@ package org.nlp2rdf.implementation.lexo;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
-import com.hp.hpl.jena.datatypes.xsd.impl.XSDDouble;
 import com.hp.hpl.jena.ontology.*;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import org.nlp2rdf.core.NIFNamespaces;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.*;
@@ -55,8 +55,11 @@ public class LExO {
     private static Logger log = LoggerFactory.getLogger(LExO.class);
     private static StanfordWrapper stanfordWrapper = new StanfordWrapper();
 
-    private static OntModel nifmodel = null;
+    private static OntModel nifModel = null;
+    private static OntModel lexoModel = null;
+    private static OntModel rlogModel = null;
     private static Map<String, String> queries = null;
+
     private static final String sparqlPrefix = "PREFIX lexo: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/lexo#> \n" +
             "PREFIX stanford: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#> \n" +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
@@ -66,61 +69,75 @@ public class LExO {
 
     private static String lexotypens = "http://example.org/type#";
 
+    {
+        init();
 
-    private static synchronized Map<String, String> getQueries() {
-        if (queries == null) {
-            queries = new HashMap<>();
-            OntModel suite = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-            InputStream aa = LExO.class.getClassLoader().getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/ontologies/vm/lexo/lexo.ttl");
+    }
 
-            suite.read(aa, "", "N3");
-            ExtendedIterator<Individual> eit = suite.listIndividuals(LExOOntClasses.GenRule.getOntClass(suite));
-            Individual current = null;
-            while (eit.hasNext()) {
-                current = eit.next();
-                String query = sparqlPrefix + current.getPropertyValue(LExODatatypeProperties.construct.getDatatypeProperty(suite)).toString();
-                try {
-                    QueryFactory.create(query);
-                } catch (Exception qe) {
-                    System.out.println(current);
-                    System.out.println(query);
-                    qe.printStackTrace();
-                    System.exit(0);
-                }
-                queries.put(current.getURI(), query);
+    private int axiomCreationCount = 0;
+
+    private void init() {
+
+        String nif_core_owl = "org/uni-leipzig/persistence/nlp2rdf/ontologies/nif-core/nif-core.owl";
+        String nif_core_inf_owl = "org/uni-leipzig/persistence/nlp2rdf/ontologies/nif-core/nif-core-inf.owl";
+        InputStream is1 = LExO.class.getClassLoader().getResourceAsStream(nif_core_owl);
+        InputStream is2 = LExO.class.getClassLoader().getResourceAsStream(nif_core_inf_owl);
+        nifModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+        nifModel.createAnnotationProperty(DC.description.getURI());
+        nifModel.read(is1, "", "RDF/XML");
+        //nifModel.read(is2, "", "RDF/XML");
+
+        lexoModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+        //InputStream aa = LExO.class.getClassLoader().getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/ontologies/vm/lexo/lexo.ttl");
+        InputStream aa = LExO.class.getClassLoader().getResourceAsStream("lexo.ttl");
+        lexoModel.read(aa, "", "N3");
+
+        rlogModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+        aa = LExO.class.getClassLoader().getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/ontologies/rlog/rlog.ttl");
+        rlogModel.read(aa, "", "N3");
+
+
+        queries = new HashMap<>();
+        ExtendedIterator<Individual> eit = lexoModel.listIndividuals(LExOOntClasses.GenRule.getOntClass(lexoModel));
+        Individual current = null;
+        while (eit.hasNext()) {
+            current = eit.next();
+            String query = sparqlPrefix + current.getPropertyValue(LExODatatypeProperties.construct.getDatatypeProperty(lexoModel)).toString();
+            try {
+                QueryFactory.create(query);
+            } catch (Exception qe) {
+                System.out.println(current);
+                System.out.println(query);
+                qe.printStackTrace();
+                System.exit(0);
             }
-            System.err.println("Parsing of " + queries.size() + " queries was successful");
+            queries.put(current.getURI(), query);
         }
-        return queries;
+        System.err.println("Parsing of " + queries.size() + " queries was successful");
     }
 
     synchronized OntModel getNIFModel() {
-        if (nifmodel == null) {
+        if (nifModel == null) {
 
-            String nif_core_owl = "org/uni-leipzig/persistence/nlp2rdf/ontologies/nif-core/nif-core.owl";
-            String nif_core_inf_owl = "org/uni-leipzig/persistence/nlp2rdf/ontologies/nif-core/nif-core-inf.owl";
-            InputStream is1 = LExO.class.getClassLoader().getResourceAsStream(nif_core_owl);
-            InputStream is2 = LExO.class.getClassLoader().getResourceAsStream(nif_core_inf_owl);
-            nifmodel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-            nifmodel.createAnnotationProperty(DC.description.getURI());
-            nifmodel.read(is1, "", "RDF/XML");
-            nifmodel.read(is2, "", "RDF/XML");
+
         }
-        return nifmodel;
+        return nifModel;
     }
 
-    public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, NIFParameters nifParameters) {
-        Map<String, String> queries = getQueries();
+    public OntModel processText(String prefix, Individual context, URIScheme urischeme, OntModel nifModel, NIFParameters nifParameters) {
         NumberFormat nf = NumberFormat.getNumberInstance(Locale.ENGLISH);
         nf.setMinimumFractionDigits(2);
-        OntModel intermediate = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+        OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+        model.addSubModel(rlogModel);
+        model.addSubModel(lexoModel);
+
 
         //the logging event
-        Resource logRes = intermediate.createResource(nifParameters.getLogPrefix() + UUID.randomUUID());
-        logRes.addProperty(RDF.type, intermediate.createResource(RLOGOntClasses.Entry.getUri()));
-        logRes.addProperty(RLOGObjectProperties.level.getObjectProperty(intermediate), intermediate.createResource(RLOGIndividuals.INFO.getUri()));
+        Resource logRes = model.createResource(nifParameters.getLogPrefix() + UUID.randomUUID());
+        logRes.addProperty(RDF.type, model.createResource(RLOGOntClasses.Entry.getUri()));
+        logRes.addProperty(RLOGObjectProperties.level.getObjectProperty(model), model.createResource(RLOGIndividuals.INFO.getUri()));
         XSDDateTime date = new XSDDateTime(Calendar.getInstance());
-        logRes.addProperty(RLOGDatatypeProperties.date.getDatatypeProperty(intermediate), date.toString(), date.getNarrowedDatatype());
+        logRes.addProperty(RLOGDatatypeProperties.date.getDatatypeProperty(model), date.toString(), date.getNarrowedDatatype());
         StringBuilder logmessage = new StringBuilder();
 
         //String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
@@ -128,23 +145,35 @@ public class LExO {
         /*
         * NLP is happening here
         * */
-        stanfordWrapper.processText(prefix, context, urischeme, model, nifParameters);
-        model.addSubModel(getNIFModel());
-        model.prepare();
+
+         Monitor stanford = MonitorFactory.getTimeMonitor("stanford").start();
+        stanfordWrapper.processText(prefix, context, urischeme, nifModel, nifParameters);
+        logmessage.append("Total stanford time: ").append(nf.format(stanford.stop().getLastValue())).append("\n");
+
+        System.err.println("Start reasoning");
+        Monitor pellet = MonitorFactory.getTimeMonitor("pellet").start();
+        nifModel.addSubModel(getNIFModel());
+
+        // model.prepare();
+        logmessage.append("Total pellet time: ").append(nf.format(pellet.stop().getLastValue())).append("\n");
 
 
         /*
        *  Rule processing
-       *  stored in intermediate
+       *  stored in model
        * */
-
+        System.err.println("Starting execution of rules");
+        Monitor querytimetotal = MonitorFactory.getTimeMonitor("querytimetotal").start();
         for (Object key : queries.keySet()) {
+
             Monitor mon = MonitorFactory.getTimeMonitor((String) key).start();
             String query = queries.get(key);
-            QueryExecution qe = QueryExecutionFactory.create(query, model);
-            qe.execConstruct(intermediate);
-            logRes.addProperty(intermediate.createProperty((String) key + "_time"),model.createTypedLiteral(mon.stop().getLastValue(), XSDDatatype.XSDdouble));
+            QueryExecution qe = QueryExecutionFactory.create(query, nifModel);
+            qe.execConstruct(model);
+            logRes.addProperty(model.createProperty((String) key + "_time"), model.createTypedLiteral(mon.stop().getLastValue(), XSDDatatype.XSDdouble));
+            System.err.println(key + " needed: " + nf.format(mon.getLastValue()));
         }
+        logmessage.append("Total rule time: ").append(nf.format(querytimetotal.stop().getLastValue())).append("\n");
 
 
         /*
@@ -159,8 +188,8 @@ public class LExO {
                 "{ ?s nif:dependencyTrans [] ; nif:anchorOf ?anchorOf . }" +
                 "UNION " +
                 "{ [] nif:dependencyTrans ?s . ?s nif:anchorOf ?anchorOf . }}";
-        QueryExecution getUCNodes = QueryExecutionFactory.create(avnq, model);
-        ResultSet rsavng = getUCNodes.execSelect();
+        QueryExecution getUncoveredNodes = QueryExecutionFactory.create(avnq, nifModel);
+        ResultSet rsavng = getUncoveredNodes.execSelect();
         Map<Resource, String> anchorOf = new HashMap<>();
         while (rsavng.hasNext()) {
             QuerySolution qs = rsavng.next();
@@ -168,12 +197,11 @@ public class LExO {
             String uncovanch = qs.getLiteral("anchorOf").toString();
             uncoveredNodes.add(s);
             anchorOf.put(s, uncovanch);
-
         }
 
         int totalNodes = uncoveredNodes.size();
 
-        ResIterator rit = intermediate.listSubjects();
+        ResIterator rit = model.listSubjects();
         while (rit.hasNext()) {
             uncoveredNodes.remove(rit.nextResource());
         }
@@ -186,109 +214,186 @@ public class LExO {
             System.err.println("Uncovered nodes found:");
             for (Resource r : uncoveredNodes) {
                 System.err.println("- UNCOV: " + anchorOf.get(r) + " [" + r + "]");
+                Resource un = model.getResource(r.getURI());
+                un.addProperty(LExODatatypeProperties.uncovered.getDatatypeProperty(model), "uncovered");
             }
         }
 
         // print all "skipped" statements  once
-        List<Statement> skipped = intermediate.listStatements(null, LExODatatypeProperties.skipped.getDatatypeProperty(intermediate), (String) null).toList();
+        List<Statement> skipped = model.listStatements(null, LExODatatypeProperties.skipped.getDatatypeProperty(model), (String) null).toList();
         if (!skipped.isEmpty()) {
-            System.err.println("Skipped nodes found:");
+            System.err.println(skipped.size() + " skipped nodes found.");
             for (Statement s : skipped) {
                 Resource r = s.getSubject();
-                System.err.println("- SKIP: " + anchorOf.get(r) + ", Reason: " + s.getObject().asLiteral().toString() + " [" + r + "]");
-                //intermediate.remove(s);
+                //System.err.println("- SKIP: " + anchorOf.get(r) + ", Reason: " + s.getObject().asLiteral().toString() + " [" + r + "]");
+                model.remove(s);
             }
         }
 
 
-        determine_name(intermediate);
+        /*******
+         * merging of axioms
+         ******/
+        Map<String, Resource> nif2classUri = new HashMap<>();
+        determine_name(model, nif2classUri);
+        boolean repeat = true;
+        Set<String> finished = new HashSet<>();
 
+        List<Resource> nifResources = model.listSubjectsWithProperty(LExOObjectProperties.axDesc.getObjectProperty(model)).toList();
+        while (repeat) {
+            repeat = false;
+            for (Resource current : nifResources) {
+
+                if (finished.contains(current.getURI())) {
+                    continue;
+                }
+                repeat = repeat || build_axioms(current, model, nif2classUri, finished);
+            }
+        }
+
+        /*********
+         * quality check:
+         * any bnodes, that are nowhere object
+         ********/
+
+        String bnodesQuery = sparqlPrefix + "SELECT ?bn ?p ?o {" +
+                " ?bn ?p ?o " +
+                "FILTER (isBlank(?bn) ) " +
+                "FILTER (NOT EXISTS { [] ?in ?bn } )" +
+                "FILTER (NOT EXISTS { ?bn rdfs:subClassOf [] } )" +
+                " }" ;
+        QueryExecution bnodes = QueryExecutionFactory.create(bnodesQuery, model);
+        ResultSet bnodesrs = bnodes.execSelect();
+        int bnodesrsSize = 0;
+        while (bnodesrs.hasNext()) {
+            QuerySolution qs = bnodesrs.next();
+            //Resource s = qs.getResource("bn");
+            System.err.println("unconnected blank nodes found: "+qs);
+            bnodesrsSize++;
+        }
+        System.err.println(axiomCreationCount + " axioms created.");
+        System.err.println(bnodesrsSize + " unconnected blank nodes found.");
         logRes.addProperty(RLOGDatatypeProperties.message.getDatatypeProperty(model), model.createLiteral(logmessage.toString()));
-        intermediate.write(System.out, "N3");
-        System.out.println(skipped.size());
         System.err.println("Coverage: " + " " + covered + " of " + totalNodes + " (" + nf.format(100 * (double) covered / totalNodes) + "%)");
-        System.exit(0);
-
-
-        intermediate.removeAll(null, model.createObjectProperty(NIFNamespaces.LExO + "compound"), null);
-
-        /**String ready = "Select ?s { ?s ?p ?o . FILTER (strstarts(str(?s),\"" + nifParameters.getPrefix() + "\" )) . " +
-         "FILTER ( " +
-         "   NOT EXISTS {?s lexo:subclassof ?o . FILTER (strstarts(str(?o), \"" + nifParameters.getPrefix() + "\" )) }   "
-         //+ " && NOT EXISTS {?s ?p [ ?p2 ?o2 ] . FILTER (strstarts(str(?o2), \"" + nifParameters.getPrefix() + "\" )) }   "
-         + " ) }";
-         ready = "Select ?s { ?s ?p ?o .  " +
-         "FILTER ( " +
-         "   NOT EXISTS {?s lexo:subclassof ?o . FILTER (strstarts(str(?o), \"" + nifParameters.getPrefix() + "\" )) }   "
-         //+ " && NOT EXISTS {?s ?p [ ?p2 ?o2 ] . FILTER (strstarts(str(?o2), \"" + nifParameters.getPrefix() + "\" )) }   "
-         + " ) }";
-         System.out.println(nifParameters.getPrefix());
-         System.out.println(sparqlPrefix+ready);
-
-         QueryExecution nextres = QueryExecutionFactory.create(sparqlPrefix + ready, intermediate);
-         ResultSet rs3 = nextres.execSelect();
-
-         while (rs3.hasNext()) {
-         QuerySolution qs = rs3.next();
-         Resource s = qs.getResource("s");
-
-         System.out.println(s);
-         //res1.remove(s);
-         }  */
-
-        intermediate.write(System.out, "N3");
-
-
-        System.exit(0);
-        /*
-      List<Resource> resources = intermediate.listSubjects().toList();
-      boolean modified = false;
-      while (!resources.isEmpty() && modified) {
-          modified = false;
-          Set<Resource> remove = new HashSet<>();
-          for (Resource r : resources) {
-          }
-      }  */
-
-
-        System.exit(0);
+        return model;
     }
 
+    public boolean build_axioms(Resource currentNIFResource, OntModel model, Map<String, Resource> nif2classUri, Set<String> finished) {
 
-    public void determine_name(OntModel model) {
-        ObjectProperty cn = model.createObjectProperty(NIFNamespaces.LExO + "compound");
-        ObjectProperty name = model.createObjectProperty(NIFNamespaces.LExO + "name");
-        DatatypeProperty cnOrder = model.createDatatypeProperty(NIFNamespaces.LExO + "cnOrder");
-        DatatypeProperty cnName = model.createDatatypeProperty(NIFNamespaces.LExO + "cnName");
-        List<Resource> resources = model.listSubjectsWithProperty(cn).toList();
+        //split all axiomdescriptions of resource
+        StmtIterator sit = currentNIFResource.listProperties(LExOObjectProperties.axDesc.getObjectProperty(model));
+        Set<Resource> axioms = new HashSet<>();
+        Set<Resource> axiomParts = new HashSet<>();
+        Resource className = nif2classUri.get(currentNIFResource.getURI());
+        while (sit.hasNext()) {
+            Statement stmt = sit.nextStatement();
+            Resource currentAxDescriptor = stmt.getObject().asResource();
+            //this is null, in some cases.
+            Resource axTarget = currentAxDescriptor.getPropertyResourceValue(LExOObjectProperties.axTarget.getObjectProperty(model));
+            if (axTarget != null) {
+                if (finished.contains(axTarget.getURI())) {
+                    if (currentAxDescriptor.hasProperty(RDF.type, LExOOntClasses.Axiom.getOntClass(model))) {
+                        axioms.add(currentAxDescriptor);
+                    } else if (currentAxDescriptor.hasProperty(RDF.type, LExOOntClasses.AxiomPart.getOntClass(model))) {
+                        axiomParts.add(currentAxDescriptor);
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
 
+        Resource result = null;
+        List<Resource> intersections = new ArrayList<Resource>();
+
+        if (className != null) {
+            intersections.add(className);
+        }
+        for (Resource part : axiomParts) {
+
+            Resource realTarget = nif2classUri.get(part.getPropertyResourceValue(LExOObjectProperties.axTarget.getObjectProperty(model)).getURI());
+            Resource axSemantic = part.getPropertyResourceValue(LExOAnnotationProperties.axSemantic.getAnnotationProperty(model));
+
+            if (axSemantic.getURI().equals(OWL.someValuesFrom.getURI())) {
+                ObjectProperty axProperty = model.createObjectProperty(part.getPropertyResourceValue(LExOAnnotationProperties.axProperty.getAnnotationProperty(model)).getURI());
+                intersections.add(model.createSomeValuesFromRestriction(null, axProperty, realTarget));
+            } else {
+                intersections.add(realTarget);
+            }
+        }
+
+        if (intersections.size() == 1) {
+            result = intersections.get(0);
+        } else if (intersections.isEmpty()) {
+            //not sure
+            System.err.println("isempty");
+        } else {
+            RDFList list = model.createList();
+            for (Resource r : intersections) {
+                list = list.with(r);
+            }
+            result = model.createIntersectionClass(null, list);
+        }
+
+
+        for (Resource axiom : axioms) {
+            Resource realTarget = nif2classUri.get(axiom.getPropertyResourceValue(LExOObjectProperties.axTarget.getObjectProperty(model)).getURI());
+            Resource axSemantic = axiom.getPropertyResourceValue(LExOAnnotationProperties.axSemantic.getAnnotationProperty(model));
+            if (axSemantic.getURI().equals(OWL.equivalentClass.getURI())) {
+                ((OntClass) result).addEquivalentClass(realTarget);
+                axiomCreationCount++;
+            } else if (axSemantic.getURI().equals(RDFS.subClassOf.getURI())) {
+                ((OntClass) result).addSuperClass(realTarget);
+                axiomCreationCount++;
+            } else {
+                System.out.println("Please implement: " + axSemantic);
+                System.exit(0);
+            }
+        }
+        nif2classUri.put(currentNIFResource.getURI(), result);
+        finished.add(currentNIFResource.getURI());
+        return true;
+    }
+
+    public void determine_name(OntModel model, Map<String, Resource> nif2classUri) {
+        ResIterator rit = model.listSubjectsWithProperty(LExOObjectProperties.axDesc.getObjectProperty(model));
         List<Resource> bns = new ArrayList<>();
+        while (rit.hasNext()) {
+            Resource currentAxDescriptor = null;
+            SortedSet<Sorter> sortedNames = new TreeSet<Sorter>();
 
-        //each resource
-        for (Resource r : resources) {
-            StmtIterator sit = r.listProperties(cn);
-            Resource currentr = null;
-            SortedSet<Sorter> sose = new TreeSet<Sorter>();
+            Resource currentResource = rit.nextResource();
 
+            //get all axiomdescriptions of resource
+            StmtIterator sit = currentResource.listProperties(LExOObjectProperties.axDesc.getObjectProperty(model));
+            boolean hasOneClassPart = false;
             while (sit.hasNext()) {
-                currentr = sit.nextStatement().getObject().asResource();
-                bns.add(currentr);
-                sose.add(new Sorter(currentr.getProperty(cnOrder).getObject().asLiteral().getInt(), currentr.getProperty(cnName).getObject().asLiteral().toString()));
+                Statement stmt = sit.nextStatement();
+                if (stmt.getObject().asResource().hasProperty(RDF.type, LExOOntClasses.ClassPart.getOntClass(model))) {
+                    currentAxDescriptor = stmt.getObject().asResource();
+                    bns.add(currentAxDescriptor);
+                    sortedNames.add(new Sorter(currentAxDescriptor.getProperty(LExODatatypeProperties.cnOrder.getDatatypeProperty(model)).
+                            getObject().asLiteral().getInt(), currentAxDescriptor.getProperty(LExODatatypeProperties.cnPart.getDatatypeProperty(model)).getObject().asLiteral().toString()));
+                    hasOneClassPart = true;
+                }
             }
 
-            StringBuilder sb = new StringBuilder(lexotypens);
-            for (Sorter s : sose) {
-                sb.append(s.getName());
-                sb.append("_");
+            if (hasOneClassPart) {
+                StringBuilder sb = new StringBuilder(lexotypens);
+                for (Sorter s : sortedNames) {
+                    sb.append(s.getName());
+                    sb.append("_");
+                }
+                String classUri = sb.substring(0, sb.length() - 1);
+                currentResource.addProperty(LExODatatypeProperties.className.getDatatypeProperty(model), model.createResource(classUri));
+                nif2classUri.put(currentResource.getURI(), model.createClass(classUri));
             }
-
-
-            r.addProperty(name, model.createResource(sb.substring(0, sb.length() - 1)));
-
         }
-        for (Resource r : bns) {
+
+        //delete?
+        /*for (Resource r : bns) {
             r.removeProperties();
-        }
+        } */
     }
 
 
@@ -311,109 +416,109 @@ public class LExO {
         }
     }
 
-    /**
+/**
 
-     while (it1.hasNext()) {
-     res1.add(it1.nextStatement().getObject().asResource());
-     }
+ while (it1.hasNext()) {
+ res1.add(it1.nextStatement().getObject().asResource());
+ }
 
-     ResIterator it2 = intermediate.listSubjects();
-     Set<Resource> res2 = new HashSet<>();
-     while (it2.hasNext()) {
-     Resource r = it2.nextResource();
-     if (r.isURIResource()) {
-     res2.add(r);
-     }
-     }    **/
+ ResIterator it2 = intermediate.listSubjects();
+ Set<Resource> res2 = new HashSet<>();
+ while (it2.hasNext()) {
+ Resource r = it2.nextResource();
+ if (r.isURIResource()) {
+ res2.add(r);
+ }
+ }    **/
 
-    //Set<Resource> difference = new HashSet<Resource>(res1);
+//Set<Resource> difference = new HashSet<Resource>(res1);
 
-    //System.out.println(res1);
-    //System.out.println(res2);
-    //System.out.println(difference.toString());
-
-
-    //
-    //model.listResourcesWithProperty(NIFObjectProperties.dependencyTrans.getObjectProperty(model));
-
-    /** //
-     // System.out.println().toList());
-     ObjectProperty deptrans = NIFObjectProperties.dependencyTrans.getObjectProperty(model);
-     DatatypeProperty beginIndex = NIFDatatypeProperties.beginIndex.getDatatypeProperty(model);
-     AnnotationProperty oliaCategory = NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model);
-     DatatypeProperty lexo = model.createDatatypeProperty("http://lexo.le/def");
-     DatatypeProperty lemma = NIFDatatypeProperties.lemma.getDatatypeProperty(model);
-     WordComparator wc = new WordComparator(beginIndex);
+//System.out.println(res1);
+//System.out.println(res2);
+//System.out.println(difference.toString());
 
 
-     ResIterator resIterator = model.listResourcesWithProperty(deptrans);
-     Set<String> forbidden = new HashSet<>(Arrays.asList(new String[]{"http://purl.org/olia/olia.owl#Determiner"}));
+//
+//model.listResourcesWithProperty(NIFObjectProperties.dependencyTrans.getObjectProperty(model));
 
-     while (resIterator.hasNext()) {
-     SortedSet<Individual> words = new TreeSet<>(wc);
-     Resource current = resIterator.nextResource();
-     NodeIterator nt = model.listObjectsOfProperty(current, deptrans);
-     words.add(model.getIndividual(current.getURI()));
-     while (nt.hasNext()) {
-     Individual word = model.getIndividual(nt.nextNode().asResource().getURI());
-     NodeIterator nt2 = word.listPropertyValues(oliaCategory);
-     boolean allow = true;
-     while (nt2.hasNext()) {
-     String cat = nt2.nextNode().asResource().getURI();
-     if (forbidden.contains(cat)) {
-     allow = false;
-     }
-     }
-     if (allow) {
-     words.add(word);
-     }
-     }
-
-     StringBuilder sb = new StringBuilder();
-     for (Individual word : words) {
-     sb.append(word.getPropertyValue(lemma).asLiteral().getString());
-     sb.append(" ");
-     }
-     current.addProperty(lexo, sb.toString().trim());
-     System.out.println(current+"  - > "+sb.toString().trim());
-
-     }
-
-     // add properties for each word
-     ExtendedIterator<Individual> itw = model.listIndividuals(NIFOntClasses.Word.getOntClass(model));
-     for (; itw.hasNext(); ) {
-     Individual current = itw.next();
-     if (!current.hasProperty(lexo)) {
-     current.addProperty(lexo, current.getPropertyValue(lemma).asLiteral().getString());
-     }
-     }
-
-     System.exit(0);
-
-     QueryExecution qe = QueryExecutionFactory.create("SELECT ?a ?b ?c {?s <" + oliaCategory.getURI() + "> ?o }", model);
-     ResultSet rs = qe.execSelect();
-
-     for (; rs.hasNext(); ) {
-     QuerySolution qs = rs.next();
-     Resource s = qs.getResource("s");
-     Resource o = qs.getResource("o");
-     System.out.println(s + "  " + o);
-
-     }
-     System.exit(0);
+/** //
+ // System.out.println().toList());
+ ObjectProperty deptrans = NIFObjectProperties.dependencyTrans.getObjectProperty(model);
+ DatatypeProperty beginIndex = NIFDatatypeProperties.beginIndex.getDatatypeProperty(model);
+ AnnotationProperty oliaCategory = NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model);
+ DatatypeProperty lexo = model.createDatatypeProperty("http://lexo.le/def");
+ DatatypeProperty lemma = NIFDatatypeProperties.lemma.getDatatypeProperty(model);
+ WordComparator wc = new WordComparator(beginIndex);
 
 
-     QueryExecution qe2 = QueryExecutionFactory.create("SELECT ?s ?o {?s <" + oliaCategory.getURI() + "> ?o }", model);
-     ResultSet rs2 = qe.execSelect();
+ ResIterator resIterator = model.listResourcesWithProperty(deptrans);
+ Set<String> forbidden = new HashSet<>(Arrays.asList(new String[]{"http://purl.org/olia/olia.owl#Determiner"}));
 
-     for (; rs2.hasNext(); ) {
-     QuerySolution qs = rs2.next();
-     Resource s = qs.getResource("s");
-     Resource o = qs.getResource("o");
-     System.out.println(s + "  " + o);
+ while (resIterator.hasNext()) {
+ SortedSet<Individual> words = new TreeSet<>(wc);
+ Resource current = resIterator.nextResource();
+ NodeIterator nt = model.listObjectsOfProperty(current, deptrans);
+ words.add(model.getIndividual(current.getURI()));
+ while (nt.hasNext()) {
+ Individual word = model.getIndividual(nt.nextNode().asResource().getURI());
+ NodeIterator nt2 = word.listPropertyValues(oliaCategory);
+ boolean allow = true;
+ while (nt2.hasNext()) {
+ String cat = nt2.nextNode().asResource().getURI();
+ if (forbidden.contains(cat)) {
+ allow = false;
+ }
+ }
+ if (allow) {
+ words.add(word);
+ }
+ }
 
-     }
-     System.exit(0);            **/
+ StringBuilder sb = new StringBuilder();
+ for (Individual word : words) {
+ sb.append(word.getPropertyValue(lemma).asLiteral().getString());
+ sb.append(" ");
+ }
+ current.addProperty(lexo, sb.toString().trim());
+ System.out.println(current+"  - > "+sb.toString().trim());
+
+ }
+
+ // add properties for each word
+ ExtendedIterator<Individual> itw = model.listIndividuals(NIFOntClasses.Word.getOntClass(model));
+ for (; itw.hasNext(); ) {
+ Individual current = itw.next();
+ if (!current.hasProperty(lexo)) {
+ current.addProperty(lexo, current.getPropertyValue(lemma).asLiteral().getString());
+ }
+ }
+
+ System.exit(0);
+
+ QueryExecution qe = QueryExecutionFactory.create("SELECT ?a ?b ?c {?s <" + oliaCategory.getURI() + "> ?o }", model);
+ ResultSet rs = qe.execSelect();
+
+ for (; rs.hasNext(); ) {
+ QuerySolution qs = rs.next();
+ Resource s = qs.getResource("s");
+ Resource o = qs.getResource("o");
+ System.out.println(s + "  " + o);
+
+ }
+ System.exit(0);
+
+
+ QueryExecution qe2 = QueryExecutionFactory.create("SELECT ?s ?o {?s <" + oliaCategory.getURI() + "> ?o }", model);
+ ResultSet rs2 = qe.execSelect();
+
+ for (; rs2.hasNext(); ) {
+ QuerySolution qs = rs2.next();
+ Resource s = qs.getResource("s");
+ Resource o = qs.getResource("o");
+ System.out.println(s + "  " + o);
+
+ }
+ System.exit(0);            **/
 
 }
 

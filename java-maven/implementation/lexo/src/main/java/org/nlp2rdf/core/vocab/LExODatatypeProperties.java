@@ -24,7 +24,22 @@ public enum LExODatatypeProperties {
     /**
      * SPARQL construct query -> Put the valid SPARQL construct queries here.
      */
-    construct;
+    construct,
+
+    /**
+     * TODO add label -> part which is used in the construction of class name
+     */
+    cnPart,
+
+    /**
+     * TODO add label -> gives the order of how the classname is constructed
+     */
+    cnOrder,
+
+    /**
+     * TODO add label -> TODO add comment
+     */
+    className;
 
     String uri;
 

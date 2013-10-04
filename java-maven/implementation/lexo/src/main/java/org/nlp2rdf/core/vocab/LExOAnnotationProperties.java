@@ -9,7 +9,12 @@ import com.hp.hpl.jena.ontology.OntModel;
 public enum LExOAnnotationProperties {
 
     /**
-     * axiom property -> property for OWL property estrictions axioms
+     * TODO add label -> TODO add comment
+     */
+    axSemantic,
+
+    /**
+     * axiom property -> property for OWL property restrictions axioms
      */
     axProperty;
 

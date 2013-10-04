@@ -52,10 +52,20 @@ lexo:axTarget a owl:ObjectProperty ;
     rdfs:label "axiom target"@en ;
     rdfs:comment "target for binary axioms".
 
+lexo:axSemantic a owl:AnnotationProperty .
+
 lexo:axProperty a owl:AnnotationProperty ;
     rdfs:label "axiom property"@en ;
-    rdfs:comment "property for OWL property estrictions axioms"@en .
+    rdfs:comment "property for OWL property restrictions axioms"@en .
 
+lexo:className a owl:DatatypeProperty ;
+    rdfs:comment ""@en .
+
+lexo:cnPart a owl:DatatypeProperty ;
+    rdfs:comment "part which is used in the construction of class name"@en .
+
+lexo:cnOrder a owl:DatatypeProperty ;
+    rdfs:comment "gives the order of how the classname is constructed"@en .
 
 lexo:skipped a owl:DatatypeProperty ;
     rdfs:comment "a simple marker to check whether this part was used"@en .
@@ -217,19 +227,18 @@ CONSTRUCT  {
         lexo:axMerge  owl:intersectionOf ;
         lexo:axTarget ?dep
     ] .
-    #?dep lexo:skipped "true" .
 } {
-    ?gov  ?dep ?dep .
-    ?dep  nif:oliaCategory  ?adjectiveOrParticiple .
-    FILTER (?adjectiveOrParticiple IN (olia:Participle,olia:Adjective )) .
-    FILTER (?dep IN (stanford:amod)) .
-    #, stanford:partmod )) .
-    # ?gov  stanford:amod ?dep .
-    # ?dep  nif:lemma ?lemma .
-    # ?dep  nif:anchorOf ?anchorOf .
-    # BIND (IRI(concat("http://example.org/type#",ucase(substr(?lemma,1,1)), substr(if(?adjectiveOrParticiple=olia:Adjective,?lemma,?anchorOf),2),"_Thing")) AS ?name) .
-    # TODO FILTER NOT EXISTS { ?dep lexo:adjectiveType lexo:Subsective}.
-    # TODO FILTER NOT EXISTS { ?dep lexo:adjectiveType lexo:Privative}.
+    {?gov  stanford:amod ?dep .}
+    UNION
+    #TODO check whether this makes sense
+    {?gov  stanford:partmod ?dep .}
+    {?dep  nif:oliaCategory olia:Participle .}
+    UNION
+    {?dep  nif:oliaCategory  olia:Adjective .}
+
+    # TODO implement
+    # FILTER NOT EXISTS { ?dep lexo:adjectiveType lexo:Subsective}.
+    # FILTER NOT EXISTS { ?dep lexo:adjectiveType lexo:Privative}.
 }""".
 
 #################################
@@ -293,6 +302,7 @@ lexo:RelativeClause a lexo:GenRule ;
 lexo:construct """
 CONSTRUCT {
     ?gov lexo:axDesc [
+        a lexo:AxiomPart ;
         lexo:axSource lexo:RelativeClause ;
         lexo:axSemantic  owl:intersectionOf ;
         lexo:axMerge  owl:unionOf ;
@@ -323,7 +333,7 @@ CONSTRUCT {
     ] .
 } {
     ?verb  nif:oliaCategory olia:Verb ;
-        nif:lemma ?lemma  .
+           nif:lemma ?lemma  .
     ?verb ?prep ?target .
     FILTER (strStarts ( str(?prep), "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#prep_"  )) .
 
