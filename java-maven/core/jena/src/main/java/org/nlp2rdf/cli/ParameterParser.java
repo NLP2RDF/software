@@ -6,10 +6,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.apache.jena.riot.RiotParseException;
-import org.nlp2rdf.core.Format;
-import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RLOGSLF4JBinding;
-import org.nlp2rdf.core.Text2RDF;
+import org.nlp2rdf.core.*;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.urischemes.URISchemeHelper;
 
@@ -25,6 +22,32 @@ import static java.util.Arrays.asList;
  */
 public class ParameterParser {
 
+
+    public static NIFParameters CLIbefore(String[] args, OptionParser parser, String addHelp) throws ParameterException, IOException {
+        ParameterParser.addOutFileParameter(parser);
+        OptionSet options = ParameterParser.getOption(parser, args);
+        ParameterParser.handleHelpAndWS(options, addHelp);
+        return ParameterParser.parseOptions(options, false);
+
+    }
+
+    public static void CLIAfter(OntModel outputModel, NIFParameters nifParameters) throws IOException {
+        NIFNamespaces.addNifPrefix(outputModel);
+        NIFNamespaces.addRLOGPrefix(outputModel);
+        outputModel.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
+        outputModel.setNsPrefix("olia", "http://purl.org/olia/olia.owl#");
+        outputModel.setNsPrefix("p", nifParameters.getPrefix());
+
+        if (nifParameters.getOptions().has("outfile")) {
+            FileWriter fw = new FileWriter((File) nifParameters.getOptions().valueOf("outfile"));
+            outputModel.write(fw, Format.toJena(nifParameters.getOutputFormat()));
+
+        } else {
+
+            outputModel.write(System.out, Format.toJena(nifParameters.getOutputFormat()));
+        }
+
+    }
 
     public static OptionParser getParser(String[] args, String defaultPrefix) throws IOException {
 
@@ -67,10 +90,9 @@ public class ParameterParser {
         parser.acceptsAll(asList("outfile"), "a NIF RDF file with the result of validation as RDF, only takes effect, if outformat is 'turtle' or 'rdfxml'").withRequiredArg().ofType(File.class).describedAs("RDF file");
     }
 
-    public static void handleHelpAndWS(OptionSet options) throws ParameterException, IOException {
+    public static void handleHelpAndWS(OptionSet options, String addHelp) throws ParameterException, IOException {
         // print help screen
         if (options.has("h")) {
-            String addHelp = "";
             throw new ParameterException(addHelp);
         }
 

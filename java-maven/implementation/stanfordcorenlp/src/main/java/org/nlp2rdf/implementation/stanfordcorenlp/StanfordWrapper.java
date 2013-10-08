@@ -70,8 +70,11 @@ public class StanfordWrapper {
     private static Logger log = LoggerFactory.getLogger(StanfordWrapper.class);
 
 
-    public void processText(String prefix, Individual context, URIScheme urischeme, OntModel model, NIFParameters nifParameters) {
-        String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
+    public void processText( Individual context, OntModel inputModel, OntModel outputModel, NIFParameters nifParameters) {
+        String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(inputModel)).asLiteral().getString();
+        String prefix = nifParameters.getPrefix();
+        URIScheme urischeme = nifParameters.getUriScheme();
+
         /**
          * Prepare Stanford
          **/
@@ -116,8 +119,8 @@ public class StanfordWrapper {
          **/
         //get parameters for the URIGenerator
         Text2RDF text2RDF = new Text2RDF();
-        text2RDF.generateNIFModel(prefix, context, urischeme, model, tokenizedText);
-        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s) ", RLOGIndividuals.DEBUG, this.getClass().getCanonicalName(), null, null));
+        text2RDF.generateNIFModel(prefix, context, urischeme, outputModel, tokenizedText);
+        outputModel.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "Finished creating " + tokenizedText.size() + " sentence(s) with " + wordCount + " word(s) ", RLOGIndividuals.DEBUG, this.getClass().getCanonicalName(), null, null));
         // text2RDF.addNextAndPreviousProperties(prefix,urischeme,model);
 
         // traversing the words in the current sentence
@@ -128,7 +131,7 @@ public class StanfordWrapper {
             for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                 Span wordSpan = new Span(token.get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), token.get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
                 //the word should exist already
-                Individual wordIndividual = model.getIndividual(urischeme.generate(prefix, contextString, wordSpan));
+                Individual wordIndividual = outputModel.getIndividual(urischeme.generate(prefix, contextString, wordSpan));
 
                 if (wordIndividual == null) {
                     log.error("SKIPPING: word was not found in the model: " + urischeme.generate(prefix, contextString, wordSpan));
@@ -138,12 +141,12 @@ public class StanfordWrapper {
                  * Lemma
                  ******/
 
-                wordIndividual.addProperty(NIFDatatypeProperties.lemma.getDatatypeProperty(model), token.get(CoreAnnotations.LemmaAnnotation.class));
+                wordIndividual.addProperty(NIFDatatypeProperties.lemma.getDatatypeProperty(outputModel), token.get(CoreAnnotations.LemmaAnnotation.class));
 
                 /********************************
                  * POS tag
                  ******/
-                model.setNsPrefix("olia", "http://purl.org/olia/olia.owl#");
+                outputModel.setNsPrefix("olia", "http://purl.org/olia/olia.owl#");
                 // this is the POS tag of the token
                 String posTag = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
 
@@ -151,18 +154,18 @@ public class StanfordWrapper {
                 if (oliaIndividual != null) {
 
                     for (String s : oliaIndividual) {
-                        wordIndividual.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(model), model.createIndividual(s, OWL.Thing));
+                        wordIndividual.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(outputModel), outputModel.createIndividual(s, OWL.Thing));
                         List<String> pennlinks = (List<String>) Penn.links.get(s);
                         if (pennlinks != null) {
                             for (String oc : pennlinks) {
-                                wordIndividual.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(model), model.createClass(oc));
+                                wordIndividual.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(outputModel), outputModel.createClass(oc));
                             }
                         } else {
-                            model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "missing oliaLinks for " + s, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
+                            outputModel.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "missing oliaLinks for " + s, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
                         }
                     }
                 } else {
-                    model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "missing oliaLinks for " + posTag, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
+                    outputModel.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), "missing oliaLinks for " + posTag, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
 
                 }
             }
@@ -171,7 +174,7 @@ public class StanfordWrapper {
 
             if (dependencies != null) {
                 //time to add the prefix
-                StanfordSimple.addStanfordSimplePrefix(model);
+                StanfordSimple.addStanfordSimplePrefix(outputModel);
 
 
 
@@ -187,29 +190,29 @@ public class StanfordWrapper {
                     ObjectProperty relation = null;
                     switch (edgeURIs.length) {
                         case 1:
-                            relation = model.createObjectProperty(edgeURIs[0]);
+                            relation = outputModel.createObjectProperty(edgeURIs[0]);
 
                             break;
                         case 2:
-                            relation = model.createObjectProperty(edgeURIs[0]);
-                            relation.addSubProperty(model.createObjectProperty(edgeURIs[1]));
+                            relation = outputModel.createObjectProperty(edgeURIs[0]);
+                            relation.addSubProperty(outputModel.createObjectProperty(edgeURIs[1]));
                             break;
                         default:
                             String message = "Empty edge label, no URI written: " + edgeURIs;
-                            model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), message, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
+                            outputModel.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), message, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
                             continue;
 
                     }
 
-                    Individual gov = text2RDF.createCStringIndividual(prefix, context, govSpan, urischeme, model);
-                    Individual dep = text2RDF.createCStringIndividual(prefix, context, depSpan, urischeme, model);
+                    Individual gov = text2RDF.createCStringIndividual(prefix, context, govSpan, urischeme, outputModel);
+                    Individual dep = text2RDF.createCStringIndividual(prefix, context, depSpan, urischeme, outputModel);
                     gov.addProperty(relation, dep);
-                    relation.addSuperProperty(NIFObjectProperties.inter.getObjectProperty(model));
-                    relation.addSuperProperty(NIFObjectProperties.dependency.getObjectProperty(model));
+                    relation.addSuperProperty(NIFObjectProperties.inter.getObjectProperty(outputModel));
+                    relation.addSuperProperty(NIFObjectProperties.dependency.getObjectProperty(outputModel));
 
                     if (gov == null || dep == null) {
                         String message = "SKIPPING Either gov or dep was null for the dependencies\n" + "gov: " + gov + "\ndep: " + dep;
-                        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), message, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
+                        outputModel.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), message, RLOGIndividuals.ERROR, this.getClass().getCanonicalName(), null, null));
                         continue;
                     }
 

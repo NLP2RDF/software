@@ -35,14 +35,14 @@ public class StanfordWS extends NIFServlet {
 
             ExtendedIterator<Individual> eit = model.listIndividuals(NIFOntClasses.Context.getOntClass(model));
             for (; eit.hasNext(); ) {
-                stanfordWrapper.processText(nifParameters.getPrefix(), eit.next(), nifParameters.getUriScheme(), model, nifParameters);
+                stanfordWrapper.processText(eit.next(), model, model, nifParameters);
                 x++;
             }
         }
         double lv = mon.stop().getLastValue();
-        double avg = lv/x;
+        double avg = lv / x;
 
-        String finalMessage = "Annotated " + x + " nif:Context(s)  in " +lv + " ms. (avg " + avg + ") producing " + model.size() + " triples";
+        String finalMessage = "Annotated " + x + " nif:Context(s)  in " + lv + " ms. (avg " + avg + ") producing " + model.size() + " triples";
         model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, stanfordWrapper.getClass().getCanonicalName(), null, null));
         model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 

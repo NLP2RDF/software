@@ -2,8 +2,6 @@ package org.nlp2rdf.implementation.stanfordcorenlp;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
@@ -35,8 +33,8 @@ public class StanfordCLI {
         ParameterParser.addOutFileParameter(parser);
         try {
             OptionSet options = ParameterParser.getOption(parser, args);
-            ParameterParser.handleHelpAndWS(options);
-            NIFParameters nifParameters = ParameterParser.parseOptions(options,  false);
+            ParameterParser.handleHelpAndWS(options, "");
+            NIFParameters nifParameters = ParameterParser.parseOptions(options, false);
 
             //customize
 
@@ -47,7 +45,7 @@ public class StanfordCLI {
             int x = 0;
             for (ExtendedIterator<Individual> it = model.listIndividuals(NIFOntClasses.Context.getOntClass(model)); it.hasNext(); ) {
                 Individual context = it.next();
-                s.processText(nifParameters.getPrefix(), context, nifParameters.getUriScheme(), model, nifParameters);
+                s.processText(context, model, model, nifParameters);
                 x++;
             }
             String finalMessage = "Annotated " + x + " nif:Context(s)  in " + mon.stop().getTotal() + " ms.  (avg.:" + (mon.getAvg()) + ") producing " + model.size() + " triples";

@@ -22,14 +22,16 @@
             <artifactId>stanfordcorenlp</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>owlapi</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.ansell.pellet</groupId>
             <artifactId>pellet-jena</artifactId>
-            <version>2.3.4-ansell</version>
         </dependency>
         <dependency>
             <groupId>com.github.ansell.pellet</groupId>
             <artifactId>pellet-common</artifactId>
-            <version>2.3.4-ansell</version>
         </dependency>
 
     </dependencies>

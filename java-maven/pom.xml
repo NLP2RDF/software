@@ -234,13 +234,18 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.nlp2rdf.software</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>stanfordcorenlp</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.nlp2rdf.software</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>lexo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>owlapi</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -337,10 +342,21 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
+            <!--dependency>
                 <groupId>com.owldl</groupId>
                 <artifactId>pellet-jena</artifactId>
                 <version>2.3.0</version>
+            </dependency-->
+
+            <dependency>
+                <groupId>com.github.ansell.pellet</groupId>
+                <artifactId>pellet-jena</artifactId>
+                <version>2.3.4-ansell</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ansell.pellet</groupId>
+                <artifactId>pellet-common</artifactId>
+                <version>2.3.4-ansell</version>
             </dependency>
             <dependency>
                 <groupId>commons-collections</groupId>

@@ -7,14 +7,20 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>core</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>owlapi</artifactId>
+    <packaging>jar</packaging>
 
-    <name>Core Module (NIF API and Ontologies)</name>
+    <properties>
+        <main.basedir>${project.parent.basedir}</main.basedir>
+    </properties>
 
-    <modules>
-        <module>jena</module>
-        <module>owlapi</module>
-    </modules>
+    <name>OWLAPI Implementation</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.owldl</groupId>
+            <artifactId>pellet</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -90,7 +90,6 @@ public class Validate {
            } */
         } catch (ParameterException e) {
             ParameterParser.die(parser, e.getMessage());
-            // main script
         }
 
 

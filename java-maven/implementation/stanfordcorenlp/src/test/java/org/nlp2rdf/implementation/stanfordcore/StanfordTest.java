@@ -73,14 +73,14 @@ public class StanfordTest {
             int targetLength = input.length();
             OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
             URIScheme uriScheme = new RFC5147String();
-            String prefix =    "http://example.org/test/";
-            Individual context = new Text2RDF().createContextIndividual(prefix,input,uriScheme,m);
-            NIFParameters nifParameters = new NIFParameters(m, new HashMap<String, String>(),prefix, null, uriScheme, null, "turtle");
+            String prefix = "http://example.org/test/";
+            Individual context = new Text2RDF().createContextIndividual(prefix, input, uriScheme, m);
+            NIFParameters nifParameters = new NIFParameters(m, new HashMap<String, String>(), prefix, null, uriScheme, null, "turtle");
 
 
-            new StanfordWrapper().processText(nifParameters.getPrefix(), context, uriScheme, m,nifParameters);
+            new StanfordWrapper().processText(context, m, m, nifParameters);
             //m.write(System.out, Format.toJena(nifParameters.getOutputFormat()));
-           // logger.info(m.toString());
+            // logger.info(m.toString());
             //Assert.assertEquals(expected, m.toString());
         } catch (IOException ioe) {
             //if offline do nothing

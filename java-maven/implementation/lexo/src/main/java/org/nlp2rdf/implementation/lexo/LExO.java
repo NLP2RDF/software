@@ -34,7 +34,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.*;
 import org.nlp2rdf.implementation.stanfordcorenlp.StanfordWrapper;
 import org.slf4j.Logger;
@@ -116,47 +115,30 @@ public class LExO {
         System.err.println("Parsing of " + queries.size() + " queries was successful");
     }
 
-    synchronized OntModel getNIFModel() {
-        if (nifModel == null) {
 
-
-        }
-        return nifModel;
-    }
-
-    public OntModel processText(String prefix, Individual context, URIScheme urischeme, OntModel nifModel, NIFParameters nifParameters) {
+    public void processText(Individual context, OntModel inputModel, OntModel outputModel, NIFParameters nifParameters) {
         NumberFormat nf = NumberFormat.getNumberInstance(Locale.ENGLISH);
         nf.setMinimumFractionDigits(2);
-        OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-        model.addSubModel(rlogModel);
-        model.addSubModel(lexoModel);
 
+        //prepare the outputModel
+        outputModel.addSubModel(rlogModel);
+        outputModel.addSubModel(lexoModel);
 
         //the logging event
-        Resource logRes = model.createResource(nifParameters.getLogPrefix() + UUID.randomUUID());
-        logRes.addProperty(RDF.type, model.createResource(RLOGOntClasses.Entry.getUri()));
-        logRes.addProperty(RLOGObjectProperties.level.getObjectProperty(model), model.createResource(RLOGIndividuals.INFO.getUri()));
+        Resource logRes = outputModel.createResource(nifParameters.getLogPrefix() + UUID.randomUUID());
+        logRes.addProperty(RDF.type, outputModel.createResource(RLOGOntClasses.Entry.getUri()));
+        logRes.addProperty(RLOGObjectProperties.level.getObjectProperty(outputModel), outputModel.createResource(RLOGIndividuals.INFO.getUri()));
         XSDDateTime date = new XSDDateTime(Calendar.getInstance());
-        logRes.addProperty(RLOGDatatypeProperties.date.getDatatypeProperty(model), date.toString(), date.getNarrowedDatatype());
+        logRes.addProperty(RLOGDatatypeProperties.date.getDatatypeProperty(outputModel), date.toString(), date.getNarrowedDatatype());
         StringBuilder logmessage = new StringBuilder();
 
-        //String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
-
         /*
-        * NLP is happening here
+        * Stanford
         * */
-
-         Monitor stanford = MonitorFactory.getTimeMonitor("stanford").start();
-        stanfordWrapper.processText(prefix, context, urischeme, nifModel, nifParameters);
+        Monitor stanford = MonitorFactory.getTimeMonitor("stanford").start();
+        inputModel.addSubModel(nifModel);
+        stanfordWrapper.processText(context, inputModel, inputModel, nifParameters);
         logmessage.append("Total stanford time: ").append(nf.format(stanford.stop().getLastValue())).append("\n");
-
-        System.err.println("Start reasoning");
-        Monitor pellet = MonitorFactory.getTimeMonitor("pellet").start();
-        nifModel.addSubModel(getNIFModel());
-
-        // model.prepare();
-        logmessage.append("Total pellet time: ").append(nf.format(pellet.stop().getLastValue())).append("\n");
-
 
         /*
        *  Rule processing
@@ -168,9 +150,9 @@ public class LExO {
 
             Monitor mon = MonitorFactory.getTimeMonitor((String) key).start();
             String query = queries.get(key);
-            QueryExecution qe = QueryExecutionFactory.create(query, nifModel);
-            qe.execConstruct(model);
-            logRes.addProperty(model.createProperty((String) key + "_time"), model.createTypedLiteral(mon.stop().getLastValue(), XSDDatatype.XSDdouble));
+            QueryExecution qe = QueryExecutionFactory.create(query, inputModel);
+            qe.execConstruct(outputModel);
+            logRes.addProperty(outputModel.createProperty((String) key + "_time"), outputModel.createTypedLiteral(mon.stop().getLastValue(), XSDDatatype.XSDdouble));
             System.err.println(key + " needed: " + nf.format(mon.getLastValue()));
         }
         logmessage.append("Total rule time: ").append(nf.format(querytimetotal.stop().getLastValue())).append("\n");
@@ -188,7 +170,7 @@ public class LExO {
                 "{ ?s nif:dependencyTrans [] ; nif:anchorOf ?anchorOf . }" +
                 "UNION " +
                 "{ [] nif:dependencyTrans ?s . ?s nif:anchorOf ?anchorOf . }}";
-        QueryExecution getUncoveredNodes = QueryExecutionFactory.create(avnq, nifModel);
+        QueryExecution getUncoveredNodes = QueryExecutionFactory.create(avnq, inputModel);
         ResultSet rsavng = getUncoveredNodes.execSelect();
         Map<Resource, String> anchorOf = new HashMap<>();
         while (rsavng.hasNext()) {
@@ -201,7 +183,7 @@ public class LExO {
 
         int totalNodes = uncoveredNodes.size();
 
-        ResIterator rit = model.listSubjects();
+        ResIterator rit = outputModel.listSubjects();
         while (rit.hasNext()) {
             uncoveredNodes.remove(rit.nextResource());
         }
@@ -214,19 +196,19 @@ public class LExO {
             System.err.println("Uncovered nodes found:");
             for (Resource r : uncoveredNodes) {
                 System.err.println("- UNCOV: " + anchorOf.get(r) + " [" + r + "]");
-                Resource un = model.getResource(r.getURI());
-                un.addProperty(LExODatatypeProperties.uncovered.getDatatypeProperty(model), "uncovered");
+                Resource un = outputModel.getResource(r.getURI());
+                un.addProperty(LExODatatypeProperties.uncovered.getDatatypeProperty(outputModel), "uncovered");
             }
         }
 
         // print all "skipped" statements  once
-        List<Statement> skipped = model.listStatements(null, LExODatatypeProperties.skipped.getDatatypeProperty(model), (String) null).toList();
+        List<Statement> skipped = outputModel.listStatements(null, LExODatatypeProperties.skipped.getDatatypeProperty(outputModel), (String) null).toList();
         if (!skipped.isEmpty()) {
             System.err.println(skipped.size() + " skipped nodes found.");
             for (Statement s : skipped) {
                 Resource r = s.getSubject();
                 //System.err.println("- SKIP: " + anchorOf.get(r) + ", Reason: " + s.getObject().asLiteral().toString() + " [" + r + "]");
-                model.remove(s);
+                outputModel.remove(s);
             }
         }
 
@@ -235,11 +217,11 @@ public class LExO {
          * merging of axioms
          ******/
         Map<String, Resource> nif2classUri = new HashMap<>();
-        determine_name(model, nif2classUri);
+        determine_name(outputModel, nif2classUri);
         boolean repeat = true;
         Set<String> finished = new HashSet<>();
 
-        List<Resource> nifResources = model.listSubjectsWithProperty(LExOObjectProperties.axDesc.getObjectProperty(model)).toList();
+        List<Resource> nifResources = outputModel.listSubjectsWithProperty(LExOObjectProperties.axDesc.getObjectProperty(outputModel)).toList();
         while (repeat) {
             repeat = false;
             for (Resource current : nifResources) {
@@ -247,7 +229,7 @@ public class LExO {
                 if (finished.contains(current.getURI())) {
                     continue;
                 }
-                repeat = repeat || build_axioms(current, model, nif2classUri, finished);
+                repeat = repeat || build_axioms(current, outputModel, nif2classUri, finished);
             }
         }
 
@@ -261,21 +243,20 @@ public class LExO {
                 "FILTER (isBlank(?bn) ) " +
                 "FILTER (NOT EXISTS { [] ?in ?bn } )" +
                 "FILTER (NOT EXISTS { ?bn rdfs:subClassOf [] } )" +
-                " }" ;
-        QueryExecution bnodes = QueryExecutionFactory.create(bnodesQuery, model);
+                " }";
+        QueryExecution bnodes = QueryExecutionFactory.create(bnodesQuery, outputModel);
         ResultSet bnodesrs = bnodes.execSelect();
         int bnodesrsSize = 0;
         while (bnodesrs.hasNext()) {
             QuerySolution qs = bnodesrs.next();
             //Resource s = qs.getResource("bn");
-            System.err.println("unconnected blank nodes found: "+qs);
+            System.err.println("unconnected blank nodes found: " + qs);
             bnodesrsSize++;
         }
         System.err.println(axiomCreationCount + " axioms created.");
         System.err.println(bnodesrsSize + " unconnected blank nodes found.");
-        logRes.addProperty(RLOGDatatypeProperties.message.getDatatypeProperty(model), model.createLiteral(logmessage.toString()));
+        logRes.addProperty(RLOGDatatypeProperties.message.getDatatypeProperty(outputModel), outputModel.createLiteral(logmessage.toString()));
         System.err.println("Coverage: " + " " + covered + " of " + totalNodes + " (" + nf.format(100 * (double) covered / totalNodes) + "%)");
-        return model;
     }
 
     public boolean build_axioms(Resource currentNIFResource, OntModel model, Map<String, Resource> nif2classUri, Set<String> finished) {
