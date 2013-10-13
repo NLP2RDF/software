@@ -145,6 +145,34 @@ $log[]=array('type'=>'triple','s'=>$loguri, 'p'=>NIF."date",'o'=>$time, 's_type'
 
 $triples = array_merge($triples, $newtriples,$log);
 
+
+if ($_REQUEST['dummy']==="true"){
+	echo "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
+	@prefix dbo: <http://dbpedia.org/ontology/>.
+	@prefix owl: <http://www.w3.org/2002/07/owl#>.
+	@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#>.
+	@prefix prefix: <".$prefix."> .
+	<".$prefix."char=0,39> 
+		a nif:RFC5147String , nif:Context ;
+		nif:beginIndex \"0\";
+		nif:endIndex \"39\";
+		nif:isString \"\"\"My favorite actress is Natalie Portman.\"\"\" . 
+		
+	<".$prefix."char=23,39> 
+		a nif:RFC5147String , nif:NamedEntity ;
+		nif:beginIndex \"23\";
+		nif:endIndex \"38\";
+		nif:referenceContext <".$prefix."char=0,39>  ;
+		itsrdf:taIdentRef <http://dbpedia.org/resource/Natalie_Portman> ;
+		itsrdf:taClassRef <http://nerd.eurecom.fr/ontology#Person> , dbo:Actor, dbo:Artist, dbo:Person, dbo:Agent, owl:Thing .
+		
+	<http://dbpedia.org/resource/Natalie_Portman> a <http://nerd.eurecom.fr/ontology#Person> , dbo:Actor, dbo:Artist, dbo:Person, dbo:Agent, owl:Thing .
+	
+	<http://nerd.eurecom.fr/ontology#Person>  nif:classType \"nerd-coarse-grained\" .
+	dbo:Actor  nif:classType \"most-specific\" . ";
+	die;
+	}
+
 /****
  * Out
  * ****/
