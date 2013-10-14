@@ -146,7 +146,7 @@ $log[]=array('type'=>'triple','s'=>$loguri, 'p'=>NIF."date",'o'=>$time, 's_type'
 $triples = array_merge($triples, $newtriples,$log);
 
 
-if ($_REQUEST['dummy']==="true"){
+if (@$_REQUEST['dummy']==="true"){
 	echo "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
 	@prefix dbo: <http://dbpedia.org/ontology/>.
 	@prefix owl: <http://www.w3.org/2002/07/owl#>.
