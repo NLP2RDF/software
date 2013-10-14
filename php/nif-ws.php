@@ -195,6 +195,8 @@ switch ($outformat){
 	case "ntriples":  $ser = ARC2::getNTriplesSerializer(array('ns' => $ns)); break;
 	
 } 
+
+$output="";
  
 if ($outformat == "turtle"){
         $output = $ser->getSerializedTriples($triples);
