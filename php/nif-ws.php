@@ -193,6 +193,7 @@ switch ($outformat){
 	case "rdfxml":  $ser = ARC2::getRDFXMLSerializer(array('ns' => $ns)); break;
 	case "json":  $ser = ARC2::getRDFJSONSerializer(array('ns' => $ns)); break;
 	case "ntriples":  $ser = ARC2::getNTriplesSerializer(array('ns' => $ns)); break;
+	default : $ser = ARC2::getTurtleSerializer(array('ns' => $ns)); break;
 	
 } 
 
@@ -213,7 +214,10 @@ if ($outformat == "turtle"){
 }else if ($outformat == "text"){
 		$output = getTextFromTriples($triples);
         header("Content-Type: text/plain");
-}
+}else{
+		$output = $ser->getSerializedTriples($triples);
+        header("Content-Type: text/turtle");
+	}
 echo $output;
 
 
