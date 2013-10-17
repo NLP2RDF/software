@@ -164,12 +164,11 @@ if (@$_REQUEST['dummy']==="true"){
 		nif:endIndex \"38\";
 		nif:referenceContext <".$prefix."char=0,39>  ;
 		itsrdf:taIdentRef <http://dbpedia.org/resource/Natalie_Portman> ;
-		itsrdf:taClassRef <http://nerd.eurecom.fr/ontology#Person> , dbo:Actor, dbo:Artist, dbo:Person, dbo:Agent, owl:Thing .
+		itsrdf:taClassRef <http://nerd.eurecom.fr/ontology#Person> , dbo:Actor, dbo:Artist, dbo:Person, dbo:Agent, owl:Thing ;
+		nif:taMscref dbo:Actor .
 		
 	<http://dbpedia.org/resource/Natalie_Portman> a <http://nerd.eurecom.fr/ontology#Person> , dbo:Actor, dbo:Artist, dbo:Person, dbo:Agent, owl:Thing .
-	
-	<http://nerd.eurecom.fr/ontology#Person>  nif:classType \"nerd-coarse-grained\" .
-	dbo:Actor  nif:classType \"most-specific\" . ";
+	<http://nerd.eurecom.fr/ontology#Person>  <http://nerd.eurecom.fr/ontology#isCoreClass> \"1\" . ";
 	die;
 	}
 
