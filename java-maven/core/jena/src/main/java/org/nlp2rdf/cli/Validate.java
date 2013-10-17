@@ -1,6 +1,8 @@
 package org.nlp2rdf.cli;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.nlp2rdf.core.Format;
@@ -44,11 +46,15 @@ public class Validate {
 
             NIFParameters nifParameters = ParameterParser.parseOptions(options, false);
             String outformat = nifParameters.getOutputFormat();
-            OntModel model = nifParameters.getInputModel();
 
+            //customize
+            OntModel outputModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
+            OntModel inputModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM_RDFS_INF, ModelFactory.createDefaultModel());
+            inputModel.add(nifParameters.getInputModel());
+            inputModel.createOntology(nifParameters.getPrefix());
+            nifParameters.setInputModel(inputModel);
 
             SPARQLValidator sparqlValidator = null;
-            String defaultTestsuiteFile = "org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl";
 
             if (options.hasArgument("testsuite")) {
                 File ttt = (File) options.valueOf("testsuite");
@@ -57,29 +63,29 @@ public class Validate {
                 }
                 sparqlValidator = SPARQLValidator.getInstance(ttt);
             } else {
-                sparqlValidator = SPARQLValidator.getInstance(defaultTestsuiteFile);
+                sparqlValidator = SPARQLValidator.getInstance();
             }
             System.err.println("NIF Validator for defaultTestsuiteFile version " + sparqlValidator.getVersion() + ", " + sparqlValidator.getTests().size() + " tests total.");
 
 
             if (outformat.equals("text")) {
-                model.add(sparqlValidator.validate(model));
+                outputModel.add(sparqlValidator.validate(inputModel));
 
             } else if (outformat.equals("turtle") || outformat.equals("rdfxml") || outformat.equals("ntriples")) {
                 sparqlValidator.setQuiet(true);
-                model.add(sparqlValidator.validate(model));
+                outputModel.add(sparqlValidator.validate(inputModel));
                 if (options.hasArgument("outfile")) {
                     File outfile = (File) options.valueOf("outfile");
-                    model.write(new FileOutputStream(outfile), Format.toJena(outformat));
+                    outputModel.write(new FileOutputStream(outfile), Format.toJena(outformat));
                 } else {
-                    model.write(System.out, Format.toJena(outformat));
+                    outputModel.write(System.out, Format.toJena(outformat));
                 }
             } else {
-                model.add(sparqlValidator.validate(model));
+                outputModel.add(sparqlValidator.validate(inputModel));
             }
 
 
-            System.err.println(model.listIndividuals(model.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " log messages found (could be debug messages, errors are displayed separately).");
+            System.err.println(outputModel.listIndividuals(outputModel.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " log messages found (could be debug messages, errors are displayed separately).");
             // TODO: some handling for inaccessible files or overwriting existing files
             //File f = (File) options.valueOf("o");
 
