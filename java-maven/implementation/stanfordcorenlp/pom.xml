@@ -4,6 +4,7 @@
         <artifactId>nif-2.0-parent</artifactId>
         <groupId>org.nlp2rdf.software</groupId>
         <version>2.0.1-SNAPSHOT</version>
+          <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
