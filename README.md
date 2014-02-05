@@ -5,6 +5,27 @@ This repository contains software and tools using and implementing NIF 2.0.
 * The [NLP2RDF/NIF project page] (http://nlp2rdf.org) provides an overview.
 * See here for an overview of resources: [License, Persistence, Versioning and Resource List](http://persistence.uni-leipzig.org/nlp2rdf/specification/version.html)  
 
+## NIF Stanford Implementation
+We are currently providing a maven web service for the stanford implementation.
+
+### Compile and run
+Note: you will need to install Maven
+
+1. Download and unzip: https://github.com/NLP2RDF/software/archive/master.zip
+2. go to folder java-maven
+3. run '''mvn install'''
+4. go to the folder '''software/java-maven/implementation/stanfordcorenlp/
+5. run '''mvn jetty:run'''
+
+The server will start at 8899 because the option '''-Djetty.port=8899''' is default and omitted.
+
+you should be able to reach the service under:
+'''curl http://localhost:8899/stanfordcorenlp/stanfordcorenlp?f=text&i=This+is+a+test.'''
+
+### CLI
+The -e option is Maven for extended error messages
+    mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.stanfordcorenlp.StanfordCLI" -Dexec.args="-f text -i 'This is a test.' "
+
 ## NIF Validator
 An up-to-date validator is supplied at root level in this repository and can be dowloaded here: http://persistence.uni-leipzig.org/nlp2rdf/specifications/validate.jar
 
