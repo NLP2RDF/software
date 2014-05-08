@@ -10,7 +10,6 @@
     <name>NLP2RDF Parent Pom</name>
     <url>http://nlp2rdf.org</url>
     <properties>
-        <!--  tell the compiler we can use 1.6 -->
         <compiler.version>1.7</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -236,6 +235,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>stanfordcorenlp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+               <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>validator</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

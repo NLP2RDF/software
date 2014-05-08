@@ -13,7 +13,7 @@
     <name>Implementations of NIF</name>
 
     <modules>
-        <!--module>opennlp</module-->
+        <module>validator</module>
         <module>stanfordcorenlp</module>
         <!--module>snowball</module-->
         <!--module>demo</module-->

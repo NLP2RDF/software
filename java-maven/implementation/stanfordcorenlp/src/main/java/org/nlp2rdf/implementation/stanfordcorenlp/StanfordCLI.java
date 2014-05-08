@@ -9,10 +9,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.nlp2rdf.cli.ParameterException;
 import org.nlp2rdf.cli.ParameterParser;
-import org.nlp2rdf.core.Format;
-import org.nlp2rdf.core.NIFNamespaces;
-import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RLOGSLF4JBinding;
+import org.nlp2rdf.core.*;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
 import org.nlp2rdf.core.vocab.RLOGIndividuals;
 
@@ -37,7 +34,6 @@ public class StanfordCLI {
             NIFParameters nifParameters = ParameterParser.parseOptions(options, false);
 
             //customize
-
             OntModel model = nifParameters.getInputModel();
             StanfordWrapper s = new StanfordWrapper();
             //some stats

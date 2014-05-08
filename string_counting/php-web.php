@@ -4,14 +4,13 @@ $input = $_REQUEST['input'];
 
 echo "Encoding: ".mb_detect_encoding($input)."\n";
 echo " is normalized NFC? ".Normalizer::isNormalized($input,Normalizer::FORM_C)."\n";
-echo " is normalized NFD? ".Normalizer::isNormalized($input,Normalizer::FORM_D)."\n";
+echo " is normalized NFD? ".Normalizer::isNormalized(Normalizer::isNormalized(Normalizer::isNormalized($input,Normalizer::FORM_D)))."\n";
 echo " is normalized NFKC? ".Normalizer::isNormalized($input,Normalizer::FORM_KC)."\n";
 echo " is normalized NFKD? ".Normalizer::isNormalized($input,Normalizer::FORM_KD)."\n";
  printme($input, Normalizer::FORM_C);
  printme($input, Normalizer::FORM_D);
  printme($input, Normalizer::FORM_KC);
  printme($input, Normalizer::FORM_KD);
-
 
 
 /**

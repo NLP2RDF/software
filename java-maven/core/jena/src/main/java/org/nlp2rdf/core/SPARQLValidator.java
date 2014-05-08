@@ -27,7 +27,9 @@ import java.util.Scanner;
  * User: hellmann
  * Date: 01.07.13
  *                    mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.cli.Validate" -Dexec.args="-i src/test/resources/nif-erroneous-model.ttl"
+ * replaced by RDFUnitWrapper
  */
+@Deprecated
 public class SPARQLValidator {
     private static Logger log = LoggerFactory.getLogger(SPARQLValidator.class);
 

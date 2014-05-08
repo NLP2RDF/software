@@ -1,4 +1,4 @@
-package org.nlp2rdf.implementation.stanfordcorenlp;
+package org.nlp2rdf.implementation.validator;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -18,21 +18,14 @@ import org.nlp2rdf.webservice.NIFServlet;
  * User: hellmann
  * Date: 20.09.13
  */
-public class StanfordWS extends NIFServlet {
-
-
-    private final StanfordWrapper stanfordWrapper;
-
-    public StanfordWS() {
-        this.stanfordWrapper = new StanfordWrapper();
-    }
+public class ValidateWS extends NIFServlet {
 
     public OntModel execute(NIFParameters nifParameters) throws Exception {
 
         OntModel model = nifParameters.getInputModel();
         OntModel results = ModelFactory.createOntologyModel();
         //some stats
-        Monitor mon = MonitorFactory.getTimeMonitor(stanfordWrapper.getClass().getCanonicalName()).start();
+        Monitor mon = MonitorFactory.getTimeMonitor(RDFUnitWrapper.class.getCanonicalName()).start();
         int x = 0;
         {
 
@@ -46,17 +39,13 @@ public class StanfordWS extends NIFServlet {
 
 
 
-            ExtendedIterator<Individual> eit = model.listIndividuals(NIFOntClasses.Context.getOntClass(model));
-            for (; eit.hasNext(); ) {
-                stanfordWrapper.processText(eit.next(), model, model, nifParameters);
-                x++;
-            }
+
         }
         double lv = mon.stop().getLastValue();
         double avg = lv / x;
 
         String finalMessage = "Annotated " + x + " nif:Context(s)  in " + lv + " ms. (avg " + avg + ") producing " + model.size() + " triples";
-        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, stanfordWrapper.getClass().getCanonicalName(), null, null));
+        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, RDFUnitWrapper.class.getCanonicalName(), null, null));
         model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
         return results;

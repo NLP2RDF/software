@@ -1,4 +1,4 @@
-package org.nlp2rdf.implementation.stanfordcorenlp;
+package org.nlp2rdf.core;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.aksw.rdfunit.RDFUnit;
