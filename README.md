@@ -73,8 +73,13 @@ mvn jetty:run
 
 ### Use directly with Maven
 ```Shell
-cd java-maven/core/jena
-mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.cli.Validate" -Dexec.args="-i src/test/resources/nif-erroneous-model.ttl -o turtle"
+# install
+cd java-maven
+mvn clean install
+# run
+cd ../implementation/validator
+mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.validator.ValidateCLI" -Dexec.args="-i ../../core/jena/src/test/resources/nif-erroneous-model.ttl -t file -o turtle"
+mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.validator.ValidateCLI" -Dexec.args="-i ../../core/jena/src/test/resources/nif-correct-model.ttl -t file -o turtle"
 ```
 
 ### Build Validator Jar 
