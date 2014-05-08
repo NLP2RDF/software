@@ -63,6 +63,11 @@
             <version>9.0.5.v20130815</version>
         </dependency-->
 
+        <dependency>
+            <groupId>org.aksw.rdfunit</groupId>
+            <artifactId>rdfunit-core</artifactId>
+        </dependency>
+
 
     </dependencies>
 

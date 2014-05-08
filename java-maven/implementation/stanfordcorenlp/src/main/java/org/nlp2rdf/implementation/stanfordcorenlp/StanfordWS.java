@@ -2,6 +2,8 @@ package org.nlp2rdf.implementation.stanfordcorenlp;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
@@ -27,10 +29,20 @@ public class StanfordWS extends NIFServlet {
     public OntModel execute(NIFParameters nifParameters) throws Exception {
 
         OntModel model = nifParameters.getInputModel();
+        OntModel results = ModelFactory.createOntologyModel();
         //some stats
         Monitor mon = MonitorFactory.getTimeMonitor(stanfordWrapper.getClass().getCanonicalName()).start();
         int x = 0;
         {
+
+            // Convert model to OntModel
+            Model validationResults = RDFUnitWrapper.validate(model);
+            results.add(validationResults);
+            if(! nifParameters.getParameterMap().containsKey("validationreportonly")) {
+                // write results in original model
+                model.add(results);
+            }
+
 
 
             ExtendedIterator<Individual> eit = model.listIndividuals(NIFOntClasses.Context.getOntClass(model));
@@ -46,7 +58,7 @@ public class StanfordWS extends NIFServlet {
         model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, stanfordWrapper.getClass().getCanonicalName(), null, null));
         model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
-        return model;
+        return results;
         /* if (nifParameters.inputWasText()) {
             URIGenerator uriGenerator = URIGeneratorHelper.determineGenerator(nifParameters.getUriRecipe(), nifParameters.getContextLength());
             stanfordCoreNLPWrapper.processText(nifParameters.getPrefix(), nifParameters.getInputAsText(), uriGenerator, model);
