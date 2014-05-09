@@ -380,7 +380,7 @@
             <dependency>
                 <groupId>org.aksw.rdfunit</groupId>
                 <artifactId>rdfunit-core</artifactId>
-                <version>0.5</version>
+                <version>0.6</version>
             </dependency>
 
         </dependencies>
