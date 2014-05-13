@@ -147,18 +147,29 @@ public class ParameterParser {
 
         InputStream is = null;
         try {
-            if (inputtype.equals("file")) {
-                is = new FileInputStream(new File(input));
-            } else if (inputtype.equals("url")) {
-                is = new URI(input).toURL().openStream();
-            } else if (inputtype.equals("direct")) {
+
+            if (inputtype.equals("direct")) {
                 if (input == null) {
                     throw new ParameterException("input can not be empty, on CLI use '-i -  for stdin' or curl --data-urlencode @-");
                 } else if (input.equals("-")) {
                     is = new BufferedInputStream(System.in);
                 } else {
-                    is = new ByteArrayInputStream(input.getBytes());
+                    if(isWebService) {
+                        is = new ByteArrayInputStream(input.getBytes());
+                    }else{
+                        //this is a workaround to build a more robust cli, which shows mercy for forgetting the -t option
+                        System.err.println("you forgot the \"-t file\" or \"-t url\" option, but I am ok, assuming \"-t file\"");
+                        if(new File(input).exists()) {
+                            inputtype = "file";
+                        }
+                    }
                 }
+            }
+
+            if (inputtype.equals("file")) {
+                is = new FileInputStream(new File(input));
+            } else if (inputtype.equals("url")) {
+                is = new URI(input).toURL().openStream();
             } else {
                 throw new ParameterException("Option --intype=\" + inputtype + \" not known, use direct|file|url");
             }
