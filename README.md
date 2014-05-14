@@ -52,14 +52,14 @@ An up-to-date validator is supplied at root level in this repository and can be 
 # display help
 java -jar validate.jar -h
 # validate a turtle file
-java -jar validate.jar --input=java-maven/core/jena/src/test/resources/nif-erroneous-model.ttl --informat=turtle  
+java -jar validate.jar --input=java-maven/core/jena/src/test/resources/nif-erroneous-model.ttl --informat=turtle  --intype=file
 # output in turtle
-java -jar validate.jar --input=java-maven/core/jena/src/test/resources/nif-erroneous-model.ttl --informat=turtle --outformat=turtle
+java -jar validate.jar --input=java-maven/core/jena/src/test/resources/nif-erroneous-model.ttl --informat=turtle --outformat=turtle --intype=file
 # short version -i turtle and -o text are default
-java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl 
-java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl -o turtle 
+java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl -t file
+java -jar validate.jar -i core/jena/src/test/resources/nif-erroneous-model.ttl -o turtle -t file
 # test URLs
-java -jar validate.jar -i http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core/example.ttl -intype url
+java -jar validate.jar -i http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core/example.ttl --intype=url
 ```
 
 ### Start a server with Jetty and Maven
