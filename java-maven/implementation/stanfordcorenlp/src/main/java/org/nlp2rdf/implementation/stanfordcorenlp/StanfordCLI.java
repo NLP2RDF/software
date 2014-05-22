@@ -27,7 +27,7 @@ public class StanfordCLI {
         OptionParser parser = ParameterParser.getParser(args, "http://cli.nlp2rdf.org/stanfordcore#");
         // TODO as a courtesy to windows users
         // parser.acceptsAll(asList("outfile"), "a NIF RDF file with the result of validation as RDF, only takes effect, if outformat is 'turtle' or 'rdfxml'").withRequiredArg().ofType(File.class).describedAs("RDF file");
-        ParameterParser.addOutFileParameter(parser);
+        ParameterParser.addCLIParameter(parser);
         try {
             OptionSet options = ParameterParser.getOption(parser, args);
             ParameterParser.handleHelpAndWS(options, "");

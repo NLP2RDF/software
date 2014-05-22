@@ -24,7 +24,7 @@ public class ParameterParser {
 
 
     public static NIFParameters CLIbefore(String[] args, OptionParser parser, String addHelp) throws ParameterException, IOException {
-        ParameterParser.addOutFileParameter(parser);
+        ParameterParser.addCLIParameter(parser);
         OptionSet options = ParameterParser.getOption(parser, args);
         ParameterParser.handleHelpAndWS(options, addHelp);
         return ParameterParser.parseOptions(options, false);
@@ -81,13 +81,18 @@ public class ParameterParser {
 
     }
 
+    @Deprecated
     public static void addTestsuiteParameter(OptionParser parser) {
         parser.acceptsAll(asList("testsuite"), "for debugging the testsuite, a local turtle file, that contains the testsuite").withRequiredArg().ofType(File.class).describedAs("a .ttl file with a test suite");
 
     }
 
-    public static void addOutFileParameter(OptionParser parser) {
-        parser.acceptsAll(asList("outfile"), "a NIF RDF file with the result of validation as RDF, only takes effect, if outformat is 'turtle' or 'rdfxml'").withRequiredArg().ofType(File.class).describedAs("RDF file");
+    /**
+     * This is a helper function that add additional parameters for CLI clients
+     * @param parser
+     */
+    public static void addCLIParameter(OptionParser parser) {
+        parser.acceptsAll(asList("outfile"), "on CLI the output is written to the file specified via outfile").withRequiredArg().ofType(File.class).describedAs("output file");
     }
 
     public static void handleHelpAndWS(OptionSet options, String addHelp) throws ParameterException, IOException {
@@ -115,6 +120,7 @@ public class ParameterParser {
      * Parses the NIF options into an object, note that "start" and "port" have to be treated separately
      *
      * @param options
+     * @param isWebService options are parsed from a webservices
      * @return
      * @throws IOException
      * @throws ParameterException
