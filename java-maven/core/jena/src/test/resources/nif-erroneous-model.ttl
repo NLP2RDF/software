@@ -1,12 +1,13 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .
 @prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://example.com/correct.html#char=0,27>
 	a nif:Context ;
 	a nif:RFC5147String ;
-	nif:beginIndex "0" ;
-	nif:endIndex "27" ;
+	nif:beginIndex "0"^^xsd:nonNegativeInteger ;
+	nif:endIndex "27"^^xsd:nonNegativeInteger ;
 	nif:isString "transport or transportation" .
 
 # t1, old vocab
@@ -18,7 +19,7 @@
 	a nif:Context ;
 	nif:isString "transport or transportation" .
 
-# t3 beginIndex must be zero
+# t3 beginIndex must be zero, missing ^^xsd:nonNegativeInteger
 <http://example.com/error3.html#char=1,25>
 	a nif:Context ;
 	a nif:RFC5147String ;
