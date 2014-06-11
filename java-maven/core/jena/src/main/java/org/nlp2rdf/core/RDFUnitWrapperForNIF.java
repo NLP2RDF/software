@@ -25,7 +25,7 @@ import java.util.Collection;
  * Wraps RDFUnit for NIF
  * Created: 5/6/14 5:35 PM
  */
-public class RDFUnitWrapper {
+public class RDFUnitWrapperForNIF {
 
     private static String nifOntologyURI = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#";
 
@@ -33,17 +33,18 @@ public class RDFUnitWrapper {
     private static TestSuite testSuite = null;
     private static DataReader nifOntologyReader = null;
 
-    private RDFUnitWrapper() {
+    private RDFUnitWrapperForNIF() {
     }
 
     private static DataReader getNifOntologyReader() {
 
         // No locking here => possible deadock with getTestSuite()
+        // even if it's called twice, there is no harm & the overhead is negligible
         if (nifOntologyReader == null) {
 
             // Reader the nif ontology either from a resource or, if it fails, dereference it from the URI
             Collection<DataReader> nifReaderList = new ArrayList<>();
-            nifReaderList.add(new RDFFileReader(RDFUnitWrapper.class.getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl")));
+            nifReaderList.add(new RDFStreamReader(RDFUnitWrapperForNIF.class.getResourceAsStream("org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl")));
             nifReaderList.add(new RDFDereferenceReader(nifOntologyURI));
 
             nifOntologyReader = new DataFirstSuccessReader(nifReaderList);
@@ -53,7 +54,7 @@ public class RDFUnitWrapper {
 
     private static TestSuite getTestSuite() {
         if (testSuite == null) {
-            synchronized (RDFUnitWrapper.class) {
+            synchronized (RDFUnitWrapperForNIF.class) {
                 if (testSuite == null) {
 
 
@@ -61,8 +62,8 @@ public class RDFUnitWrapper {
                     Source nifSchema = new SchemaSource("nif", nifOntologyURI, getNifOntologyReader());
 
                     // Set up the manual nif test cases (from resource)
-                    DataReader manualTestCaseReader = new RDFFileReader(
-                            RDFUnitWrapper.class.getResourceAsStream(
+                    DataReader manualTestCaseReader = new RDFStreamReader(
+                            RDFUnitWrapperForNIF.class.getResourceAsStream(
                                     CacheUtils.getSourceManualTestFile("/org/aksw/rdfunit/tests/", nifSchema)));
 
                     // Instantiate manual test cases
@@ -102,7 +103,8 @@ public class RDFUnitWrapper {
 
     public static Model validate(final Model input) {
 
-        SimpleTestExecutorMonitor testExecutorMonitor = new SimpleTestExecutorMonitor();
+        final boolean enableRDFUnitLogging = false;
+        SimpleTestExecutorMonitor testExecutorMonitor = new SimpleTestExecutorMonitor(enableRDFUnitLogging);
         TestExecutor testExecutor = TestExecutor.initExecutorFactory(TestCaseExecutionType.rlogTestCaseResult);
         testExecutor.addTestExecutorMonitor(testExecutorMonitor);
 

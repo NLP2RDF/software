@@ -2,12 +2,20 @@ package org.nlp2rdf.implementation.validator;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.aksw.rdfunit.enums.TestCaseExecutionType;
+import org.aksw.rdfunit.exceptions.TripleWriterException;
+import org.aksw.rdfunit.io.DataWriter;
+import org.aksw.rdfunit.io.HTMLResultsWriter;
+import org.aksw.rdfunit.io.RDFStreamWriter;
 import org.nlp2rdf.cli.ParameterException;
 import org.nlp2rdf.cli.ParameterParser;
-import org.nlp2rdf.core.*;
+import org.nlp2rdf.core.Format;
+import org.nlp2rdf.core.NIFParameters;
+import org.nlp2rdf.core.RDFUnitWrapperForNIF;
 import org.nlp2rdf.core.vocab.RLOGOntClasses;
 
 import java.io.File;
@@ -19,7 +27,7 @@ import java.io.OutputStream;
 /**
  * User: hellmann
  * Date: 08.09.13
- *  mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.cli.Validate" -Dexec.args="-i src/test/resources/nif-erroneous-model.ttl"
+ * mvn compile exec:java -e  -Dexec.mainClass="org.nlp2rdf.cli.Validate" -Dexec.args="-i src/test/resources/nif-erroneous-model.ttl"
  */
 public class ValidateCLI {
 
@@ -53,29 +61,38 @@ public class ValidateCLI {
 
             }
 
+            // Initialize the results models
+            Model validationResults = RDFUnitWrapperForNIF.validate(inputModel);
+            outputModel.add(validationResults);
 
+            //Default writer (RDFUnit)
+            DataWriter outputWriter = null;
 
-            switch (outformat){
+            switch (outformat) {
 
                 // treat them the same
-                case "turtle":;
-                case "rdfxml":;
-                case "ntriples":{
-                    outputModel.add(RDFUnitWrapper.validate(inputModel));
-                    outputModel.write(outputStream, Format.toJena(outformat));
+                case "turtle":
+                case "rdfxml":
+                case "ntriples":
+                    outputWriter = new RDFStreamWriter(outputStream, Format.toJena(outformat));
                     break;
-                    }
-
                 case "html": {
-                    outputModel.add(RDFUnitWrapper.validate(inputModel));
-                    //TODO add HTML option, maybe there is a better way to execute the validator now
+                    outputWriter = HTMLResultsWriter.create(TestCaseExecutionType.rlogTestCaseResult, outputStream);
                     break;
-                    }
+                }
                 case "text": {
-                    outputModel.add(RDFUnitWrapper.validate(inputModel));
                     outputStream.write(outputModel.toString().getBytes());
                     break;
-                    }
+                }
+            }
+
+            // Write the output if outputWriter not null
+            try {
+                if (outputWriter != null)
+                    outputWriter.write(outputModel);
+            } catch (TripleWriterException e) {
+                System.err.println("Cannot write to output: " + e.getMessage());
+                e.printStackTrace();
             }
 
             System.err.println(outputModel.listIndividuals(outputModel.createClass(RLOGOntClasses.Entry.getUri())).toSet().size() + " log messages found (could be debug messages, errors are displayed separately).");

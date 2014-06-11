@@ -7,8 +7,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RDFUnitWrapper;
-import org.nlp2rdf.core.SPARQLValidator;
+import org.nlp2rdf.core.RDFUnitWrapperForNIF;
 import org.nlp2rdf.core.vocab.RLOGOntClasses;
 
 import java.io.File;
@@ -76,11 +75,11 @@ public class Validate {
             */
 
             if (outformat.equals("text")) {
-                outputModel.add(RDFUnitWrapper.validate(inputModel));
+                outputModel.add(RDFUnitWrapperForNIF.validate(inputModel));
 
             } else if (outformat.equals("turtle") || outformat.equals("rdfxml") || outformat.equals("ntriples")) {
                 //sparqlValidator.setQuiet(true);
-                outputModel.add(RDFUnitWrapper.validate(inputModel));
+                outputModel.add(RDFUnitWrapperForNIF.validate(inputModel));
                 if (options.hasArgument("outfile")) {
                     File outfile = (File) options.valueOf("outfile");
                     outputModel.write(new FileOutputStream(outfile), Format.toJena(outformat));
@@ -88,7 +87,7 @@ public class Validate {
                     outputModel.write(System.out, Format.toJena(outformat));
                 }
             } else {
-                outputModel.add(RDFUnitWrapper.validate(inputModel));
+                outputModel.add(RDFUnitWrapperForNIF.validate(inputModel));
             }
 
 

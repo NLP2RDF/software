@@ -8,7 +8,7 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RDFUnitWrapper;
+import org.nlp2rdf.core.RDFUnitWrapperForNIF;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
 import org.nlp2rdf.core.vocab.RLOGIndividuals;
@@ -37,7 +37,7 @@ public class StanfordWS extends NIFServlet {
         {
 
             // Convert model to OntModel
-            Model validationResults = RDFUnitWrapper.validate(model);
+            Model validationResults = RDFUnitWrapperForNIF.validate(model);
             results.add(validationResults);
             if(! nifParameters.getParameterMap().containsKey("validationreportonly")) {
                 // write results in original model

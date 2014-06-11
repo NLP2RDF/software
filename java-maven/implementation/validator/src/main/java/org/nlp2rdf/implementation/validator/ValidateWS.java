@@ -1,16 +1,13 @@
 package org.nlp2rdf.implementation.validator;
 
-import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RDFUnitWrapper;
+import org.nlp2rdf.core.RDFUnitWrapperForNIF;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
-import org.nlp2rdf.core.vocab.NIFOntClasses;
 import org.nlp2rdf.core.vocab.RLOGIndividuals;
 import org.nlp2rdf.webservice.NIFServlet;
 
@@ -25,12 +22,12 @@ public class ValidateWS extends NIFServlet {
         OntModel model = nifParameters.getInputModel();
         OntModel results = ModelFactory.createOntologyModel();
         //some stats
-        Monitor mon = MonitorFactory.getTimeMonitor(RDFUnitWrapper.class.getCanonicalName()).start();
+        Monitor mon = MonitorFactory.getTimeMonitor(RDFUnitWrapperForNIF.class.getCanonicalName()).start();
         int x = 0;
         {
 
             // Convert model to OntModel
-            Model validationResults = RDFUnitWrapper.validate(model);
+            Model validationResults = RDFUnitWrapperForNIF.validate(model);
             results.add(validationResults);
             if(! nifParameters.getParameterMap().containsKey("validationreportonly")) {
                 // write results in original model
@@ -45,7 +42,7 @@ public class ValidateWS extends NIFServlet {
         double avg = lv / x;
 
         String finalMessage = "Annotated " + x + " nif:Context(s)  in " + lv + " ms. (avg " + avg + ") producing " + model.size() + " triples";
-        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, RDFUnitWrapper.class.getCanonicalName(), null, null));
+        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, RDFUnitWrapperForNIF.class.getCanonicalName(), null, null));
         model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
         return results;

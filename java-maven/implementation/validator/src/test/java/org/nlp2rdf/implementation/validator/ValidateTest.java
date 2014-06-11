@@ -22,27 +22,15 @@
 package org.nlp2rdf.implementation.validator;
 
 
-import com.hp.hpl.jena.ontology.Individual;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.junit.Test;
-import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RDFUnitWrapper;
-import org.nlp2rdf.core.Text2RDF;
-import org.nlp2rdf.core.urischemes.RFC5147String;
-import org.nlp2rdf.core.urischemes.URIScheme;
+import org.nlp2rdf.core.RDFUnitWrapperForNIF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
 
 /**
  * @author Sebastian Hellmann - http://bis.informatik.uni-leipzig.de/SebastianHellmann
@@ -50,7 +38,7 @@ import java.util.HashMap;
  */
 public class ValidateTest {
 
-    private static Logger logger = LoggerFactory.getLogger(RDFUnitWrapper.class);
+    private static Logger logger = LoggerFactory.getLogger(RDFUnitWrapperForNIF.class);
 
 
     @Test
