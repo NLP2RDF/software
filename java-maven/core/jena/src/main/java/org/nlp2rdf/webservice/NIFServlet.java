@@ -135,11 +135,10 @@ public abstract class NIFServlet extends HttpServlet {
                 break;
             case "html": {
                 outputWriter = HTMLResultsWriter.create(TestCaseExecutionType.rlogTestCaseResult, outputStream);
-                contentType = "application/html";
+                contentType = "text/html";
                 break;
             }
             case "text": {
-
                 contentType = "text";
                 break;
             }
