@@ -13,8 +13,9 @@
     <name>Implementations of NIF</name>
 
     <modules>
-        <module>validator</module>
+        
         <module>stanfordcorenlp</module>
+        <module>validator</module>
         <!--module>snowball</module-->
         <!--module>demo</module-->
         <module>lexo</module>
