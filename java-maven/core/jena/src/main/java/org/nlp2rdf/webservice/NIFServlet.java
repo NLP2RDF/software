@@ -4,6 +4,12 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.RDFWriter;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
+import org.aksw.rdfunit.enums.TestCaseExecutionType;
+import org.aksw.rdfunit.exceptions.TripleWriterException;
+import org.aksw.rdfunit.io.DataWriter;
+import org.aksw.rdfunit.io.HTMLResultsWriter;
+import org.aksw.rdfunit.io.RDFStreamWriter;
+import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.security.InvalidParameterException;
 
 /**
@@ -104,33 +107,47 @@ public abstract class NIFServlet extends HttpServlet {
     }
 
     protected void write(HttpServletResponse httpServletResponse, OntModel out, String format) throws IOException {
-        if (format.equalsIgnoreCase("rdfxml")) {
-            write(httpServletResponse, out, "RDF/XML", "application/rdf+xml");
-        } else if (format.equalsIgnoreCase("turtle")) {
-            write(httpServletResponse, out, "TURTLE", "text/turtle");
-        } else if (format.equalsIgnoreCase("n3")) {
-            write(httpServletResponse, out, "N3", "text/rdf+n3");
-        } else if (format.equalsIgnoreCase("ntriples")) {
-            write(httpServletResponse, out, "N-TRIPLE", "text/rdf+n3");
-        } else {
-            throw new InvalidParameterException("There is no " + format + " output implemented at the moment. Sorry!");
-        }
-
-
-    }
-
-    protected void writeError(String error, HttpServletResponse httpServletResponse) throws IOException {
-        httpServletResponse.setContentType("text/plain");
-        httpServletResponse.setCharacterEncoding("UTF-8");
 
         //this is the printer where the output has to be on
-        PrintWriter pw = httpServletResponse.getWriter();
-        pw.println(error);
-        pw.close();
+        OutputStream outputStream = httpServletResponse.getOutputStream();
 
-    }
+        //Default writer (RDFUnit)
+        DataWriter outputWriter = null;
+        String contentType = "";
 
-    protected void write(HttpServletResponse httpServletResponse, OntModel out, String jenaFormat, String contentType) throws IOException {
+        switch (format.toLowerCase()) {
+
+            // treat them the same
+            case "turtle":
+                outputWriter = new RDFStreamWriter(outputStream, "TURTLE");
+                contentType = "text/turtle";
+                break;
+            case "rdfxml":
+                outputWriter = new RDFStreamWriter(outputStream, "RDF/XML");
+                contentType = "application/rdf+xml";
+                break;
+            case "n3":
+                outputWriter = new RDFStreamWriter(outputStream, "N3");
+                contentType = "text/rdf+n3";
+            case "ntriples":
+                outputWriter = new RDFStreamWriter(outputStream, "NTRIPLES");
+                contentType = "text/rdf+n3";
+                break;
+            case "html": {
+                outputWriter = HTMLResultsWriter.create(TestCaseExecutionType.rlogTestCaseResult, outputStream);
+                contentType = "application/html";
+                break;
+            }
+            case "text": {
+
+                contentType = "text";
+                break;
+            }
+            default:
+                outputStream.close();
+                throw new InvalidParameterException("There is no " + format + " output implemented at the moment. Sorry!");
+        }
+
         httpServletResponse.setContentType(contentType);
         httpServletResponse.setCharacterEncoding("UTF-8");
 
@@ -156,17 +173,37 @@ public abstract class NIFServlet extends HttpServlet {
         out.setNsPrefix("brown", "http://purl.org/olia/brown.owl#");
          */
 
-        //this is the printer where the output has to be on
-        PrintWriter pw = httpServletResponse.getWriter();
-        RDFWriter writer = out.getWriter(jenaFormat);
-        writer.setProperty("showXmlDeclaration", "true");
+
+        try {
+            if (outputWriter != null)
+                outputWriter.write(out);
+            else { // ct -> text
+                outputStream.write(outputStream.toString().getBytes());
+            }
+        } catch (TripleWriterException e) {
+            System.err.println("Cannot write to output: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        //RDFWriter writer = out.getWriter(jenaFormat);
+        //writer.setProperty("showXmlDeclaration", "true");
         //writer.setProperty("showDoctypeDeclaration", "true");
-        writer.write(out, pw, "");
-        pw.close();
+        //writer.write(out, outputStream, "");
+        outputStream.close();
 
 
     }
 
+    protected void writeError(String error, HttpServletResponse httpServletResponse) throws IOException {
+        httpServletResponse.setContentType("text/plain");
+        httpServletResponse.setCharacterEncoding("UTF-8");
+
+        //this is the printer where the output has to be on
+        PrintWriter pw = httpServletResponse.getWriter();
+        pw.println(error);
+        pw.close();
+
+    }
 
     public static String printParameterMap(HttpServletRequest httpServletRequest) {
 
