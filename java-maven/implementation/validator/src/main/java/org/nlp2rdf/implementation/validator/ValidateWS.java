@@ -29,7 +29,7 @@ public class ValidateWS extends NIFServlet {
             // Convert model to OntModel
             Model validationResults = RDFUnitWrapperForNIF.validate(model);
             results.add(validationResults);
-            if(! nifParameters.getParameterMap().containsKey("validationreportonly")) {
+            if( nifParameters.getParameterMap() != null && !nifParameters.getParameterMap().containsKey("validationreportonly")) {
                 // write results in original model
                 model.add(results);
             }

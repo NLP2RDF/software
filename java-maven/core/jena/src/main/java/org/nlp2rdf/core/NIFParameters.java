@@ -30,6 +30,7 @@ import java.util.Map;
 
 /**
  * A simple wrapper for the common options in NIF Services
+ * TODO unify parametermap
  */
 public class NIFParameters {
 
