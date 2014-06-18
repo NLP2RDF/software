@@ -380,12 +380,12 @@
             <dependency>
                 <groupId>org.aksw.rdfunit</groupId>
                 <artifactId>rdfunit-core</artifactId>
-                <version>0.6.3</version>
+                <version>0.6.4</version>
             </dependency>
             <dependency>
                 <groupId>org.aksw.rdfunit</groupId>
-                <artifactId>rdfunit-resources</artifactId>
-                <version>0.6.3</version>
+                <artifactId>rdfunit-validate</artifactId>
+                <version>0.6.4</version>
             </dependency>
 
         </dependencies>

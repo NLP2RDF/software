@@ -11,18 +11,17 @@ import org.aksw.rdfunit.exceptions.TripleWriterException;
 import org.aksw.rdfunit.io.DataWriter;
 import org.aksw.rdfunit.io.HTMLResultsWriter;
 import org.aksw.rdfunit.io.RDFStreamWriter;
+import org.aksw.rdfunit.validate.RDFUnitStaticWrapper;
 import org.nlp2rdf.cli.ParameterException;
 import org.nlp2rdf.cli.ParameterParser;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RDFUnitWrapperForNIF;
 import org.nlp2rdf.core.vocab.RLOGOntClasses;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
 
 /**
  * User: hellmann
@@ -32,9 +31,11 @@ import java.io.OutputStream;
 public class ValidateCLI {
 
     public static void main(String[] args) throws IOException {
+
+        RDFUnitStaticWrapper.initWrapper("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl");
+
         OptionParser parser = ParameterParser.getParser(args, "http://cli.nlp2rdf.org/validator#");
         ParameterParser.addCLIParameter(parser);
-
 
         try {
             OptionSet options = ParameterParser.getOption(parser, args);
@@ -62,7 +63,7 @@ public class ValidateCLI {
             }
 
             // Initialize the results models
-            Model validationResults = RDFUnitWrapperForNIF.validate(inputModel);
+            Model validationResults = RDFUnitStaticWrapper.validate(inputModel);
             outputModel.add(validationResults);
 
             //Default writer (RDFUnit)

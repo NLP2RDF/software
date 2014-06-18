@@ -22,8 +22,9 @@
 package org.nlp2rdf.implementation.validator;
 
 
+import org.aksw.rdfunit.validate.RDFUnitStaticWrapper;
 import org.junit.Test;
-import org.nlp2rdf.core.RDFUnitWrapperForNIF;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ import java.net.URL;
  */
 public class ValidateTest {
 
-    private static Logger logger = LoggerFactory.getLogger(RDFUnitWrapperForNIF.class);
+    private static Logger logger = LoggerFactory.getLogger(RDFUnitStaticWrapper.class);
 
 
     @Test

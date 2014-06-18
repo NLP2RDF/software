@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>org.aksw.rdfunit</groupId>
-            <artifactId>rdfunit-resources</artifactId>
+            <artifactId>rdfunit-validate</artifactId>
         </dependency>
         <!--dependency>
             <groupId>commons-codec</groupId>

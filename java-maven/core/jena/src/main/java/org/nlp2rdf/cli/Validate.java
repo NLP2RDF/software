@@ -5,9 +5,9 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.aksw.rdfunit.validate.RDFUnitStaticWrapper;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RDFUnitWrapperForNIF;
 import org.nlp2rdf.core.vocab.RLOGOntClasses;
 
 import java.io.File;
@@ -24,6 +24,8 @@ import java.io.IOException;
 public class Validate {
 
     public static void main(String[] args) throws IOException {
+
+        RDFUnitStaticWrapper.initWrapper("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl");
 
         OptionParser parser = ParameterParser.getParser(args, "http://cli.nlp2rdf.org/validate#");
         try {
@@ -75,11 +77,11 @@ public class Validate {
             */
 
             if (outformat.equals("text")) {
-                outputModel.add(RDFUnitWrapperForNIF.validate(inputModel));
+                outputModel.add(RDFUnitStaticWrapper.validate(inputModel));
 
             } else if (outformat.equals("turtle") || outformat.equals("rdfxml") || outformat.equals("ntriples")) {
                 //sparqlValidator.setQuiet(true);
-                outputModel.add(RDFUnitWrapperForNIF.validate(inputModel));
+                outputModel.add(RDFUnitStaticWrapper.validate(inputModel));
                 if (options.hasArgument("outfile")) {
                     File outfile = (File) options.valueOf("outfile");
                     outputModel.write(new FileOutputStream(outfile), Format.toJena(outformat));
@@ -87,7 +89,7 @@ public class Validate {
                     outputModel.write(System.out, Format.toJena(outformat));
                 }
             } else {
-                outputModel.add(RDFUnitWrapperForNIF.validate(inputModel));
+                outputModel.add(RDFUnitStaticWrapper.validate(inputModel));
             }
 
 
