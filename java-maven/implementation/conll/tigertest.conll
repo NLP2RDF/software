@@ -1,0 +1,13 @@
+1_1	Der	der	_	ART	_	case=nom|number=sg|gender=masc	_	3	_	NK	_	_	_	_
+1_2	texanische	texanisch	_	ADJA	_	case=nom|number=sg|gender=masc|degree=pos	_	3	_	NK	_	_	_	_
+1_3	Milliardär	Milliardär	_	NN	_	case=nom|number=sg|gender=masc	_	6	_	SB	_	_	_	_
+1_4	Ross	Ross	_	NE	_	case=nom|number=sg|gender=masc	_	5	_	PNC	_	_	_	_
+1_5	Perot	Perot	_	NE	_	case=nom|number=sg|gender=masc	_	3	_	NK	_	_	_	_
+1_6	hat	haben	_	VAFIN	_	number=sg|person=3|tense=pres|mood=ind	_	0	_	--	_	_	_	_
+1_7	das	der	_	ART	_	case=acc|number=sg|gender=neut	_	9	_	NK	_	_	_	_
+1_8	politische	politisch	_	ADJA	_	case=acc|number=sg|gender=neut|degree=pos	_	9	_	NK	_	_	_	_
+1_9	Establishment	Establishment	_	NN	_	case=acc|number=sg|gender=neut	_	12	_	OA	_	_	_	_
+1_10	in	in	_	APPR	_	_	_	9	_	MNR	_	_	_	_
+1_11	Washington	Washington	_	NE	_	case=dat|number=sg|gender=neut	_	10	_	NK	_	_	_	_
+1_12	aufgeschreckt	aufschrecken	_	VVPP	_	_	_	6	_	OC	_	_	_	_
+1_13	.	--	_	$.	_	_	_	6	_	--	_	_	_	_

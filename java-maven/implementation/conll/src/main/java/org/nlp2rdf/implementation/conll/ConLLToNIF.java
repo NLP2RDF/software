@@ -7,18 +7,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections.map.MultiValueMap;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.SPARQLValidator;
-import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.NIFAnnotationProperties;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.vocab.NIFObjectProperties;
@@ -29,11 +25,6 @@ import org.slf4j.LoggerFactory;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -143,8 +134,8 @@ public class ConLLToNIF {
 			String contextString = "";
 			int count = 0;
 			while((line = reader.readLine()) != null) {	
-//				count++;
-//				if(count%1000==0) 
+				count++;
+				if(count>10000) break;
 //					System.out.println(count);
 				
 				if(!line.isEmpty()) {
@@ -158,6 +149,7 @@ public class ConLLToNIF {
 					sentence = new ArrayList<String>();
 				}
 			}
+			System.out.println(contextString);
 			contextResource.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(outputModel), offset+"");
 			contextResource.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(outputModel), outputModel.createLiteral(contextString));
 			ResourceUtils.renameResource(contextResource, contextResource.getURI()+offset);
