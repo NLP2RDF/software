@@ -140,9 +140,11 @@ public class StanfordWrapper {
                 /********************************
                  * Lemma
                  ******/
-
-                wordIndividual.addProperty(NIFDatatypeProperties.lemma.getDatatypeProperty(outputModel), token.get(CoreAnnotations.LemmaAnnotation.class));
-
+                
+                if(token.get(CoreAnnotations.LemmaAnnotation.class)!=null) {
+                	wordIndividual.addProperty(NIFDatatypeProperties.lemma.getDatatypeProperty(outputModel), token.get(CoreAnnotations.LemmaAnnotation.class));
+                }
+                
                 /********************************
                  * POS tag
                  ******/
