@@ -4,7 +4,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.vocab.NIFObjectProperties;
@@ -21,6 +24,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 public class NIFSentenceSampleStream extends
@@ -71,12 +75,26 @@ public class NIFSentenceSampleStream extends
 		List<Span> sentenceSpans = new ArrayList<Span>();
 		String documentContent = documentRes.getProperty(stringProp).getString();
 
+		Map<Integer, Resource> sentenceMap = new HashMap<Integer, Resource>();
+		
 		for (Resource sentenceRes : sentenceResources) {
 			if(sentenceRes.hasProperty(RDF.type, sentenceProp)) {
-				int[] borders = this.extractSentenceOffsets(sentenceRes.getURI());
-				Span sentenceBorder = new Span(borders[0], borders[1]);
-				sentenceSpans.add(sentenceBorder);
+//				int[] borders = this.extractSentenceOffsets(sentenceRes.getURI());
+//				Span sentenceBorder = new Span(borders[0], borders[1]);
+//				sentenceSpans.add(sentenceBorder);
+				Integer startIndex = this.extractSentenceOffsets(sentenceRes.getURI())[0];
+				sentenceMap.put(startIndex, sentenceRes);
 			}
+		}
+
+		List<Integer> sortedIndexes = new ArrayList<Integer>();
+		sortedIndexes.addAll(sentenceMap.keySet());
+		Collections.sort(sortedIndexes);
+
+		for (Integer startIndex : sortedIndexes) {
+			int[] borders = this.extractSentenceOffsets(sentenceMap.get(startIndex).getURI());
+			Span sentenceBorder = new Span(borders[0], borders[1]);
+			sentenceSpans.add(sentenceBorder);
 		}
 
 		return new SentenceSample(documentContent,

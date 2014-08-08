@@ -2,6 +2,7 @@ package org.nlp2rdf.implementation.opennlp;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -56,7 +57,11 @@ public class OpenNLPWrapper {
 		this.documentText = context.getProperty(NIFDatatypeProperties.isString.getDatatypeProperty(nifModel)).getString();
 		this.prefix = parameters.getPrefix();
 		this.uriScheme = parameters.getUriScheme();
-		this.modelFolder = new File(parameters.getOptions().valueOf("modelFolder").toString());
+		if(!parameters.getOptions().has("modelFolder")) {
+			log.error("No model specified, please specify via -modelFolder");
+		} else {
+			this.modelFolder = new File(parameters.getOptions().valueOf("modelFolder").toString());
+		}
 		if(!parameters.getOptions().has("language")) {
 			log.warn("No language specified, defaulting to english");
 			lang = "en";
@@ -72,13 +77,17 @@ public class OpenNLPWrapper {
 	
 	public void processText(Individual context, NIFParameters nifParameters) {
 		
+		if(modelFolder==null)
+			return;
+		
 		//sentence detection
 		Span[] sentences = sentDetect(documentText);
 		List<Individual> sentenceResources = addSentences(sentences);
-
+		sentences = null;
 		//tokenizing & pos tagging
 		Tokenizer tokenizer = null;
 		InputStream modelIn = null;
+
 		try {
 		   // Loading tokenizer model
 			modelIn = new FileInputStream(modelFolder.getAbsolutePath()+"/"+lang+"-token.bin");
@@ -103,9 +112,13 @@ public class OpenNLPWrapper {
 				for(int i = 0; i < sentenceWords.size(); i++) {
 					addPos(sentenceWords.get(i), tags[i]);
 				}
+				tokenSpans = null;
+				tags = null;
 				
 			}
 			
+		} catch (FileNotFoundException fnf) {
+			log.error("Model file not found "+ fnf.getMessage());
 		} catch (final IOException ioe) {
 			ioe.printStackTrace();
 		} finally {
@@ -131,6 +144,7 @@ public class OpenNLPWrapper {
 		InputStream modelIn = null;
 		try {
 		   // Loading sentence detection model
+
 		   modelIn = new FileInputStream(modelFolder.getAbsolutePath()+"/"+lang+"-sent.bin");
 		   final SentenceModel sentenceModel = new SentenceModel(modelIn);
 		   modelIn.close();
@@ -197,7 +211,7 @@ public class OpenNLPWrapper {
 
 	public List<Individual> addSpans(Span[] spans, String text, OntClass spanClass, int offset) {
 		List<Individual> resources = new ArrayList<Individual>();
-
+		
 		for(int i = 0; i < spans.length; i++) {
 			
 			Span span = spans[i];

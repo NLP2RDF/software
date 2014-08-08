@@ -124,6 +124,7 @@ public class NIFPOSSampleStream extends FilterObjectStream<Resource, POSSample> 
 		TypedRDFResourceStream res = null;
 		NIFPOSSampleStream nifposstream = null;
 		try {
+
 			model.read(new BufferedReader(new FileReader(
 			    "/home/martin/workspace/OpenNLPNIFParser/resources/nifnertest.ttl")),
 			    "http://example.org", "TURTLE");
