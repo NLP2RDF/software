@@ -5,7 +5,7 @@ import org.apache.commons.collections.map.MultiValueMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Stts { 
+public class Stts implements OliaInterface { 
 
 	public static MultiValueMap links = MultiValueMap.decorate(new HashMap<String, ArrayList<String>>());
 	
@@ -226,6 +226,17 @@ public class Stts {
 		hasTag.put("PTKNEG", "http://purl.org/olia/stts.owl#PTKNEG");
 	}
 	
-
+	@Override 
+	public MultiValueMap getLinks()
+	{
+		return links;
 	}
+	
+	@Override 
+	public MultiValueMap getTags()
+	{
+		return hasTag;
+	}
+
+}
 	

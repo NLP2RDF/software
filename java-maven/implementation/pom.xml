@@ -16,6 +16,8 @@
         
         <module>stanfordcorenlp</module>
         <module>validator</module>
+				<module>conll</module>
+				<module>opennlp</module>
         <!--module>snowball</module-->
         <!--module>demo</module-->
         <module>lexo</module>
