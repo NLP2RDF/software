@@ -22,7 +22,7 @@
 package org.nlp2rdf.implementation.validator;
 
 
-import org.aksw.rdfunit.validate.RDFUnitStaticWrapper;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
 import org.junit.Test;
 
 import org.slf4j.Logger;

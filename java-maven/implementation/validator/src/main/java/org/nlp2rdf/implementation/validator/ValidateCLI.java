@@ -11,7 +11,7 @@ import org.aksw.rdfunit.exceptions.TripleWriterException;
 import org.aksw.rdfunit.io.DataWriter;
 import org.aksw.rdfunit.io.HTMLResultsWriter;
 import org.aksw.rdfunit.io.RDFStreamWriter;
-import org.aksw.rdfunit.validate.RDFUnitStaticWrapper;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
 import org.nlp2rdf.cli.ParameterException;
 import org.nlp2rdf.cli.ParameterParser;
 import org.nlp2rdf.core.Format;
