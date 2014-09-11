@@ -240,14 +240,9 @@ public class ParameterParser {
 
 		// case -l parameter setted, language detection will be enabled.
 		if (informat.equals("text")) {
-			if (!options.has("l"))
-				new Text2RDF().createContextIndividual(
-						(String) options.valueOf("p"), toString(is), uriScheme,
-						model);
-			else
-				new Text2RDF().createContextIndividual(
-						(String) options.valueOf("p"), toString(is), uriScheme,
-						model,true);
+			new Text2RDF().createContextIndividual(
+					(String) options.valueOf("p"), toString(is), uriScheme,
+					model);
 
 		} else {
 			try {
