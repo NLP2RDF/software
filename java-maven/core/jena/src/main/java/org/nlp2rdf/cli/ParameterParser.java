@@ -172,7 +172,7 @@ public class ParameterParser {
                 }
             }
 
-            if (inputtype.equals("file")) {
+            else if (inputtype.equals("file")) {
                 is = new FileInputStream(new File(input));
             } else if (inputtype.equals("url")) {
                 is = new URI(input).toURL().openStream();
