@@ -20,7 +20,7 @@ The server will start at 8899 because the option `-Djetty.port=8899` is default 
 
 you should be able to reach the service under:
 ```Shell
-curl http://localhost:8899/stanfordcorenlp/stanfordcorenlp?f=text&i=This+is+a+test.
+curl http://localhost:8899/stanfordcorenlp/stanfordcorenlpn?f=text&i=This+is+a+test.&t=direct
 ```
 
 ### CLI
