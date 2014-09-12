@@ -8,7 +8,7 @@ import joptsimple.OptionSet;
 import org.apache.jena.riot.RiotParseException;
 import org.nlp2rdf.core.*;
 import org.nlp2rdf.core.urischemes.URIScheme;
-import org.nlp2rdf.core.urischemes.URISchemeHelper;
+import org.nlp2rdf.core.urischemes.URISchemeHelper; 
 
 import java.io.*;
 import java.net.URI;
@@ -20,6 +20,15 @@ import static java.util.Arrays.asList;
  * User: hellmann Date: 07.09.13
  */
 public class ParameterParser {
+
+	public static OptionParser parser = null;
+
+	public static OptionParser getParser() {
+		if (parser == null)
+			parser = new OptionParser();
+		return parser;
+
+	}
 
 	public static NIFParameters CLIbefore(String[] args, OptionParser parser,
 			String addHelp) throws ParameterException, IOException {
@@ -57,7 +66,8 @@ public class ParameterParser {
 
 		// all default and required options according to:
 		// http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html
-		OptionParser parser = new OptionParser();
+		if (parser == null)
+			parser = new OptionParser();
 		parser.acceptsAll(asList("h", "help"), "Show help.");
 		parser.acceptsAll(asList("info"), "Display implementation information.");
 
@@ -224,8 +234,8 @@ public class ParameterParser {
 			} else if (inputtype.equals("direct")) {
 				is = new ByteArrayInputStream(input.getBytes());
 			} else {
-				throw new ParameterException(
-						"Option --intype=" + inputtype + " not known, use direct|file|url");
+				throw new ParameterException("Option --intype=" + inputtype
+						+ " not known, use direct|file|url");
 			}
 		} catch (FileNotFoundException fne) {
 			fne.printStackTrace();
