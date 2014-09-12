@@ -78,6 +78,7 @@ public class NIFParameterWebserviceFactory {
             throw new ParameterException(baos.toString());
         }
 
-        return ParameterParser.parseOptions(options, false);
+        // parse options with webservice setted to true
+        return ParameterParser.parseOptions(options, true);
     }
 }

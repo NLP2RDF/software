@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+	<a href="validator">Validate</a>
+
+	<form action="validator" id="usrform" method="post">
+		
+		<label for="f">Input format</label> 
+		<select name="f">
+			<option value="turtle">Turtle</option>
+			<option value="text">Text</option>
+		</select> 
+		
+		<br />
+		
+		<label for="t">Input type</label> 
+		<select name="t">
+			<option value="direct">Direct</option>
+			<option value="url">URL</option>
+		</select> 
+		
+		<br />
+		<label for="o">Output format</label> 
+		<select name="o">
+			<option value="turtle">Turtle</option>
+			<option value="text">Text</option>
+		</select> 
+		
+		<br />
+		
+		<label for="u">URI Scheme</label> 
+		<select name="u">
+			<option value="RFC5147String ">RFC5147String</option>
+			<option value="CStringInst">CStringInst</option>
+		</select> 
+		
+		<br />
+		
+		<label for="p">Prefix</label> 
+			<input name="p">
+		<br />
+		
+		<label for="i">RDF Data</label>
+		<textarea name="i" id="i" form="usrform"
+			style="width: 400px; height: 250px;">#Enter RDF here...</textarea>
+
+		 
+		<input type="submit">
+	</form>
+
+
+</body>
+</html>
