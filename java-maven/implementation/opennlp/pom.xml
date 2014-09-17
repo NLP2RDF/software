@@ -40,9 +40,18 @@
 		</dependency>
 
 	</dependencies>
-<build>
-<plugins>
-    <plugin>
+	<build>
+		<plugins>
+			 <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <configuration>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <stopKey>foo</stopKey>
+                    <stopPort>8896</stopPort>
+                </configuration>
+            </plugin>
+			<plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.6</version>
                 <executions>
@@ -51,7 +60,7 @@
                         <configuration>
                             <target>
                                 <mkdir dir="log"/>
-				<mkdir dir="model"/>
+								<mkdir dir="model"/>
                             </target>
                         </configuration>
                         <goals>
@@ -60,9 +69,8 @@
                     </execution>
                 </executions>
             </plugin>
-
-</plugins>
-</build>
+		</plugins>
+	</build>
 
 	<!-- <build> <plugins> <plugin> <artifactId>maven-assembly-plugin</artifactId> 
 		<configuration> <archive> <manifest> <mainClass>org.nlp2rdf.implementation.stanfordcorenlp.StanfordCLI</mainClass> 
