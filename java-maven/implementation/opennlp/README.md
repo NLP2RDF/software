@@ -29,6 +29,20 @@ MAVEN_OPTS="-Xmx4000m -XX:+UseConcMarkSweepGC"
 
 before running the application. Still, this application does not scale very well for large texts due to JENA model overhead.
 
+#### Web Service Example 
+In order to run the opennlp NIF web service you have to start the jetty plugin. Thus, navigate to the OpenNLP and start the plugin:
+
+```Shell
+mvn jetty:run
+
+```
+You are now able use the `curl` or use your favorite navigator to get the OpenNLP output.
+The example above shows a URL which contain the the mandatories paramenters:
+
+http://localhost:8899/opennlp/opennlp?f=text&i=This+is+a+test.&t=direct&modelFolder=model
+
+Notice that the `modelFolder` is the path to the folder that contains models from [from OpenNLP](http://opennlp.sourceforge.net/models-1.5/). In the example, there is a folder called `model` located at OpenNLP directory.
+
 #### Parsers
 
 NIF Parsers enable you to read NIF files and generate OpenNLP objects from them. You can, for example, read OpenNLP **SentenceSamples** from a NIF file and use them to train a model:
