@@ -14,10 +14,12 @@ foreach ( @$_REQUEST ['service'] as $service ) {
 		continue;
 		// retrieve
 	$time_start = microtime ( true );
-	$uri = $service . "?input-type=text&nif=true&prefix=" . urlencode ( $prefix ) . "&urirecipe=$urirecipe&input=" . urlencode ( $_REQUEST ['text'] );
+//	$uri = $service . "?input-type=text&nif=true&prefix=" . urlencode ( $prefix ) . "&urirecipe=$urirecipe&input=" . urlencode ( $_REQUEST ['text'] );
 	$uri = $service . "?f=text&prefix=" . urlencode ( $prefix ) . "&input=" . urlencode ( $_REQUEST ['text'] );
-	// echo $uri;
-	// $uri = "http://demo.nlp2rdf.org:9999/stanfordcorenlpn?f=text&i=This+is+a+test.&t=direct";
+	
+	// case opennlp was chosen we need add &modelFolder=model in order to se the defauld model folder
+	$uri = $uri."&modelFolder=model";
+	
 	$data = file_get_contents ( $uri );
 	$time_end = microtime ( true );
 	$time_service_needed = round ( $time_end - $time_start, 2 );
@@ -189,7 +191,7 @@ if ($format == "turtle") {
 	$serviceCheckboxes = array (
 			"<a href=\"http://nlp2rdf.org/implementations/snowballstemmer\" target=_blank >Snowball Stemmer</a> - NIF 2.0 draft" => "http://nlp2rdf.lod2.eu/demo/NIFStemmer",
 			"<a href=\"http://demo.nlp2rdf.org:9999/stanfordcorenlpn\" target=_blank >Stanford CoreNLP</a> - NIF 2.0 draft</a>" => "http://demo.nlp2rdf.org:9999/stanfordcorenlpn",
-			// "<a href=\"http://code.google.com/p/nlp2rdf/source/browse/#hg%2Fimplementation%2Fopennlp\" target=_blank >OpenNLP</a>"=>"http://nlp2rdf.lod2.eu/demo/NIFOpenNLP" ,
+		    "<a href=\"http://demo.nlp2rdf.org:9998/opennlp\" target=_blank >OpenNLP</a>"=>"http://demo.nlp2rdf.org:9998/opennlp" ,
 			"<a href=\"https://github.com/kenda/nlp2rdf.MontyLingua\" target=_blank >MontyLingua</a> - NIF 1.0" => "http://nlp2rdf.lod2.eu/demo/NIFMontyLingua",
 			"<a href=\"https://github.com/robbl/node-dbpedia-spotlight-nif\" target=_blank >DBpedia Spotlight</a> - NIF 1.0" => "http://nlp2rdf.lod2.eu/demo/NIFDBpediaSpotlight" 
 	);
