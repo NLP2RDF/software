@@ -18,7 +18,9 @@ foreach ( @$_REQUEST ['service'] as $service ) {
 	$uri = $service . "?f=text&prefix=" . urlencode ( $prefix ) . "&input=" . urlencode ( $_REQUEST ['text'] );
 	
 	// case opennlp was chosen we need add &modelFolder=model in order to se the defauld model folder
+	if(strstr($uri, "opennlp"))
 	$uri = $uri."&modelFolder=model";
+	
 	
 	$data = file_get_contents ( $uri );
 	$time_end = microtime ( true );
@@ -189,7 +191,7 @@ if ($format == "turtle") {
 				<legend>Tools</legend>
 	<?php
 	$serviceCheckboxes = array (
-			"<a href=\"http://nlp2rdf.org/implementations/snowballstemmer\" target=_blank >Snowball Stemmer</a> - NIF 2.0 draft" => "http://nlp2rdf.lod2.eu/demo/NIFStemmer",
+			"<a href=\"http://demo.nlp2rdf.org:9996/snowball\" target=_blank >Snowball Stemmer</a> - NIF 2.0 draft" => "http://demo.nlp2rdf.org:9996/snowball",
 			"<a href=\"http://demo.nlp2rdf.org:9999/stanfordcorenlpn\" target=_blank >Stanford CoreNLP</a> - NIF 2.0 draft</a>" => "http://demo.nlp2rdf.org:9999/stanfordcorenlpn",
 		    "<a href=\"http://demo.nlp2rdf.org:9998/opennlp\" target=_blank >OpenNLP</a>"=>"http://demo.nlp2rdf.org:9998/opennlp" ,
 			"<a href=\"https://github.com/kenda/nlp2rdf.MontyLingua\" target=_blank >MontyLingua</a> - NIF 1.0" => "http://nlp2rdf.lod2.eu/demo/NIFMontyLingua",
