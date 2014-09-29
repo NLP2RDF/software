@@ -41,17 +41,24 @@
 
 	</dependencies>
 	<build>
-		<plugins>
-			 <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <stopKey>foo</stopKey>
-                    <stopPort>8896</stopPort>
-                </configuration>
-            </plugin>
-			<plugin>
+	 <plugins>
+	        <plugin>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-maven-plugin</artifactId>
+			<configuration>
+                    		<scanIntervalSeconds>10</scanIntervalSeconds>
+                    		<stopKey>foo</stopKey>
+                    		<stopPort>8896</stopPort>
+				<systemProperties>
+                                        <systemProperty>
+                                                <name>jetty.port</name>
+                                                <value>9998</value>
+                                        </systemProperty>
+                                </systemProperties>
+
+                	</configuration>
+                </plugin>
+		<plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.6</version>
                 <executions>
@@ -60,7 +67,7 @@
                         <configuration>
                             <target>
                                 <mkdir dir="log"/>
-								<mkdir dir="model"/>
+				<mkdir dir="model"/>
                             </target>
                         </configuration>
                         <goals>
