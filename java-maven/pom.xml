@@ -420,10 +420,10 @@
             <name>University Leipzig, AKSW Maven2 Repository</name>
             <url>http://maven.aksw.org/repository/snapshots</url>
         </repository>
-        <repository>
+        <!--repository>
             <id>opennlp.sf.net</id>
             <url>http://opennlp.sourceforge.net/maven2</url>
-        </repository>
+        </repository-->
         <!--repository>
             <id>some_stuff_such_as_pellet</id>
             <url>http://on.cs.unibas.ch/maven/repository</url>

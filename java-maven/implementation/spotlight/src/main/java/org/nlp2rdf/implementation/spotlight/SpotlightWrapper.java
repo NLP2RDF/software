@@ -36,7 +36,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Test;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.Span;
