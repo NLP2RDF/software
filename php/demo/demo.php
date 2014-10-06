@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <?php
 include ("../ARC2/ARC2.php");
 
