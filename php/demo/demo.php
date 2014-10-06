@@ -12,7 +12,6 @@ $stanford = "http://demo.nlp2rdf.org:9999/stanfordcorenlpn";
 $opennlp = "http://demo.nlp2rdf.org:9998/opennlp";
 $spotlight = "http://demo.nlp2rdf.org:9995/spotlight";
 
-echo @$_REQUEST ['service'];
 
 $meta = "";
 $output = "";
@@ -24,12 +23,13 @@ foreach ( @$_REQUEST ['service'] as $service ) {
 	$time_start = microtime ( true );
 //	$uri = $service . "?input-type=text&nif=true&prefix=" . urlencode ( $prefix ) . "&urirecipe=$urirecipe&input=" . urlencode ( $_REQUEST ['text'] );
 	$uri = $service . "?f=text&prefix=" . urlencode ( $prefix ) . "&input=" . urlencode ( $_REQUEST ['text'] );
-	echo "-";
+	
 	// case opennlp was chosen we need add &modelFolder=model in order to se the defauld model folder
 	if(strstr($uri, "opennlp"))
 	$uri = $uri."&modelFolder=model";
 
-	echo "-";
+	if(strstr($uri, "spotlight"))
+	$uri = $uri."&confidence=".$_REQUEST ['confidence'];
 	
 	$data = file_get_contents ( $uri );
 	$time_end = microtime ( true );
@@ -79,7 +79,8 @@ $ns = array (
 		'nif' => "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#",
 		'rlog' => "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#",
 		'dc' => "http://purl.org/dc/elements/1.1/",
-		'stanford' => "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#"
+		'stanford' => "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/vm/dep/stanford#",
+		'itsrdf' => "http://www.w3.org/2005/11/its/rdf#"
 );
 
 if ($format == "turtle") {
@@ -198,9 +199,9 @@ if ($format == "turtle") {
 	<?php
 	$serviceCheckboxes = array (
 			"<a href=\"$snowball\" target=_blank >Snowball Stemmer</a> " => "$snowball",
-			"<a href=\"$stanford\" target=_blank >Stanford CoreNLP</a> </a>" => "$stanford",
+			"<a href=\"$stanford\" target=_blank >Stanford CoreNLP</a> " => "$stanford",
 		    "<a href=\"$opennlp\" target=_blank >OpenNLP</a>"=>"$opennlp" ,
-			"<a href=\"$spotlight\" target=_blank >DBpedia Spotlight</a> " => "$spotlight" 
+			"<a href=\"$spotlight\" target=_blank >DBpedia Spotlight</a> (Confidence: <input style=\"width:35\" name=\"confidence\" value=\"0.5\" type=\"text\"/> )" => "$spotlight" 
 // 			"<a href=\"https://github.com/kenda/nlp2rdf.MontyLingua\" target=_blank >MontyLingua</a> - NIF 1.0" => "http://nlp2rdf.lod2.eu/demo/NIFMontyLingua",
 	);
 	$first = true;
