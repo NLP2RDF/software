@@ -6,6 +6,14 @@ $urirecipe = (isset ( $_REQUEST ['urirecipe'] )) ? $_REQUEST ['urirecipe'] : "of
 $text = $_REQUEST ['text'];
 $format = $_REQUEST ['format'];
 
+//current webservices url
+$snowball = "http://demo.nlp2rdf.org:9996/snowball";
+$stanford = "http://demo.nlp2rdf.org:9999/stanfordcorenlpn";
+$opennlp = "http://demo.nlp2rdf.org:9998/opennlp";
+$spotlight = "http://demo.nlp2rdf.org:9995/spotlight";
+
+echo @$_REQUEST ['service'];
+
 $meta = "";
 $output = "";
 $alltriples = array ();
@@ -16,11 +24,12 @@ foreach ( @$_REQUEST ['service'] as $service ) {
 	$time_start = microtime ( true );
 //	$uri = $service . "?input-type=text&nif=true&prefix=" . urlencode ( $prefix ) . "&urirecipe=$urirecipe&input=" . urlencode ( $_REQUEST ['text'] );
 	$uri = $service . "?f=text&prefix=" . urlencode ( $prefix ) . "&input=" . urlencode ( $_REQUEST ['text'] );
-	
+	echo "-";
 	// case opennlp was chosen we need add &modelFolder=model in order to se the defauld model folder
 	if(strstr($uri, "opennlp"))
 	$uri = $uri."&modelFolder=model";
-	
+
+	echo "-";
 	
 	$data = file_get_contents ( $uri );
 	$time_end = microtime ( true );
@@ -150,15 +159,12 @@ if ($format == "turtle") {
 					target="_blank">full documentation</a> [<a
 					href="http://dblp.uni-trier.de/rec/bibtex/conf/ekaw/HellmannLAN12"
 					target=_blank">Bibtex</a>]. The code for this demo is available <a
-					href="http://code.google.com/p/nlp2rdf/source/browse/nlp2rdf.lod2.eu/demo.php"
+					href="https://github.com/NLP2RDF/software/tree/master/php/demo"
 					target="_blank">here</a>. This service also allows you to retrieve
 				the raw data. Use the <em>format</em> parameter which supports <em>rdfxml,
 					turtle, rdfjson, ntriples</em> as values. You can also use the <em>Accept:</em>
 				header with the appropriate content-type. Note that this service is
-				currently using NIF-1.0, while the NIF-2.0 specification is in work.
-				Take a look at the <a
-					href="http://nlp2rdf.org/news/nif-roadmap-2012-and-pointers"
-					target="_blank">roadmap</a> for further informations.
+				currently using NIF-2.0 specification.
 			</p>
 		</div>
 
@@ -191,11 +197,11 @@ if ($format == "turtle") {
 				<legend>Tools</legend>
 	<?php
 	$serviceCheckboxes = array (
-			"<a href=\"http://demo.nlp2rdf.org:9996/snowball\" target=_blank >Snowball Stemmer</a> - NIF 2.0 draft" => "http://demo.nlp2rdf.org:9996/snowball",
-			"<a href=\"http://demo.nlp2rdf.org:9999/stanfordcorenlpn\" target=_blank >Stanford CoreNLP</a> - NIF 2.0 draft</a>" => "http://demo.nlp2rdf.org:9999/stanfordcorenlpn",
-		    "<a href=\"http://demo.nlp2rdf.org:9998/opennlp\" target=_blank >OpenNLP</a>"=>"http://demo.nlp2rdf.org:9998/opennlp" ,
-			"<a href=\"https://github.com/kenda/nlp2rdf.MontyLingua\" target=_blank >MontyLingua</a> - NIF 1.0" => "http://nlp2rdf.lod2.eu/demo/NIFMontyLingua",
-			"<a href=\"https://github.com/robbl/node-dbpedia-spotlight-nif\" target=_blank >DBpedia Spotlight</a> - NIF 1.0" => "http://nlp2rdf.lod2.eu/demo/NIFDBpediaSpotlight" 
+			"<a href=\"$snowball\" target=_blank >Snowball Stemmer</a> " => "$snowball",
+			"<a href=\"$stanford\" target=_blank >Stanford CoreNLP</a> </a>" => "$stanford",
+		    "<a href=\"$opennlp\" target=_blank >OpenNLP</a>"=>"$opennlp" ,
+			"<a href=\"$spotlight\" target=_blank >DBpedia Spotlight</a> " => "$spotlight" 
+// 			"<a href=\"https://github.com/kenda/nlp2rdf.MontyLingua\" target=_blank >MontyLingua</a> - NIF 1.0" => "http://nlp2rdf.lod2.eu/demo/NIFMontyLingua",
 	);
 	$first = true;
 	foreach ( $serviceCheckboxes as $key => $value ) {
@@ -213,15 +219,17 @@ if ($format == "turtle") {
 	<label for="text2"><p style="display: inline">Other NIF service:</p>&nbsp;</label><input
 					id="text2" type="text" name="service[]" value="" /><br />
 				<p style="display: inline">Coming soon:</p>
-				<br /> <input type="checkbox" disabled="disabled" /> <label>&nbsp;<a
-					href="http://code.google.com/p/nlp2rdf/source/browse/#hg%2Fimplementation%2Fopennlp">OpenNLP(not
-						working currently)</a></label><br /> <input type="checkbox"
+				<br /> <input type="checkbox"
 					disabled="disabled" /> <label>&nbsp;<a
 					href="https://bitbucket.org/gruenerkaktus/uimanif/overview">UIMA</a></label><br />
 				<input type="checkbox" disabled="disabled" /> <label>&nbsp;<a
 					href="https://bitbucket.org/mack/mallet2nif">Mallet</a></label><br />
 				<input type="checkbox" disabled="disabled" /> <label>&nbsp;<a
-					href="https://bitbucket.org/d_cherix/gan/overview">Gate ANNIE</a></label>
+					href="https://bitbucket.org/d_cherix/gan/overview">Gate ANNIE</a>
+					</label>
+					<br/><input type="checkbox" disabled="disabled" /> <label>&nbsp;<a
+					href="">DBpedia Spotlight</a>
+					</label>
 			</fieldset>
 			<div style="float: right">
 				<button type="reset" class="medium red">
