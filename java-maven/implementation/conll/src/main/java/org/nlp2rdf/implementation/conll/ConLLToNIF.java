@@ -133,11 +133,12 @@ public class ConLLToNIF {
 			List<String> sentence = new ArrayList<String>();
 			String contextString = "";
 			int count = 0;
+			System.out.println("parsing file");
 			while((line = reader.readLine()) != null) {	
 				count++;
-				if(count>10000) break;
-//					System.out.println(count);
-				
+				if(count%1000==0) {
+					System.out.println(count);
+				}
 				if(!line.isEmpty()) {
 					sentence.add(line);
 				}
@@ -149,7 +150,7 @@ public class ConLLToNIF {
 					sentence = new ArrayList<String>();
 				}
 			}
-			System.out.println(contextString);
+			
 			contextResource.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(outputModel), offset+"");
 			contextResource.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(outputModel), outputModel.createLiteral(contextString));
 			ResourceUtils.renameResource(contextResource, contextResource.getURI()+offset);

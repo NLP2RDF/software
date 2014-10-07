@@ -5,12 +5,15 @@ import org.apache.commons.collections.map.MultiValueMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Penn { 
+public class Penn implements OliaInterface { 
 
 	public static MultiValueMap links = MultiValueMap.decorate(new HashMap<String, ArrayList<String>>());
 	
 	static {
-
+		
+		links.put("http://purl.org/olia/penn.owl#RP", "http://purl.org/olia/penn.owl#Particle");
+		links.put("http://purl.org/olia/penn.owl#TO", "http://purl.org/olia/penn.owl#To");
+		links.put("http://purl.org/olia/penn.owl#IN", "http://purl.org/olia/penn.owl#PrepositionOrSubordinatingConjunction");
 		links.put("http://purl.org/olia/penn.owl#LS", "http://purl.org/olia/olia.owl#Residual");
 		links.put("http://purl.org/olia/penn.owl#JJS", "http://purl.org/olia/olia.owl#Adjective");
 		links.put("http://purl.org/olia/penn.owl#leftCurlyBracket", "http://purl.org/olia/olia.owl#ParentheticalPunctuation");
@@ -196,6 +199,17 @@ public class Penn {
 		hasTag.put("-RSB-", "http://purl.org/olia/penn.owl#rightSquareBracket");
 	}
 	
-
+	@Override 
+	public MultiValueMap getLinks()
+	{
+		return links;
 	}
+	
+	@Override 
+	public MultiValueMap getTags()
+	{
+		return hasTag;
+	}
+
+}
 	

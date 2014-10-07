@@ -5,7 +5,7 @@ import org.apache.commons.collections.map.MultiValueMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Brown { 
+public class Brown implements OliaInterface { 
 
 	public static MultiValueMap links = MultiValueMap.decorate(new HashMap<String, ArrayList<String>>());
 	
@@ -281,6 +281,18 @@ public class Brown {
 		hasTag.put("TL", "http://purl.org/olia/brown.owl#TL");
 		hasTag.put("ABL", "http://purl.org/olia/brown.owl#ABL");
 		hasTag.put("UH", "http://purl.org/olia/brown.owl#UH");
+	}
+	
+	@Override 
+	public MultiValueMap getLinks()
+	{
+		return links;
+	}
+	
+	@Override 
+	public MultiValueMap getTags()
+	{
+		return hasTag;
 	}
 	
 
