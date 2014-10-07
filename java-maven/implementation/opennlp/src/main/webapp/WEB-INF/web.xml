@@ -5,12 +5,13 @@
 <web-app>
     <display-name>NLP2RDF</display-name>
     <servlet>
-        <servlet-name>NIFSnowball</servlet-name>
-        <servlet-class>org.nlp2rdf.implementation.snowball.SnowballWS</servlet-class>
+        <servlet-name>opennlp</servlet-name>
+        <servlet-class>org.nlp2rdf.implementation.opennlp.OpenNLPWS</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>NIFSnowball</servlet-name>
-        <url-pattern>/snowball</url-pattern>
+        <servlet-name>opennlp</servlet-name>
+        <url-pattern>/opennlp</url-pattern>
     </servlet-mapping>
+
 </web-app>

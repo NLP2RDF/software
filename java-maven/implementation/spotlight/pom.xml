@@ -9,9 +9,9 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>snowball</artifactId>
+	<artifactId>spotlight</artifactId>
 	<packaging>jar</packaging>
-	<name>Snowball Tartarus</name>
+	<name>DBpedia Spotlight</name>
 
 	<dependencies>
 
@@ -25,17 +25,8 @@
 			<artifactId>jena-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-snowball</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.nlp2rdf.software</groupId>
 			<artifactId>OLiA</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-analyzers</artifactId>
-			<version>3.6.2</version>
 		</dependency>
 
 		<dependency>
@@ -54,8 +45,24 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>jsp-api</artifactId>
 		</dependency>
+		<dependency>
+
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
+		</dependency>
+
+
+
 
 	</dependencies>
+
 
 	<build>
 		<plugins>
@@ -69,7 +76,7 @@
 					<systemProperties>
 						<systemProperty>
 							<name>jetty.port</name>
-							<value>9996</value>
+							<value>9995</value>
 						</systemProperty>
 					</systemProperties>
 

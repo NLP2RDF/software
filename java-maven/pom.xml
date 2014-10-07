@@ -117,20 +117,12 @@
 
                 <plugin>
                     <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>maven-jetty-plugin</artifactId>
-
-
+                    <artifactId>jetty-maven-plugin</artifactId>
+		    <version>8.1.8.v20121106</version>
                     <configuration>
                         <stopKey>stopKey</stopKey>
                         <stopPort>9999</stopPort>
                         <scanIntervalSeconds>1</scanIntervalSeconds>
-                        <requestLog implementation="org.mortbay.jetty.NCSARequestLog">
-                            <filename>log/yyyy_mm_dd.request.log</filename>
-                            <retainDays>90</retainDays>
-                            <append>true</append>
-                            <extended>false</extended>
-                            <logTimeZone>GMT</logTimeZone>
-                        </requestLog>
                         <systemProperties>
                             <systemProperty>
                                 <name>jetty.port</name>
@@ -345,6 +337,7 @@
                 <version>1.0.3</version>
                 <scope>provided</scope>
             </dependency>
+
             <dependency>
                 <groupId>com.owldl</groupId>
                 <artifactId>pellet</artifactId>
@@ -395,13 +388,22 @@
             <dependency>
                 <groupId>org.aksw.rdfunit</groupId>
                 <artifactId>rdfunit-validate</artifactId>
-                <version>0.6.4</version>
+                <version>0.6.8</version>
             </dependency>
 
         </dependencies>
     </dependencyManagement>
 
     <repositories>
+<repository>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <layout>default</layout>
+      <url>http://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
         <!--repository>
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Repository for Maven</name>
@@ -418,10 +420,10 @@
             <name>University Leipzig, AKSW Maven2 Repository</name>
             <url>http://maven.aksw.org/repository/snapshots</url>
         </repository>
-        <repository>
+        <!--repository>
             <id>opennlp.sf.net</id>
             <url>http://opennlp.sourceforge.net/maven2</url>
-        </repository>
+        </repository-->
         <!--repository>
             <id>some_stuff_such_as_pellet</id>
             <url>http://on.cs.unibas.ch/maven/repository</url>
@@ -430,7 +432,21 @@
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
+      
+    <pluginRepository>
+      <id>central</id>
+      <name>Maven Plugin Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+    </pluginRepository>
+
+  <pluginRepository>
             <id>maven.codehaus.plugin.snapshots</id>
             <name>Codehaus plugin Repository</name>
             <url>https://nexus.codehaus.org/content/repositories/public</url>

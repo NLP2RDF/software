@@ -5,7 +5,7 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.aksw.rdfunit.validate.RDFUnitStaticWrapper;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.vocab.RLOGOntClasses;

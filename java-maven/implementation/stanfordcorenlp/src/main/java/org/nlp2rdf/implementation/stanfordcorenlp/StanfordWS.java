@@ -7,7 +7,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import org.aksw.rdfunit.validate.RDFUnitStaticWrapper;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.vocab.NIFOntClasses;

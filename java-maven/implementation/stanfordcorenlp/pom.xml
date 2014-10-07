@@ -1,75 +1,97 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>nif-2.0-parent</artifactId>
-        <groupId>org.nlp2rdf.software</groupId>
-        <version>2.0.1-SNAPSHOT</version>
-          <relativePath>../../pom.xml</relativePath>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>nif-2.0-parent</artifactId>
+		<groupId>org.nlp2rdf.software</groupId>
+		<version>2.0.1-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
-    <artifactId>stanfordcorenlp</artifactId>
-    <packaging>jar</packaging>
+	<artifactId>stanfordcorenlp</artifactId>
+	<packaging>jar</packaging>
 
-    <name>Stanford CoreNLP</name>
-    <dependencies>
+	<name>Stanford CoreNLP</name>
+	<dependencies>
 
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>jena</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jena</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-core</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-core</artifactId>
+		</dependency>
 
-        <!--
-          <dependency>
-              <groupId>edu.stanford.nlp</groupId>
-              <artifactId>stanford-corenlp-models</artifactId>
-              <version>1.3.4</version>
-          </dependency>
-      -->
-        <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>1.3.4</version>
-            <classifier>models</classifier>
-        </dependency>
+		<!-- <dependency> <groupId>edu.stanford.nlp</groupId> <artifactId>stanford-corenlp-models</artifactId> 
+			<version>1.3.4</version> </dependency> -->
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>1.3.4</version>
+			<classifier>models</classifier>
+		</dependency>
 
-        <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>1.3.4</version>
-        </dependency>
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>1.3.4</version>
+		</dependency>
 
-        <!--dependency>
-            <groupId>org.nlp2rdf</groupId>
-            <artifactId>webservice</artifactId>
-        </dependency-->
-        <dependency>
-            <groupId>org.nlp2rdf.software</groupId>
-            <artifactId>OLiA</artifactId>
-        </dependency>
+		<!--dependency> <groupId>org.nlp2rdf</groupId> <artifactId>webservice</artifactId> 
+			</dependency -->
+		<dependency>
+			<groupId>org.nlp2rdf.software</groupId>
+			<artifactId>OLiA</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jsp-api</artifactId>
-        </dependency>
-        <!--dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>9.0.5.v20130815</version>
-        </dependency-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+		</dependency>
+		<!--dependency> <groupId>org.eclipse.jetty</groupId> <artifactId>jetty-server</artifactId> 
+			<version>9.0.5.v20130815</version> </dependency -->
 
 
 
 
-    </dependencies>
-
+	</dependencies>
     <build>
         <plugins>
+		<plugin>
+		<groupId>org.eclipse.jetty</groupId>
+		<artifactId>jetty-maven-plugin</artifactId>
+		<configuration>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <stopKey>foo</stopKey>
+                    <stopPort>8896</stopPort>
+                                <systemProperties>
+                                        <systemProperty>
+                                                <name>jetty.port</name>
+                                                <value>9999</value>
+                                        </systemProperty>
+                                </systemProperties>
+
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <configuration>
+                            <target>
+                                <mkdir dir="log"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>

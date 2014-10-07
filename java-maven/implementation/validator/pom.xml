@@ -44,15 +44,24 @@
                     </descriptorRefs>
                 </configuration>
             </plugin>
-             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <stopKey>foo</stopKey>
-                    <stopPort>8896</stopPort>
-                </configuration>
-            </plugin>
+
+
+		 <plugin>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-maven-plugin</artifactId>
+			<configuration>
+                    		<scanIntervalSeconds>10</scanIntervalSeconds>
+                    		<stopKey>foo</stopKey>
+                    		<stopPort>9890</stopPort>
+				<systemProperties>
+                                        <systemProperty>
+                                                <name>jetty.port</name>
+                                                <value>9990</value>
+                                        </systemProperty>
+                                </systemProperties>
+
+                	</configuration>
+                </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.6</version>
