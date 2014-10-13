@@ -383,12 +383,12 @@
             <dependency>
                 <groupId>org.aksw.rdfunit</groupId>
                 <artifactId>rdfunit-core</artifactId>
-                <version>0.6.4</version>
+                <version>0.7.1</version>
             </dependency>
             <dependency>
                 <groupId>org.aksw.rdfunit</groupId>
                 <artifactId>rdfunit-validate</artifactId>
-                <version>0.6.8</version>
+                <version>0.7.1</version>
             </dependency>
 
         </dependencies>

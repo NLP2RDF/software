@@ -7,10 +7,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.aksw.rdfunit.enums.TestCaseExecutionType;
-import org.aksw.rdfunit.exceptions.TripleWriterException;
-import org.aksw.rdfunit.io.DataWriter;
-import org.aksw.rdfunit.io.HTMLResultsWriter;
-import org.aksw.rdfunit.io.RDFStreamWriter;
+import org.aksw.rdfunit.io.writer.*;
 import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
 import org.nlp2rdf.cli.ParameterException;
 import org.nlp2rdf.cli.ParameterParser;
@@ -67,7 +64,7 @@ public class ValidateCLI {
             outputModel.add(validationResults);
 
             //Default writer (RDFUnit)
-            DataWriter outputWriter = null;
+            RDFWriter outputWriter = null;
 
             switch (outformat) {
 
@@ -78,7 +75,7 @@ public class ValidateCLI {
                     outputWriter = new RDFStreamWriter(outputStream, Format.toJena(outformat));
                     break;
                 case "html": {
-                    outputWriter = HTMLResultsWriter.create(TestCaseExecutionType.rlogTestCaseResult, outputStream);
+                    outputWriter = RDFWriterFactory.createHTMLWriter(TestCaseExecutionType.rlogTestCaseResult, outputStream);
                     break;
                 }
                 case "text": {
@@ -91,7 +88,7 @@ public class ValidateCLI {
             try {
                 if (outputWriter != null)
                     outputWriter.write(outputModel);
-            } catch (TripleWriterException e) {
+            } catch (RDFWriterException e) {
                 System.err.println("Cannot write to output: " + e.getMessage());
                 e.printStackTrace();
             }

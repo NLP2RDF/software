@@ -53,7 +53,10 @@
 		<!--dependency> <groupId>org.eclipse.jetty</groupId> <artifactId>jetty-server</artifactId> 
 			<version>9.0.5.v20130815</version> </dependency -->
 
-
+        <dependency>
+            <groupId>org.aksw.rdfunit</groupId>
+            <artifactId>rdfunit-validate</artifactId>
+        </dependency>
 
 
 	</dependencies>

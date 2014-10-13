@@ -1,15 +1,10 @@
 package org.nlp2rdf.webservice;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.RDFWriter;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.aksw.rdfunit.enums.TestCaseExecutionType;
-import org.aksw.rdfunit.exceptions.TripleWriterException;
-import org.aksw.rdfunit.io.DataWriter;
-import org.aksw.rdfunit.io.HTMLResultsWriter;
-import org.aksw.rdfunit.io.RDFStreamWriter;
-import org.nlp2rdf.core.Format;
+import org.aksw.rdfunit.io.writer.*;
 import org.nlp2rdf.core.NIFParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +107,7 @@ public abstract class NIFServlet extends HttpServlet {
         OutputStream outputStream = httpServletResponse.getOutputStream();
 
         //Default writer (RDFUnit)
-        DataWriter outputWriter = null;
+        RDFWriter outputWriter = null;
         String contentType = "";
 
         switch (format.toLowerCase()) {
@@ -134,7 +129,7 @@ public abstract class NIFServlet extends HttpServlet {
                 contentType = "text/rdf+n3";
                 break;
             case "html": {
-                outputWriter = HTMLResultsWriter.create(TestCaseExecutionType.rlogTestCaseResult, outputStream);
+                outputWriter = RDFWriterFactory.createHTMLWriter(TestCaseExecutionType.rlogTestCaseResult, outputStream);
                 contentType = "text/html";
                 break;
             }
@@ -179,7 +174,7 @@ public abstract class NIFServlet extends HttpServlet {
             else { // ct -> text
                 outputStream.write(outputStream.toString().getBytes());
             }
-        } catch (TripleWriterException e) {
+        } catch (RDFWriterException e) {
             System.err.println("Cannot write to output: " + e.getMessage());
             e.printStackTrace();
         }
