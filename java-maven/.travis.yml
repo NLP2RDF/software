@@ -4,7 +4,7 @@ jdk:
 branches:
   only:
     - master
-
+    - dev
 before_script: cd java-maven
 install: /bin/true
 script: "mvn clean install"
