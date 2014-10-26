@@ -16,11 +16,11 @@ Note: you will need to install Maven
 4. go to the folder `software/java-maven/implementation/stanfordcorenlp/`
 5. run `mvn jetty:run`
 
-The server will start at 8899 because the option `-Djetty.port=8899` is default and omitted.
+The server will start at port 9999. You can change the port number, for example running at port 8899 you might use  `-Djetty.port=8899` parameter.
 
-you should be able to reach the service under:
+Now you should be able to reach the service under:
 ```Shell
-curl "http://localhost:8899/stanfordcorenlp/stanfordcorenlpn?f=text&i=This+is+a+test.&t=direct"
+curl "http://localhost:9999/stanfordcorenlp/stanfordcorenlpn?f=text&i=This+is+a+test.&t=direct"
 ```
 
 ### CLI
@@ -97,8 +97,8 @@ We would be happy, if you were to share your code for NIF implementations using 
 ## Maven
 Including the maven dependencies allows you to load the ontologies via 
 ```Java
-String nif-core-ttl = "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl" ;
-String nif-core-owl = "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.owl" ;
+String nif_core_ttl = "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl" ;
+String nif_core_owl = "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.owl" ;
 String testsuite = "org/uni-leipzig/persistence/nlp2rdf/testcase/lib/nif-2.0-suite.ttl" ;
 // get input stream
 InputStream is = SPARQLValidator.class.getClassLoader().getResourceAsStream(testsuite);
