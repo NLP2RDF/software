@@ -12,6 +12,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.graph.NodeFactory;
+import com.hp.hpl.jena.vocabulary.XSD;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
@@ -59,7 +62,8 @@ public class ConLLToNIF {
 		contextResource = outputModel.createIndividual(uri, outputModel.createClass(NIFOntClasses.RFC5147String.getUri()));
 		contextResource.addOntClass(NIFOntClasses.Context.getOntClass(outputModel));
 		contextResource.addOntClass(NIFOntClasses.String.getOntClass(outputModel));
-		contextResource.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(outputModel), "0");
+    RDFDatatype nonNegInt = NodeFactory.getType(XSD.nonNegativeInteger.getURI());
+    contextResource.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(outputModel), "0", nonNegInt);
 		
 		if(!nifParameters.getOptions().has("informat")) {
 			log.warn("informat parameter empty, please choose informat=file or informat=text");
@@ -190,8 +194,9 @@ public class ConLLToNIF {
 			Individual wordResource = outputModel.createIndividual(uri, outputModel.createClass(NIFOntClasses.RFC5147String.getUri()));
 			wordResource.addOntClass(NIFOntClasses.Word.getOntClass(outputModel));
 			wordResource.addOntClass(NIFOntClasses.String.getOntClass(outputModel));
-			wordResource.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(outputModel), word.getStart()+"");
-			wordResource.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(outputModel), word.getEnd()+"");
+      RDFDatatype nonNegInt = NodeFactory.getType(XSD.nonNegativeInteger.getURI());
+      wordResource.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(outputModel), word.getStart()+"", nonNegInt);
+			wordResource.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(outputModel), word.getEnd()+"", nonNegInt);
 			wordResource.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(outputModel), outputModel.createLiteral(word.getWordString()));
 			wordResource.addProperty(NIFDatatypeProperties.posTag.getDatatypeProperty(outputModel), word.getPos());
 			
@@ -240,8 +245,9 @@ public class ConLLToNIF {
 		Individual sentenceResource = outputModel.createIndividual(uri, outputModel.createClass(NIFOntClasses.RFC5147String.getUri()));
 		sentenceResource.addOntClass(NIFOntClasses.Sentence.getOntClass(outputModel));
 		sentenceResource.addOntClass(NIFOntClasses.String.getOntClass(outputModel));
-		sentenceResource.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(outputModel), startOffset+"");
-		sentenceResource.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(outputModel), endOffset+"");
+    RDFDatatype nonNegInt = NodeFactory.getType(XSD.nonNegativeInteger.getURI());
+    sentenceResource.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(outputModel), startOffset+"", nonNegInt);
+		sentenceResource.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(outputModel), endOffset+"", nonNegInt);
 		sentenceResource.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(outputModel), outputModel.createLiteral(sentence));
 		return sentenceResource;
 	}
