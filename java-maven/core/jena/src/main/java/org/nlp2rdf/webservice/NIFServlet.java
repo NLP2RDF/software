@@ -29,6 +29,15 @@ public abstract class NIFServlet extends HttpServlet {
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         handle(httpServletRequest, httpServletResponse);
     }
+    
+    @Override
+    protected void doOptions(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+        //The following are CORS headers
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS, DELETE");
+        httpServletResponse.setHeader("Access-Control-Max-Age", "*");
+        httpServletResponse.setHeader("Access-Control-Allow-Headers", "*");
+    }
 
     @Override
     protected void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
@@ -48,6 +57,12 @@ public abstract class NIFServlet extends HttpServlet {
      * @throws IOException
      */
     private void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+
+       //The following are CORS headers
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS, DELETE");
+        httpServletResponse.setHeader("Access-Control-Max-Age", "*");
+        httpServletResponse.setHeader("Access-Control-Allow-Headers", "*");
 
         NIFParameters nifParameters = null;
         try {
