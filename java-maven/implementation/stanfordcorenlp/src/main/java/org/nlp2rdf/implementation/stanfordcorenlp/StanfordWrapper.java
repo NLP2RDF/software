@@ -28,6 +28,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.Annotator;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
@@ -69,12 +70,7 @@ import java.util.TreeMap;
 public class StanfordWrapper {
     private static Logger log = LoggerFactory.getLogger(StanfordWrapper.class);
 
-
-    public void processText( Individual context, OntModel inputModel, OntModel outputModel, NIFParameters nifParameters) {
-        String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(inputModel)).asLiteral().getString();
-        String prefix = nifParameters.getPrefix();
-        URIScheme urischeme = nifParameters.getUriScheme();
-
+    protected Annotator buildAnnotator(NIFParameters nifParameters) {
         /**
          * Prepare Stanford
          **/
@@ -88,7 +84,15 @@ public class StanfordWrapper {
             //TODO implement proper config parsing
         }
 
-        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+        return new StanfordCoreNLP(props);
+    }
+
+    public void processText( Individual context, OntModel inputModel, OntModel outputModel, NIFParameters nifParameters) {
+        String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(inputModel)).asLiteral().getString();
+        String prefix = nifParameters.getPrefix();
+        URIScheme urischeme = nifParameters.getUriScheme();
+
+        Annotator pipeline = buildAnnotator(nifParameters);
 
         // create an empty Annotation just with the given text
         Annotation document = new Annotation(contextString);
