@@ -10,7 +10,7 @@
     <name>NLP2RDF Parent Pom</name>
     <url>http://nlp2rdf.org</url>
     <properties>
-        <compiler.version>1.7</compiler.version>
+        <compiler.version>1.8</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
