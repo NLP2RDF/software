@@ -11,11 +11,13 @@ public class Brown implements OliaInterface {
 	
 	static {
 
+		links.put("http://purl.org/olia/brown.owl#AP", "http://purl.org/olia/olia.owl#Determiner");
 		links.put("http://purl.org/olia/brown.owl#IN", "http://purl.org/olia/olia.owl#Preposition");
 		links.put("http://purl.org/olia/brown.owl#IN", "http://purl.org/olia/olia.owl#Adposition");
 		links.put("http://purl.org/olia/brown.owl#WDT", "http://purl.org/olia/olia.owl#PronounOrDeterminer");
 		links.put("http://purl.org/olia/brown.owl#WDT", "http://purl.org/olia/olia.owl#WHDeterminer");
 		links.put("http://purl.org/olia/brown.owl#WDT", "http://purl.org/olia/olia.owl#Determiner");
+		links.put("http://purl.org/olia/brown.owl#ABN", "http://purl.org/olia/olia.owl#Quantifier");
 		links.put("http://purl.org/olia/brown.owl#CS", "http://purl.org/olia/olia.owl#Conjunction");
 		links.put("http://purl.org/olia/brown.owl#CS", "http://purl.org/olia/olia.owl#SubordinatingConjunction");
 		links.put("http://purl.org/olia/brown.owl#SecondPossessivePronoun", "http://purl.org/olia/olia.owl#PronounOrDeterminer");
@@ -133,6 +135,7 @@ public class Brown implements OliaInterface {
 		links.put("http://purl.org/olia/brown.owl#OD", "http://purl.org/olia/olia.owl#Quantifier");
 		links.put("http://purl.org/olia/brown.owl#OD", "http://purl.org/olia/olia.owl#OrdinalNumber");
 		links.put("http://purl.org/olia/brown.owl#RBT", "http://purl.org/olia/olia.owl#Adverb");
+		links.put("http://purl.org/olia/brown.owl#RB", "http://purl.org/olia/olia.owl#Adverb");
 		links.put("http://purl.org/olia/brown.owl#BEDZ", "http://purl.org/olia/olia.owl#FiniteVerb");
 		links.put("http://purl.org/olia/brown.owl#BEDZ", "http://purl.org/olia/olia.owl#Verb");
 		links.put("http://purl.org/olia/brown.owl#HVD", "http://purl.org/olia/olia.owl#Verb");
@@ -195,7 +198,8 @@ public class Brown implements OliaInterface {
 	public static MultiValueMap hasTag = MultiValueMap.decorate(new HashMap<String, ArrayList<String>>());
 	
 	static {
-
+		
+		hasTag.put("AP", "http://purl.org/olia/brown.owl#AP");
 		hasTag.put("RBR", "http://purl.org/olia/brown.owl#RBR");
 		hasTag.put("VBG", "http://purl.org/olia/brown.owl#VBG");
 		hasTag.put("WDT", "http://purl.org/olia/brown.owl#WDT");
@@ -214,6 +218,8 @@ public class Brown implements OliaInterface {
 		hasTag.put("BER", "http://purl.org/olia/brown.owl#BER");
 		hasTag.put("DO", "http://purl.org/olia/brown.owl#DO");
 		hasTag.put(".", "http://purl.org/olia/brown.owl#sentenceCloser");
+		hasTag.put("sentenceCloser", "http://purl.org/olia/brown.owl#sentenceCloser");
+		hasTag.put("comma", "http://purl.org/olia/brown.owl#comma");
 		hasTag.put("DTX", "http://purl.org/olia/brown.owl#DTX");
 		hasTag.put("AT", "http://purl.org/olia/brown.owl#AT");
 		hasTag.put("NPS$", "http://purl.org/olia/brown.owl#NPSpossessive");
@@ -221,6 +227,7 @@ public class Brown implements OliaInterface {
 		hasTag.put("NR", "http://purl.org/olia/brown.owl#NR");
 		hasTag.put("DOD", "http://purl.org/olia/brown.owl#DOD");
 		hasTag.put("PP$", "http://purl.org/olia/brown.owl#PPpossessive");
+		hasTag.put("RB", "http://purl.org/olia/brown.owl#RB");
 		hasTag.put("BE", "http://purl.org/olia/brown.owl#BE");
 		hasTag.put("(", "http://purl.org/olia/brown.owl#openingParenthesis");
 		hasTag.put("DTI", "http://purl.org/olia/brown.owl#DTI");
@@ -231,6 +238,7 @@ public class Brown implements OliaInterface {
 		hasTag.put("TO", "http://purl.org/olia/brown.owl#TO");
 		hasTag.put("JJT", "http://purl.org/olia/brown.owl#JJT");
 		hasTag.put(":", "http://purl.org/olia/brown.owl#colon");
+		hasTag.put("colon", "http://purl.org/olia/brown.owl#colon");
 		hasTag.put("JJ", "http://purl.org/olia/brown.owl#JJ");
 		hasTag.put("BEZ", "http://purl.org/olia/brown.owl#BEZ");
 		hasTag.put(")", "http://purl.org/olia/brown.owl#closingParenthesis");
