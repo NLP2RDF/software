@@ -182,7 +182,7 @@ public class ParameterParser {
 		String outformat = (String) options.valueOf("o");
 		String informat = (String) options.valueOf("f");
 		URIScheme uriScheme = URISchemeHelper.getInstance((String) options
-				.valueOf("f"));
+				.valueOf("u"));
 
 		/** Implementation check **/
 		switch (informat) {
