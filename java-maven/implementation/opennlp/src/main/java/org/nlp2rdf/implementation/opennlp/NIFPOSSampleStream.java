@@ -34,6 +34,7 @@ public class NIFPOSSampleStream extends FilterObjectStream<Resource, POSSample> 
 	public POSSample read() throws IOException {
 
 		Resource sentRes = samples.read();
+		
 		if (sentRes == null) {
 			return null;
 		}
@@ -117,32 +118,6 @@ public class NIFPOSSampleStream extends FilterObjectStream<Resource, POSSample> 
 		}
 
 		return new POSSample(tokens, tags);
-	}
-
-	public static void main(String[] args) {
-		OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
-		TypedRDFResourceStream res = null;
-		NIFPOSSampleStream nifposstream = null;
-		try {
-
-			model.read(new BufferedReader(new FileReader(
-			    "/home/martin/workspace/OpenNLPNIFParser/resources/nifnertest.ttl")),
-			    "http://example.org", "TURTLE");
-
-			System.setOut(new PrintStream(System.out, true, "UTF-8"));
-			res = new TypedRDFResourceStream(model, NIFOntClasses.Sentence.getOntClass(model));
-			nifposstream = new NIFPOSSampleStream(res);
-			POSSample sample = nifposstream.read();
-			System.out.println(sample);
-			sample = nifposstream.read();
-			System.out.println(sample);
-			sample = nifposstream.read();
-			System.out.println(sample);
-
-		} catch (Exception e) {
-			// this shouldn't happen
-			e.printStackTrace();
-		}
 	}
 
 }

@@ -20,6 +20,7 @@ import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
+import org.h2.constant.SysProperties;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.URIScheme;
@@ -27,6 +28,7 @@ import org.nlp2rdf.core.vocab.NIFAnnotationProperties;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.vocab.NIFObjectProperties;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
+import org.nlp2rdf.vm.olia.models.OliaInterface;
 import org.nlp2rdf.vm.olia.models.Penn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,7 @@ public class OpenNLPWrapper {
 	private URIScheme uriScheme;
 	private File modelFolder;
 	private String lang;
+	private OliaInterface tagset;
 	private Set<String> unknownTags;
 	
 	Text2RDF text2RDF = new Text2RDF();
@@ -68,6 +71,36 @@ public class OpenNLPWrapper {
 		} else {
 			lang = parameters.getOptions().valueOf("language").toString();
 		}
+		if(!parameters.getOptions().has("tagset")) {
+			log.warn("No tagset specified, defaulting to Penn");
+			ClassLoader classLoader = OpenNLPWrapper.class.getClassLoader();
+			try {
+				Class tagsetClass = classLoader.loadClass("org.nlp2rdf.vm.olia.models.Penn");
+				tagset = (OliaInterface) tagsetClass.newInstance();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			ClassLoader classLoader = OpenNLPWrapper.class.getClassLoader();
+			try {
+				Class tagsetClass = classLoader.loadClass("org.nlp2rdf.vm.olia.models."+parameters.getOptions().valueOf("tagset").toString());
+				tagset = (OliaInterface) tagsetClass.newInstance();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		unknownTags = new HashSet<String>();
 	}
 	
@@ -79,7 +112,6 @@ public class OpenNLPWrapper {
 		
 		if(modelFolder==null)
 			return;
-		
 		//sentence detection
 		Span[] sentences = sentDetect(documentText);
 		List<Individual> sentenceResources = addSentences(sentences);
@@ -93,7 +125,7 @@ public class OpenNLPWrapper {
 			modelIn = new FileInputStream(modelFolder.getAbsolutePath()+"/"+lang+"-token.bin");
 			TokenizerModel tokenModel = new TokenizerModel(modelIn);
 			modelIn.close();
-			modelIn = new FileInputStream(modelFolder.getAbsolutePath()+"/"+lang+"-pos-maxent.bin");
+			modelIn = new FileInputStream(modelFolder.getAbsolutePath()+"/"+lang+"-pos.bin");
 			POSModel model = new POSModel(modelIn);
 			POSTaggerME tagger = new POSTaggerME(model);
 			modelIn.close();
@@ -101,9 +133,9 @@ public class OpenNLPWrapper {
 			tokenizer = new TokenizerME(tokenModel);
 			
 			for(Individual sentence : sentenceResources) {
-
+				
 				String sentString = sentence.getProperty(NIFDatatypeProperties.anchorOf.getDatatypeProperty(nifModel)).getString();			
-
+				
 				Span[] tokenSpans = tokenizer.tokenizePos(sentString);
 				String tags[] = tagger.tag(getStringsForSpans(tokenSpans, sentString));
 				//offset relative to the sentence, but has to be relative to document: setting off by start offset of sentence
@@ -178,13 +210,13 @@ public class OpenNLPWrapper {
 		return wordResources;
 	}
 		
-	//only penn, as per OpenNLP documentation
+	//tagset based on training corpus, is Tiger for German models
 	private void addPos(Individual wordResource, String posTag) {
-		List<String> oliaIndividual = (List<String>) Penn.hasTag.get(posTag);
+		List<String> oliaIndividual = (List<String>) tagset.getTags().get(posTag);
         if (oliaIndividual != null) {
             for (String s : oliaIndividual) {
             	wordResource.addProperty(NIFObjectProperties.oliaLink.getObjectProperty(nifModel), nifModel.createIndividual(s, OWL.Thing));
-                List<String> taglinks = (List<String>) Penn.links.get(s);
+                List<String> taglinks = (List<String>) tagset.getLinks().get(s);
                 if (taglinks != null) {
                     for (String oc : taglinks) {
                     	wordResource.addProperty(NIFAnnotationProperties.oliaCategory.getAnnotationProperty(nifModel), nifModel.createClass(oc));
@@ -197,9 +229,8 @@ public class OpenNLPWrapper {
                 }
             }
         } else {
-        	log.warn("missing oliaLinks for "+posTag);
         	if(!unknownTags.contains(posTag)) {
-        		log.warn("missing oliaLinks for "+posTag);
+        		log.warn("missing tag in olia model: "+posTag);
         		unknownTags.add(posTag);
         	}
         }
@@ -210,6 +241,7 @@ public class OpenNLPWrapper {
 	}
 
 	public List<Individual> addSpans(Span[] spans, String text, OntClass spanClass, int offset) {
+		
 		List<Individual> resources = new ArrayList<Individual>();
 		
 		for(int i = 0; i < spans.length; i++) {
@@ -217,7 +249,6 @@ public class OpenNLPWrapper {
 			Span span = spans[i];
 			int start = span.getStart()+offset;
 			int end = span.getEnd()+offset;
-			
 			org.nlp2rdf.core.Span nifSpan = new org.nlp2rdf.core.Span(start, end);
 			Individual spanResource = text2RDF.createCStringIndividual(prefix, context, nifSpan, uriScheme, nifModel);
 			spanResource.addOntClass(spanClass);

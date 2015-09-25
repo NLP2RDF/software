@@ -14,15 +14,24 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public class TypedRDFResourceStream implements ObjectStream<Resource> {
 
-	private OntModel rdfModel;
+	private OntModel rdfModel = null;
+	private List<OntModel> models;
 	private List<Resource> resources = new ArrayList<Resource>();
+	private OntClass type;
 
 	public TypedRDFResourceStream(OntModel model, OntClass type) {
 
 		this.rdfModel = model;
 		this.resources = this.rdfModel.listResourcesWithProperty(RDF.type, type)
 		    .toList();
+		this.type = type;
 
+	}
+	
+	public TypedRDFResourceStream(List<OntModel> models, OntClass type) {
+
+		this.models = models;
+		this.type = type;
 	}
 
 	public Model getModel() {
@@ -40,8 +49,16 @@ public class TypedRDFResourceStream implements ObjectStream<Resource> {
 	public Resource read() throws IOException {
 		if (this.resources.size() > 0) {
 			return this.resources.remove(0);
-		} else {
-			return null;
+		} else if(models != null){
+			if(models.size() > 0) {
+				rdfModel = models.remove(0);
+				this.resources = this.rdfModel.listResourcesWithProperty(RDF.type, type)
+					    .toList();
+				return this.resources.remove(0);
+			} else {
+				return null;
+			}
 		}
+		return null;
 	}
 }

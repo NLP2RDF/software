@@ -5,20 +5,18 @@ Tools to integrate NIF and OpenNLP. There's a wrapper that allows converting Ope
 
 #### Wrapper
 
-The OpenNLP wrapper allows annotating texts with OpenNLP models and generating NIF output. Annotation of **sentence boundaries**, **tokens** and **part of speech** are implemented at the moment. Please note that we don't distribute the models, so get them [from OpenNLP](http://opennlp.sourceforge.net/models-1.5/)
+The OpenNLP wrapper allows annotating texts with OpenNLP models and generating NIF output. Annotation of **sentence boundaries**, **tokens** and **part of speech** are implemented at the moment. Please note that we don't distribute the models, so get them [from OpenNLP](http://opennlp.sourceforge.net/models-1.5/) or train them yourself.
 
-In addition to the usual NIF API parameters, there is the parameter *modelFolder* which denotes the folder in which you have the OpenNLP models. The second new parameter is *language*, denoting the language of your models. It typically is a 2 character language code. We are assuming the models have the same naming convention as the official models (like en-token.bin; en-pos-maxent.bin etc). If there is no language code, the wrapper defaults to english. 
+In addition to the usual NIF API parameters, there is the parameter *modelFolder* which denotes the folder in which you have the OpenNLP models. The second new parameter is *language*, denoting the language of your models. It typically is a 2 character language code. We are assuming the models have the same naming convention as the official models (like en-token.bin; en-pos.bin etc). If there is no language code, the wrapper defaults to english. 
 
 You can also set an output file via *outfile*.
-
-This class also enables you to **add spans** you generated via OpenNLP to a NIF model, via the addSpans() method. It takes a Span array, the text the spans cover as well as their desired OntClass and adds them to a JENA OntModel
 
 #### CLI Example 
 
 Annotate $file and print the results to $output.ttl
 
 ```Shell
-mvn exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.opennlp.OpenNLPWrapperCLI" -Dexec.args="-intype file -f text -i $file -outfile $output.ttl -modelFolder $folder" 
+mvn exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.opennlp.OpenNLPWrapperCLI" -Dexec.args="-intype file -f text -i $file -outfile $output.ttl -modelFolder $folder -u OffsetBasedString" 
 ```
 
 Due to the use of Jena OntModel, the application is very memory intensive. You may want to use
@@ -28,6 +26,28 @@ MAVEN_OPTS="-Xmx4000m -XX:+UseConcMarkSweepGC"
 ```
 
 before running the application. Still, this application does not scale very well for large texts due to JENA model overhead.
+
+#### Training your own models
+
+To run OpenNLP, you need some models. If the existing models don't fit your language or domain, you might want to train your own ones from existing NIF corpora. To do this, run the corpus trainer like this:
+
+```Shell
+mvn exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.opennlp.train.OpenNLPModelTrainer" -Dexec.args="-intype url -f turtle -i http://brown.nlp2rdf.org/lod/a01.ttl --language=en --tasks=sentence,pos,token"
+```
+
+to train a model using an online NIF corpus, like [http://brown.nlp2rdf.org/lod/a01.ttl](http://brown.nlp2rdf.org/lod/a01.ttl). 
+
+You can define which tasks are being performed using the *tasks* parameter. It takes a comma-separated list and currently supports tokenization,pos tagging and sentence detection. 
+
+However, the corpus might be split into a number of smaller files and you want to train on the whole corpus. This is supported by using [DataID](https://github.com/dbpedia/dataid). 
+
+Just use the [DataID of the corpus](http://brown.nlp2rdf.org/dataid.ttl) as input and set the *dataid* parameter to true like so:
+
+```Shell
+mvn exec:java -e  -Dexec.mainClass="org.nlp2rdf.implementation.opennlp.train.OpenNLPModelTrainer" -Dexec.args="-intype url -f turtle -i http://brown.nlp2rdf.org/dataid.ttl --language=en --dataid=true --tasks=sentence,pos,token"
+```
+
+The models are then written to the same folder using the standard naming convention $language-$task.bin.
 
 #### Web Service Example 
 In order to run the opennlp NIF web service you have to start the jetty plugin. Thus, navigate to the OpenNLP and start the plugin:

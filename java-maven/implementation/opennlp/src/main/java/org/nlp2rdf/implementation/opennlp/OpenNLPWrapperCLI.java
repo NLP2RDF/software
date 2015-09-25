@@ -25,9 +25,12 @@ public class OpenNLPWrapperCLI {
         OptionParser parser = ParameterParser.getParser(args, "http://cli.nlp2rdf.org/opennlp#");
         // TODO as a courtesy to windows users
         // 
+        
         ParameterParser.addCLIParameter(parser);
         parser.acceptsAll(asList("modelFolder"), "The folder containing the NLP models to be used").withRequiredArg().ofType(String.class).describedAs("folder");
         parser.acceptsAll(asList("language"), "A string denoting the language of the model used, usually 2 characters").withRequiredArg().ofType(String.class).describedAs("Language string");
+        parser.acceptsAll(asList("tagset"), "The name of the tagset. Please refer to org.nlp2rdf.vm.olia.models").withRequiredArg().ofType(String.class).describedAs("tagset name");
+        
         try {
             OptionSet options = ParameterParser.getOption(parser, args);
             ParameterParser.handleHelpAndWS(options, "");
