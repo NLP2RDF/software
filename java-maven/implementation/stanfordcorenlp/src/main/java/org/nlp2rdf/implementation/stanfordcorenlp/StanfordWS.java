@@ -7,7 +7,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticValidator;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitTestSuiteGenerator;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
@@ -25,7 +26,11 @@ public class StanfordWS extends NIFServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        RDFUnitStaticWrapper.initWrapper("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl");
+        RDFUnitStaticValidator.initWrapper(
+                new RDFUnitTestSuiteGenerator.Builder()
+                        .addLocalResourceOrSchemaURI("nif", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#")
+                        .build()
+        );
     }
 
     private final StanfordWrapper stanfordWrapper;
@@ -44,7 +49,7 @@ public class StanfordWS extends NIFServlet {
         {
 
             // Convert model to OntModel
-            Model validationResults = RDFUnitStaticWrapper.validate(model);
+            Model validationResults = RDFUnitStaticValidator.validate(model);
             results.add(validationResults);
             if(! nifParameters.getParameterMap().containsKey("validationreportonly")) {
                 // write results in original model
