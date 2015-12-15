@@ -20,8 +20,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.owldl</groupId>
-            <artifactId>pellet</artifactId>
+            <groupId>com.github.ansell.pellet</groupId>
+            <artifactId>pellet-owlapiv3</artifactId>
         </dependency>
     </dependencies>
 
