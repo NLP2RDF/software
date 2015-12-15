@@ -5,7 +5,8 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticValidator;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitTestSuiteGenerator;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.vocab.RLOGOntClasses;
@@ -25,7 +26,11 @@ public class Validate {
 
     public static void main(String[] args) throws IOException {
 
-        RDFUnitStaticWrapper.initWrapper("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl");
+        RDFUnitStaticValidator.initWrapper(
+            new RDFUnitTestSuiteGenerator.Builder()
+                    .addLocalResourceOrSchemaURI("nif", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#")
+                    .build()
+        );
 
         OptionParser parser = ParameterParser.getParser(args, "http://cli.nlp2rdf.org/validate#");
         try {
@@ -77,11 +82,11 @@ public class Validate {
             */
 
             if (outformat.equals("text")) {
-                outputModel.add(RDFUnitStaticWrapper.validate(inputModel));
+                outputModel.add(RDFUnitStaticValidator.validate(inputModel));
 
             } else if (outformat.equals("turtle") || outformat.equals("rdfxml") || outformat.equals("ntriples")) {
                 //sparqlValidator.setQuiet(true);
-                outputModel.add(RDFUnitStaticWrapper.validate(inputModel));
+                outputModel.add(RDFUnitStaticValidator.validate(inputModel));
                 if (options.hasArgument("outfile")) {
                     File outfile = (File) options.valueOf("outfile");
                     outputModel.write(new FileOutputStream(outfile), Format.toJena(outformat));
@@ -89,7 +94,7 @@ public class Validate {
                     outputModel.write(System.out, Format.toJena(outformat));
                 }
             } else {
-                outputModel.add(RDFUnitStaticWrapper.validate(inputModel));
+                outputModel.add(RDFUnitStaticValidator.validate(inputModel));
             }
 
 

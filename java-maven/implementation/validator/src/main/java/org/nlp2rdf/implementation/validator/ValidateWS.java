@@ -5,7 +5,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticValidator;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitTestSuiteGenerator;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.vocab.RLOGIndividuals;
@@ -22,7 +23,11 @@ public class ValidateWS extends NIFServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        RDFUnitStaticWrapper.initWrapper("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl");
+        RDFUnitStaticValidator.initWrapper(
+                new RDFUnitTestSuiteGenerator.Builder()
+                        .addLocalResourceOrSchemaURI("nif", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#")
+                        .build()
+        );
     }
 
     public OntModel execute(NIFParameters nifParameters) throws Exception {
@@ -30,12 +35,12 @@ public class ValidateWS extends NIFServlet {
         OntModel model = nifParameters.getInputModel();
         OntModel results = ModelFactory.createOntologyModel();
         //some stats
-        Monitor mon = MonitorFactory.getTimeMonitor(RDFUnitStaticWrapper.class.getCanonicalName()).start();
+        Monitor mon = MonitorFactory.getTimeMonitor(RDFUnitStaticValidator.class.getCanonicalName()).start();
         int x = 0;
         {
 
             // Convert model to OntModel
-            Model validationResults = RDFUnitStaticWrapper.validate(model);
+            Model validationResults = RDFUnitStaticValidator.validate(model);
             results.add(validationResults);
             if( nifParameters.getParameterMap() != null && !nifParameters.getParameterMap().containsKey("validationreportonly")) {
                 // write results in original model
@@ -50,7 +55,7 @@ public class ValidateWS extends NIFServlet {
         double avg = lv / x;
 
         String finalMessage = "Annotated " + x + " nif:Context(s)  in " + lv + " ms. (avg " + avg + ") producing " + model.size() + " triples";
-        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, RDFUnitStaticWrapper.class.getCanonicalName(), null, null));
+        model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, RDFUnitStaticValidator.class.getCanonicalName(), null, null));
         model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
         return results;

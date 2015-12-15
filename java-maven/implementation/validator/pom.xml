@@ -32,10 +32,7 @@
             <groupId>org.aksw.rdfunit</groupId>
             <artifactId>rdfunit-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.aksw.rdfunit</groupId>
-            <artifactId>rdfunit-validate</artifactId>
-        </dependency>
+
     </dependencies>
 
     <build>

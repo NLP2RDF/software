@@ -8,7 +8,8 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.aksw.rdfunit.enums.TestCaseExecutionType;
 import org.aksw.rdfunit.io.writer.*;
-import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticWrapper;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticValidator;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitTestSuiteGenerator;
 import org.nlp2rdf.cli.ParameterException;
 import org.nlp2rdf.cli.ParameterParser;
 import org.nlp2rdf.core.Format;
@@ -29,7 +30,11 @@ public class ValidateCLI {
 
     public static void main(String[] args) throws IOException {
 
-        RDFUnitStaticWrapper.initWrapper("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl");
+        RDFUnitStaticValidator.initWrapper(
+                new RDFUnitTestSuiteGenerator.Builder()
+                        .addLocalResourceOrSchemaURI("nif", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#")
+                        .build()
+        );
 
         OptionParser parser = ParameterParser.getParser(args, "http://cli.nlp2rdf.org/validator#");
         ParameterParser.addCLIParameter(parser);
@@ -60,7 +65,7 @@ public class ValidateCLI {
             }
 
             // Initialize the results models
-            Model validationResults = RDFUnitStaticWrapper.validate(inputModel);
+            Model validationResults = RDFUnitStaticValidator.validate(inputModel);
             outputModel.add(validationResults);
 
             //Default writer (RDFUnit)
