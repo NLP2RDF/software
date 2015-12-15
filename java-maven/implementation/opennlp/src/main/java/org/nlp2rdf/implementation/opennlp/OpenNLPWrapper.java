@@ -20,7 +20,6 @@ import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
-import org.h2.constant.SysProperties;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.URIScheme;
