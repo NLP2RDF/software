@@ -42,36 +42,39 @@ public class StanfordWS extends NIFServlet {
     public OntModel execute(NIFParameters nifParameters) throws Exception {
 
         OntModel model = nifParameters.getInputModel();
-        OntModel results = ModelFactory.createOntologyModel();
         //some stats
         Monitor mon = MonitorFactory.getTimeMonitor(stanfordWrapper.getClass().getCanonicalName()).start();
         int x = 0;
-        {
+
 
             // Convert model to OntModel
             Model validationResults = RDFUnitStaticValidator.validate(model);
-            results.add(validationResults);
-            if(! nifParameters.getParameterMap().containsKey("validationreportonly")) {
+            /* TODO: review if this option is a sensible approach; currently this is a dead branch, since the
+               parameter converter does not allow for the validationreportonly option currently*/
+            if(nifParameters.getParameterMap().containsKey("validationreportonly")) {
                 // write results in original model
-                model.add(results);
+                OntModel validationResultsOnt = ModelFactory.createOntologyModel();
+                validationResultsOnt.add(validationResults);
+                return validationResultsOnt;
             }
-
-
 
             ExtendedIterator<Individual> eit = model.listIndividuals(NIFOntClasses.Context.getOntClass(model));
             for (; eit.hasNext(); ) {
                 stanfordWrapper.processText(eit.next(), model, model, nifParameters);
                 x++;
             }
-        }
+
         double lv = mon.stop().getLastValue();
         double avg = lv / x;
 
-        String finalMessage = "Annotated " + x + " nif:Context(s)  in " + lv + " ms. (avg " + avg + ") producing " + model.size() + " triples";
+        String finalMessage = "Annotated " + x + " nif:Context(s)  in " + lv + " ms. (avg " + avg + ") producing " +
+                model.size() + " triples (" + validationResults.size() + " additional triples for validation results)";
+        model.add(validationResults);
         model.add(RLOGSLF4JBinding.log(nifParameters.getLogPrefix(), finalMessage, RLOGIndividuals.DEBUG, stanfordWrapper.getClass().getCanonicalName(), null, null));
         model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
-        return results;
+
+        return model;
         /* if (nifParameters.inputWasText()) {
             URIGenerator uriGenerator = URIGeneratorHelper.determineGenerator(nifParameters.getUriRecipe(), nifParameters.getContextLength());
             stanfordCoreNLPWrapper.processText(nifParameters.getPrefix(), nifParameters.getInputAsText(), uriGenerator, model);

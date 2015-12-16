@@ -21,6 +21,7 @@
 
 package org.nlp2rdf.core;
 
+import com.google.common.collect.Maps;
 import com.hp.hpl.jena.ontology.OntModel;
 import joptsimple.OptionSet;
 import org.nlp2rdf.core.urischemes.URIScheme;
@@ -57,7 +58,7 @@ public class NIFParameters {
     public NIFParameters(OntModel inputModel, OptionSet options, String prefix, String logPrefix, URIScheme uriScheme, String[] uriSchemeParameters, String outputFormat) {
         this(inputModel, prefix, logPrefix, uriScheme, uriSchemeParameters, outputFormat);
         this.options = options;
-        this.parameterMap = null;
+        this.parameterMap = Maps.newHashMap();
     }
 
 

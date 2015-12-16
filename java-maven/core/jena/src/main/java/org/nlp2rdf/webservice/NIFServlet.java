@@ -64,13 +64,12 @@ public abstract class NIFServlet extends HttpServlet {
         httpServletResponse.setHeader("Access-Control-Max-Age", "*");
         httpServletResponse.setHeader("Access-Control-Allow-Headers", "*");
 
-        NIFParameters nifParameters = null;
         try {
 
             //Validate and normalize input
             Monitor mon = MonitorFactory.getTimeMonitor("NIFParameters.getInstance").start();
             String defaultPrefix = httpServletRequest.getRequestURL().toString() + "#";
-            nifParameters = NIFParameterWebserviceFactory.getInstance(httpServletRequest, defaultPrefix);
+            NIFParameters nifParameters = NIFParameterWebserviceFactory.getInstance(httpServletRequest, defaultPrefix);
             log.debug("NIFParameters Object created: " + logMonitor(mon.stop()));
 
             //execute the task
