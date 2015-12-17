@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -82,8 +83,8 @@ public class Generate {
                 template = ve.getTemplate((String) options.valueOf("t"));
             }
 
-            if (!options.hasArgument("f") || !((String) options.valueOf("f")).endsWith(".java")) {
-                System.out.println("Please specify an output file (ending on .java and using the -f option).");
+            if (!options.hasArgument("f") || ! ( ((String) options.valueOf("f")).endsWith(".java") || ((String) options.valueOf("f")).endsWith(".jsonld")) ) {
+                System.out.println("Please specify an output file (ending on .java or .jsonld and using the -f option).");
                 System.exit(0);
             } else {
                 String className = (String) options.valueOf("f");
@@ -95,10 +96,14 @@ public class Generate {
                 System.out.println("Please specify an ontology url  (using the -o option).");
                 System.exit(0);
             } else {
-                System.out.println("Trying to read ontology from " + options.valueOf("o"));
-                model.read((String) options.valueOf("o"));
-                context.put("ontology", (String) options.valueOf("o"));
-
+				List ontologies = options.valuesOf("o") ;
+				String ontnames = "" ;
+				for (int x=0 ; x < ontologies.size() ; x++ ) {
+					ontnames = ontnames + "," + ontologies.get(x);
+					System.out.println("Trying to read ontology from " + ontologies.get(x));
+					model.read((String) ontologies.get(x));
+				}
+				context.put("ontology", ontnames);
             }
 
         }
@@ -152,6 +157,7 @@ public class Generate {
             }
             Map map = new HashMap();
             map.put("name", r.getLocalName());
+            map.put("uri", r.getURI());
             map.put("label", label(r));
             map.put("comment", comment(r));
             list.add(map);

@@ -1,0 +1,27 @@
+{
+   "@context":
+   {
+      "Person": "http://xmlns.com/foaf/0.1/Person",
+      "xsd": "http://www.w3.org/2001/XMLSchema#",
+      "name": "http://xmlns.com/foaf/0.1/name",
+      "nickname": "http://xmlns.com/foaf/0.1/nick",
+      "affiliation": "http://schema.org/affiliation",
+      
+      #foreach( $op in $objectProperties )
+	  "$op.name":
+      {
+         "@id": "$op.uri",
+         "@type": "@id"
+      },
+#end
+    #foreach( $dp in $datatypeProperties )
+	  "$dp.name":
+      {
+         "@id": "$dp.uri",
+        
+      }#if( $foreach.hasNext ),
+#end
+#end
+	}
+}
+
