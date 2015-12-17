@@ -16,14 +16,13 @@
         
         <module>stanfordcorenlp</module>
         <module>validator</module>
-				<module>conll</module>
-				<module>opennlp</module>
-        <!--module>snowball</module-->
+        <module>conll</module>
+		<module>opennlp</module>
+        <module>snowball</module>
         <!--module>demo</module-->
         <module>lexo</module>
         <!--module>sample</module-->
         <!--module>lingpipe</module-->
-
     </modules>
 
     <build>
@@ -76,66 +75,4 @@
             </plugin>
         </plugins>
     </build>
-    <dependencyManagement>
-        <dependencies>
-            <!--dependency>
-                <groupId>org.nlp2rdf.software</groupId>
-                <artifactId>stanfordcorenlp-wrapper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf.software</groupId>
-                <artifactId>stanfordcorenlp-webservice</artifactId>
-                <version>${project.version}</version>
-            </dependency-->
-
-            <!--dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>stanfordcorenlp-wrapper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>stanfordcorenlp-wrapper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>stanfordcorenlp-webservice</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>snowball-wrapper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>snowball-webservice</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>lingpipe-wrapper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>opennlp-wrapper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>opennlp-webservice</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nlp2rdf</groupId>
-                <artifactId>opennlp-webservice</artifactId>
-                <version>${project.version}</version>
-            </dependency-->
-        </dependencies>
-    </dependencyManagement>
-
-
 </project>
