@@ -1,0 +1,17 @@
+# Objective Caml source 
+  ".*\\.ml[il]?" -> frame open:"(*" line:"*" close:"*)"
+| ".*\\.mly"     -> frame open:"/*" line:"*" close:"*/"
+# C source
+| ".*\\.[ch]"    -> frame open:"/*" line:"*" close:"*/"
+# Misc
+| ".*Makefile.*" -> frame open:"#"  line:"#" close:"#"
+| ".*README.*"   -> frame open:"*"  line:"*" close:"*"
+| ".*LICENSE.*"  -> frame open:"*"  line:"*" close:"*"
+# Extensions
+| ".*\\.java"  -> frame open:"/*"  line:"*" close:"*/"
+| ".*\\.xml"  -> lines open:"<!--"  line:" " close:"-->"
+| ".*\\.ttl"  -> lines open:"#"  line:"#" close:"#"
+| ".*\\.properties"  -> no
+| ".*\\.sh"  -> no
+| "header"  -> no
+| "headacheconfig"  -> no
