@@ -140,5 +140,22 @@ Please look here for the latest versions: http://maven.aksw.org/archiva/browse/o
 </dependency>
 ```
 
+# License headers 
+For all files are generator by headache
+## installation and manual
+(googleing for help is pointless)
+ ```Shell
+sudo apt-get install headache
+firefox /usr/share/doc/headache/manual.html
+```
+## adding licenses to all files
+```Shell
+#Example:  
+headache -h header -c headacheconfig java-maven/core/jena/src/main/java/org/nlp2rdf/core/Text2RDF.java
+# all files
+for i in  `find . -type f` ; do headache -h header -c headacheconfig $i ; done
+```
+
+
 #PHP
 There isn't much implemented, yet.
