@@ -9,7 +9,8 @@
 | ".*LICENSE.*"  -> frame open:"*"  line:"*" close:"*"
 # Extensions
 | ".*\\.java"  -> frame open:"/*"  line:"*" close:"*/"
-| ".*\\.xml"  -> lines open:"<!--"  line:" " close:"-->"
+#| ".*\\.xml"  -> lines open:"<!--"  line:" " close:"-->"
+| ".*\\.xml"  -> no
 | ".*\\.ttl"  -> lines open:"#"  line:"#" close:"#"
 | ".*\\.properties"  -> no
 | ".*\\.sh"  -> no
