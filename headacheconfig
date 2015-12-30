@@ -11,7 +11,7 @@
 | ".*\\.java"  -> frame open:"/*"  line:"*" close:"*/"
 #| ".*\\.xml"  -> lines open:"<!--"  line:" " close:"-->"
 | ".*\\.xml"  -> no
-| ".*\\.ttl"  -> lines open:"#"  line:"#" close:"#"
+| ".*\\.ttl"  -> frame open:"#"  line:"#" close:"#"
 | ".*\\.properties"  -> no
 | ".*\\.sh"  -> no
 | "header"  -> no
