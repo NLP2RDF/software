@@ -15,11 +15,22 @@
 
 	<dependencies>
 
-		
+		  <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>snowball</artifactId>
+        </dependency>
+        
 		 <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>stanfordcorenlp</artifactId>
         </dependency>
+        
+         <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>opennlp</artifactId>
+        </dependency>
+        
+       
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -40,7 +51,7 @@
 					<systemProperties>
 						<systemProperty>
 							<name>jetty.port</name>
-							<value>9996</value>
+							<value>9999</value>
 						</systemProperty>
 					</systemProperties>
 

@@ -8,9 +8,31 @@
         <servlet-name>NIFSnowball</servlet-name>
         <servlet-class>org.nlp2rdf.implementation.snowball.SnowballWS</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>NIFSnowball</servlet-name>
         <url-pattern>/snowball</url-pattern>
     </servlet-mapping>
+    
+    
+    <servlet>
+		<servlet-name>stanfordcorenlp</servlet-name>
+		<servlet-class>org.nlp2rdf.implementation.stanfordcorenlp.StanfordWS</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>stanfordcorenlp</servlet-name>
+		<url-pattern>/stanfordcorenlp</url-pattern>
+	</servlet-mapping>
+
+
+
+    <servlet>
+        <servlet-name>opennlp</servlet-name>
+        <servlet-class>org.nlp2rdf.implementation.opennlp.OpenNLPWS</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>opennlp</servlet-name>
+        <url-pattern>/opennlp</url-pattern>
+    </servlet-mapping>
+    
 </web-app>

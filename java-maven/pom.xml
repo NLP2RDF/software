@@ -226,6 +226,11 @@
                 <artifactId>stanfordcorenlp</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>snowball</artifactId>
+                <version>${project.version}</version>
+            </dependency>
                <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>validator</artifactId>
