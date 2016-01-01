@@ -16,8 +16,11 @@
 
 package org.nlp2rdf.core;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.vocabulary.XSD;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.urischemes.URIScheme;
@@ -42,9 +45,9 @@ public class Text2RDF {
         String uri = uriScheme.generate(prefix, contextString, span);
         Individual context = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
         context.addOntClass(NIFOntClasses.Context.getOntClass(model));
-        context.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(model), model.createLiteral(contextString));
-        context.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "");
-        context.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "");
+        context.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(model), model.createTypedLiteral(contextString,XSDDatatype.XSDstring));
+        context.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "",XSDDatatype.XSDnonNegativeInteger);
+        context.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "",XSDDatatype.XSDnonNegativeInteger);
         return context;
     }
 
@@ -53,9 +56,9 @@ public class Text2RDF {
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(model)).asLiteral().getString();
         String uri = uriScheme.generate(prefix, contextString, new Span[]{span});
         Individual string = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
-        string.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(model), model.createLiteral(span.getCoveredText(contextString).toString()));
-        string.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "");
-        string.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "");
+        string.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(model), model.createTypedLiteral(span.getCoveredText(contextString).toString(),XSDDatatype.XSDstring));
+        string.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "",XSDDatatype.XSDnonNegativeInteger);
+        string.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "",XSDDatatype.XSDnonNegativeInteger);
         string.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
         return string;
     }

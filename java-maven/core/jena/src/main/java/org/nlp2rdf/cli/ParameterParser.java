@@ -124,7 +124,7 @@ public class ParameterParser {
 				.defaultsTo(RLOGSLF4JBinding.defaultlogprefix);
 		parser.acceptsAll(asList("u", "urischeme"),
 				"specifies the syntax of the identifier of the URIs")
-				.withRequiredArg().defaultsTo("RFC5147String");
+				.withRequiredArg().defaultsTo("OffsetBasedString");
 
 		// TODO:
 

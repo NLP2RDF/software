@@ -16,6 +16,7 @@
 
 package org.nlp2rdf.implementation.stanfordcorenlp;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -71,9 +72,6 @@ public class StanfordWrapper {
          **/
         // creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution
         Properties props = new Properties();
-        //props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
-        //props.put("annotators", "tokenize, ssplit, pos, lemma, parse, ner"); // ner,  dcoref");
-        //props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
         props.put("annotators", "tokenize, ssplit, pos, lemma, parse"); // ner,  dcoref");
         if (nifParameters.getConfig() != null) {
             //TODO implement proper config parsing
@@ -141,7 +139,7 @@ public class StanfordWrapper {
                  ******/
                 
                 if(token.get(CoreAnnotations.LemmaAnnotation.class)!=null) {
-                	wordIndividual.addProperty(NIFDatatypeProperties.lemma.getDatatypeProperty(outputModel), token.get(CoreAnnotations.LemmaAnnotation.class));
+                	wordIndividual.addProperty(NIFDatatypeProperties.lemma.getDatatypeProperty(outputModel), token.get(CoreAnnotations.LemmaAnnotation.class), XSDDatatype.XSDstring);
                 }
                 
                 /********************************
