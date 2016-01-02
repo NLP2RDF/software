@@ -16,8 +16,11 @@
 
 package org.nlp2rdf.core;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.vocabulary.XSD;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.nlp2rdf.core.urischemes.URIScheme;
@@ -43,8 +46,7 @@ public class Text2RDF {
         Individual context = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
         context.addOntClass(NIFOntClasses.Context.getOntClass(model));
         context.addLiteral(NIFDatatypeProperties.isString.getDatatypeProperty(model), model.createLiteral(contextString));
-        context.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "");
-        context.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "");
+        addStartEndIndices(context, span, model);
         return context;
     }
 
@@ -54,12 +56,17 @@ public class Text2RDF {
         String uri = uriScheme.generate(prefix, contextString, new Span[]{span});
         Individual string = model.createIndividual(uri, model.createClass(uriScheme.getOWLClassURI()));
         string.addLiteral(NIFDatatypeProperties.anchorOf.getDatatypeProperty(model), model.createLiteral(span.getCoveredText(contextString).toString()));
-        string.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "");
-        string.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "");
         string.addProperty(NIFObjectProperties.referenceContext.getObjectProperty(model), context);
+        addStartEndIndices(string, span, model);
         return string;
     }
 
+    private void addStartEndIndices(Individual individual, Span span, OntModel model) {
+      RDFDatatype nonNegInt = NodeFactory.getType(XSD.nonNegativeInteger.getURI());
+
+      individual.addProperty(NIFDatatypeProperties.beginIndex.getDatatypeProperty(model), span.getStart() + "", nonNegInt);
+      individual.addProperty(NIFDatatypeProperties.endIndex.getDatatypeProperty(model), span.getEnd() + "", nonNegInt);
+    }
 
     public void generateNIFModel(String prefix, Individual context, URIScheme uriScheme, OntModel model, TreeMap<Span, List<Span>> tokenizedText) {
         assert tokenizedText != null && context != null && uriScheme != null && prefix != null;
@@ -123,65 +130,4 @@ public class Text2RDF {
             mon.stop();
         }
     }
-
-    /*public void expand(String prefix, URIScheme uriScheme, final OntModel model) {
-
-        final DatatypeProperty beginIndex = NIFDatatypeProperties.beginIndex.getDatatypeProperty(model);
-      //  final ObjectProperty beginIndex = NIFDatatypeProperties.beginIndex.getDatatypeProperty(model);
-        Monitor mon = MonitorFactory.getTimeMonitor("addNextAndPreviousProperties").start();
-
-        long previous = model.size();
-        ExtendedIterator<Individual> itw = model.listIndividuals(NIFOntClasses.Word.getOntClass(model));
-
-        SortedSet<Individual> words = new TreeSet<Individual>(new Comparator<Individual>() {
-            @Override
-            public int compare(Individual individual, Individual individual1) {
-                int a = individual.getPropertyValue(beginIndex).asLiteral().getInt();
-                int b = individual1.getPropertyValue(beginIndex).asLiteral().getInt();
-                return a - b;
-            }
-        });
-        words.addAll(itw.toSet());
-
-        Individual previousSentence = null;
-        for (Individual word : words) {
-           // Individual currentSentence = word.getPropertyValue()
-
-
-            System.out.println(word);
-        }
-
-        System.exit(0);
-
-        /**ExtendedIterator<Individual> its = model.listIndividuals(NIFOntClasses.Sentence.getOntClass(model));
-         for (Individual sentence = null; its.hasNext(); sentence = its.next()) {
-
-
-         }
-
-         List<Sentence> sentences = Sentence.list(model);
-         Collections.sort(sentences, new URIComparator(prefix, text, uriGenerator));
-         for (int x = 0; x < sentences.size(); x++) {
-         Sentence sentence = sentences.get(x);
-         List<Word> words = sentence.listWord();
-         Collections.sort(words, new URIComparator(prefix, text, uriGenerator));
-         if (x < sentences.size() - 1) {
-         //not the last one
-         sentence.setNextSentence(sentences.get(x + 1));
-         }
-
-         for (int y = 0; y < words.size(); y++) {
-         Word word = words.get(y);
-         //not the last one
-         if (y < words.size() - 1) {
-         word.setNextWord(words.get(y + 1));
-         }
-         }
-         }
-
-        mon.stop();
-        log.debug("Finished addition of next/previous properties " + (model.size() - previous) + " triples added, " + mon.getLastValue() + " ms.)");
-    }  */
-
-
 }
