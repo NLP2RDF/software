@@ -18,13 +18,9 @@ package org.nlp2rdf.implementation.stanfordcorenlp;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticValidator;
-import org.aksw.rdfunit.validate.wrappers.RDFUnitTestSuiteGenerator;
 import org.nlp2rdf.core.NIFParameters;
 import org.nlp2rdf.core.RLOGSLF4JBinding;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
@@ -66,7 +62,7 @@ public class StanfordWS extends NIFServlet {
         log.debug("Iterating each context...");
         ExtendedIterator<Individual> eit = model.listIndividuals(NIFOntClasses.Context.getOntClass(model));
         for (; eit.hasNext(); ) {
-            stanfordWrapper.processText(eit.next(), model, model, nifParameters);
+            stanfordWrapper.process(eit.next(), model, model, nifParameters);
             x++;
         }
 
@@ -82,7 +78,7 @@ public class StanfordWS extends NIFServlet {
         return model;
         /* if (nifParameters.inputWasText()) {
             URIGenerator uriGenerator = URIGeneratorHelper.determineGenerator(nifParameters.getUriRecipe(), nifParameters.getContextLength());
-            stanfordCoreNLPWrapper.processText(nifParameters.getPrefix(), nifParameters.getInputAsText(), uriGenerator, model);
+            stanfordCoreNLPWrapper.process(nifParameters.getPrefix(), nifParameters.getInputAsText(), uriGenerator, model);
         } else if (nifParameters.inputWasRDF()) {
             ErrorHandling.createError(true, nifParameters.getPrefix(), "rdf as input is not implemented yet", model);
         } else {

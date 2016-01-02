@@ -18,7 +18,6 @@ package org.nlp2rdf.implementation.snowball;
 
 import java.io.IOException;
 
-import org.nlp2rdf.cli.ParameterException;
 import org.nlp2rdf.cli.ParameterParser;
 import org.nlp2rdf.core.Format;
 import org.nlp2rdf.core.NIFParameters;
@@ -60,7 +59,7 @@ public class SnowballCLI {
             int x = 0;
             for (ExtendedIterator<Individual> it = model.listIndividuals(NIFOntClasses.Context.getOntClass(model)); it.hasNext(); ) {
                 Individual context = it.next();
-                s.processText(context, model, model, nifParameters);
+                s.process(context, model, model, nifParameters);
                 x++;
             }
             model.write(System.out, Format.toJena(nifParameters.getOutputFormat()));

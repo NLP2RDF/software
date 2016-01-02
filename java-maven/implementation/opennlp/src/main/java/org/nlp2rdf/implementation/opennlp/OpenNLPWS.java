@@ -94,7 +94,7 @@ public class OpenNLPWS extends NIFServlet {
 		double lv = mon.stop().getLastValue();
 		double avg = lv / x;
 
-		log.debug("Anotating stats...");
+		log.debug("Annotating stats...");
 		String finalMessage = "Annotated " + x + " nif:Context(s)  in " + lv
 				+ " ms. (avg " + avg + ") producing " + model.size()
 				+ " triples";

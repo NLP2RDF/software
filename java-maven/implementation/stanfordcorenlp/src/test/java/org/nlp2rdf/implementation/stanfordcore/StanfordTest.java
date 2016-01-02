@@ -73,7 +73,7 @@ public class StanfordTest {
             NIFParameters nifParameters = new NIFParameters(m, new HashMap<String, String>(), prefix, null, uriScheme, null, "turtle");
 
 
-            new StanfordWrapper().processText(context, m, m, nifParameters);
+            new StanfordWrapper().process(context, m, m, nifParameters);
             //m.write(System.out, Format.toJena(nifParameters.getOutputFormat()));
             // logger.info(m.toString());
             //Assert.assertEquals(expected, m.toString());

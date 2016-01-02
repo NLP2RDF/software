@@ -30,10 +30,7 @@ import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
-import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RLOGSLF4JBinding;
-import org.nlp2rdf.core.Span;
-import org.nlp2rdf.core.Text2RDF;
+import org.nlp2rdf.core.*;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.NIFAnnotationProperties;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
@@ -51,7 +48,7 @@ import java.util.TreeMap;
 
 
 /**
- * The basic code was taken from the ClearTK Project
+ * The basic code was inspired by the ClearTK Project
  * http://code.google.com/p/cleartk
  * who have written a UIMA wrapper.
  * The original file by Steven Bethard can be found here:
@@ -63,8 +60,10 @@ import java.util.TreeMap;
  * @author Sebastian Hellmann - http://bis.informatik.uni-leipzig.de/SebastianHellmann
  */
 
-public class StanfordWrapper {
+public class StanfordWrapper extends NIFWrapper {
     private static Logger log = LoggerFactory.getLogger(StanfordWrapper.class);
+
+
 
     protected Annotator buildAnnotator(NIFParameters nifParameters) {
         /**
@@ -80,7 +79,7 @@ public class StanfordWrapper {
         return new StanfordCoreNLP(props);
     }
 
-    public void processText( Individual context, OntModel inputModel, OntModel outputModel, NIFParameters nifParameters) {
+    public void process(Individual context, OntModel inputModel, OntModel outputModel, NIFParameters nifParameters) {
         String contextString = context.getPropertyValue(NIFDatatypeProperties.isString.getDatatypeProperty(inputModel)).asLiteral().getString();
         String prefix = nifParameters.getPrefix();
         URIScheme urischeme = nifParameters.getUriScheme();

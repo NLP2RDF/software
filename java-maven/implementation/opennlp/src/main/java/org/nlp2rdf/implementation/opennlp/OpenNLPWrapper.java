@@ -37,6 +37,7 @@ import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
 import org.nlp2rdf.core.NIFParameters;
+import org.nlp2rdf.core.NIFWrapper;
 import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.NIFAnnotationProperties;
@@ -54,7 +55,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import com.hp.hpl.jena.vocabulary.OWL;
 
-public class OpenNLPWrapper {
+public class OpenNLPWrapper  {
 	private static Logger log = LoggerFactory.getLogger(OpenNLPWrapper.class);
 	
 	private OntModel nifModel;
@@ -122,7 +123,10 @@ public class OpenNLPWrapper {
 	public OntModel getNifModel() {
 		return nifModel;
 	}
-	
+
+
+
+
 	public void processText(Individual context, NIFParameters nifParameters) {
 		
 		if(modelFolder==null)

@@ -57,7 +57,7 @@ public class StanfordCLI {
             int x = 0;
             for (ExtendedIterator<Individual> it = model.listIndividuals(NIFOntClasses.Context.getOntClass(model)); it.hasNext(); ) {
                 Individual context = it.next();
-                s.processText(context, model, model, nifParameters);
+                s.process(context, model, model, nifParameters);
                 x++;
             }
             String finalMessage = "Annotated " + x + " nif:Context(s)  in " + mon.stop().getTotal() + " ms.  (avg.:" + (mon.getAvg()) + ") producing " + model.size() + " triples";

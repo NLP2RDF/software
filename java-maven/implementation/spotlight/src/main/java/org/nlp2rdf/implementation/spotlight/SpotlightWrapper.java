@@ -57,7 +57,7 @@ import edu.stanford.nlp.util.CoreMap;
  * #statistical
  */
 
-public class SpotlightWrapper {
+public class SpotlightWrapper extends NIFWrapper {
 	private static Logger log = LoggerFactory.getLogger(SpotlightWrapper.class);
 
 	// spotlight properties

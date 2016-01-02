@@ -25,6 +25,7 @@ import org.aksw.rdfunit.io.writer.*;
 import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticValidator;
 import org.aksw.rdfunit.validate.wrappers.RDFUnitTestSuiteGenerator;
 import org.nlp2rdf.core.NIFParameters;
+import org.nlp2rdf.core.RDFUnitValidatorWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +42,7 @@ import java.security.InvalidParameterException;
  */
 public abstract class NIFServlet extends HttpServlet {
 
-    static{ RDFUnitStaticValidator.initWrapper(
-            new RDFUnitTestSuiteGenerator.Builder()
-            .addLocalResourceOrSchemaURI("nif", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#")
-    .build()
-    );}
+
 
     private static Logger log = LoggerFactory.getLogger(NIFServlet.class);
     private int counter = 0;
@@ -91,7 +88,7 @@ public abstract class NIFServlet extends HttpServlet {
 
         try {
 
-            //Validate and normalize input
+            //Validate parameters and normalize input
             Monitor mon = MonitorFactory.getTimeMonitor("NIFParameters.getInstance").start();
             String defaultPrefix = httpServletRequest.getRequestURL().toString() + "#";
             NIFParameters nifParameters = NIFParameterWebserviceFactory.getInstance(httpServletRequest, defaultPrefix);
@@ -109,10 +106,7 @@ public abstract class NIFServlet extends HttpServlet {
 
             //validation
             if(nifParameters.isValidate()) {
-                mon = MonitorFactory.getTimeMonitor("NIFServlet.validate").start();
-                Model validationResults = RDFUnitStaticValidator.validate(nifParameters.getInputModel());
-                out.add(validationResults);
-                log.debug("NIF input validated: " + logMonitor(mon.stop()));
+                new RDFUnitValidatorWrapper().process(nifParameters.getInputModel(),nifParameters.getInputModel(),nifParameters);
             }
 
             //write the response

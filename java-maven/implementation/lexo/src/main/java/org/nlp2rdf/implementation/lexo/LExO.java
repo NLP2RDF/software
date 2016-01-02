@@ -132,7 +132,7 @@ public class LExO {
         * */
         Monitor stanford = MonitorFactory.getTimeMonitor("stanford").start();
         inputModel.addSubModel(nifModel);
-        stanfordWrapper.processText(context, inputModel, inputModel, nifParameters);
+        stanfordWrapper.process(context, inputModel, inputModel, nifParameters);
         logmessage.append("Total stanford time: ").append(nf.format(stanford.stop().getLastValue())).append("\n");
 
         /*

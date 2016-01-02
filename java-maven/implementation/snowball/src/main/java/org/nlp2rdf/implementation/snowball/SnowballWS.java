@@ -16,8 +16,6 @@
 
 package org.nlp2rdf.implementation.snowball;
 
-import static java.util.Arrays.asList;
-
 import javax.servlet.ServletException;
 
 import joptsimple.OptionParser;
@@ -66,7 +64,7 @@ public class SnowballWS extends NIFServlet{
 				.hasNext();) {
 			Individual context = it.next();
 			SnowballWrapper s = new SnowballWrapper();
-			s.processText(context, model, model, nifParameters);
+			s.process(context, model, model, nifParameters);
 			x++;
 		}
 		model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");

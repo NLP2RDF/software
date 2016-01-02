@@ -21,35 +21,17 @@ import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.util.CoreMap;
 
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
-import org.apache.lucene.util.Version;
-import org.nlp2rdf.core.Format;
-import org.nlp2rdf.core.NIFParameters;
-import org.nlp2rdf.core.RLOGSLF4JBinding;
-import org.nlp2rdf.core.Span;
-import org.nlp2rdf.core.Text2RDF;
+import org.nlp2rdf.core.*;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
 import org.nlp2rdf.core.vocab.NIFOntClasses;
-import org.nlp2rdf.core.vocab.RLOGIndividuals;
 import org.nlp2rdf.implementation.stanfordcorenlp.StanfordWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tartarus.snowball.SnowballProgram;
-import org.tartarus.snowball.ext.EnglishStemmer;
 import org.tartarus.snowball.ext.PorterStemmer;
 
-import java.io.StringReader;
-import java.security.InvalidParameterException;
 import java.util.*;
 
 /**
@@ -63,7 +45,7 @@ import java.util.*;
  * http://bis.informatik.uni-leipzig.de/SebastianHellmann
  */
 
-public class SnowballWrapper {
+public class SnowballWrapper extends NIFWrapper{
 	private static Logger log = LoggerFactory.getLogger(SnowballWrapper.class);
 	private String stemmerClass = "PorterStemmer";
 
@@ -129,10 +111,10 @@ public class SnowballWrapper {
 
 
 
-	public void processText(Individual context, OntModel inputModel,
-							OntModel outputModel, NIFParameters nifParameters) {
+	public void process(Individual context, OntModel inputModel,
+						OntModel outputModel, NIFParameters nifParameters) {
 
-		new StanfordWrapper().processText(context,inputModel,outputModel,nifParameters);
+		new StanfordWrapper().process(context,inputModel,outputModel,nifParameters);
 		String contextString = context
 				.getPropertyValue(
 						NIFDatatypeProperties.isString
