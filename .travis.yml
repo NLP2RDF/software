@@ -7,7 +7,9 @@ branches:
     - dev
 before_script: cd java-maven
 install: /bin/true
-script: "mvn clean install"
+script: 
+  "cd java-maven"
+  "mvn clean install"
 notifications:
   email:
     recipients:
