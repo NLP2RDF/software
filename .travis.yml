@@ -1,13 +1,14 @@
+sudo: false
 language: java
 jdk:
-  - openjdk7
+  - oraclejdk8
 branches:
   only:
     - master
     - dev
 before_script: cd java-maven
 install: /bin/true
-script: "mvn clean install"
+script: mvn clean install
 notifications:
   email:
     recipients:
