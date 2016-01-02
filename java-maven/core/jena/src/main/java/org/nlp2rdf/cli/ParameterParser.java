@@ -125,6 +125,8 @@ public class ParameterParser {
 		parser.acceptsAll(asList("u", "urischeme"),
 				"specifies the syntax of the identifier of the URIs")
 				.withRequiredArg().defaultsTo("OffsetBasedString");
+		parser.acceptsAll(asList("v", "validate"),
+				"enables validation of input with RDFUnit (default false)").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 
 		// TODO:
 
@@ -194,6 +196,7 @@ public class ParameterParser {
 		OntModel model = ModelFactory.createOntologyModel(
 				OntModelSpec.OWL_DL_MEM, ModelFactory.createDefaultModel());
 
+		boolean validate = (Boolean) options.valueOf("v");
 		String inputtype = (String) options.valueOf("t");
 		String outformat = (String) options.valueOf("o");
 		String informat = (String) options.valueOf("f");

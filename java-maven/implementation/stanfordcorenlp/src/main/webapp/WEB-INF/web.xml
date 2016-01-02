@@ -8,19 +8,10 @@
 		<servlet-name>stanfordcorenlp</servlet-name>
 		<servlet-class>org.nlp2rdf.implementation.stanfordcorenlp.StanfordWS</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>stanfordcorenlpNoValidation</servlet-name>
-		<servlet-class>org.nlp2rdf.implementation.stanfordcorenlp.StanfordWSNoValidation</servlet-class>
-	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>stanfordcorenlp</servlet-name>
 		<url-pattern>/stanfordcorenlp</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>stanfordcorenlpNoValidation</servlet-name>
-		<url-pattern>/stanfordcorenlpn</url-pattern>
 	</servlet-mapping>
 
 </web-app>

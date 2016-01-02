@@ -40,6 +40,8 @@ public class NIFParameters {
     private final String[] uriSchemeParameters;
     private final String outputFormat;
 
+
+    private  boolean validate =false;
     private String config;
     private String configFile;
 
@@ -118,6 +120,11 @@ public class NIFParameters {
         return config;
     }
 
+    public boolean isValidate() {
+        return validate;
+    }
+
+
     public void setConfig(String config) {
         this.config = config;
     }
@@ -133,4 +140,10 @@ public class NIFParameters {
     public void setInputModel(OntModel inputModel) {
         this.inputModel = inputModel;
     }
+
+    public void setValidate(boolean validate) {
+        this.validate = validate;
+    }
+
+
 }

@@ -55,7 +55,7 @@ public class SnowballWS extends NIFServlet{
 		Monitor mon = MonitorFactory.getTimeMonitor(
 				this.getClass().getCanonicalName()).start();
 
-		log.debug("Iterating each individual...");
+		log.debug("Iterating each context individual...");
 
 		// customize
 		OntModel model = nifParameters.getInputModel();
@@ -78,7 +78,7 @@ public class SnowballWS extends NIFServlet{
 		double lv = mon.stop().getLastValue();
 		double avg = lv / x;
 
-		log.debug("Anotating stats...");
+		log.debug("Annotating stats...");
 		String finalMessage = "Annotated " + x + " nif:Context(s)  in " + lv
 				+ " ms. (avg " + avg + ") producing " + model.size()
 				+ " triples";

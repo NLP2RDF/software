@@ -17,10 +17,13 @@
 package org.nlp2rdf.webservice;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.aksw.rdfunit.enums.TestCaseExecutionType;
 import org.aksw.rdfunit.io.writer.*;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitStaticValidator;
+import org.aksw.rdfunit.validate.wrappers.RDFUnitTestSuiteGenerator;
 import org.nlp2rdf.core.NIFParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +40,12 @@ import java.security.InvalidParameterException;
  * Date: 20.09.13
  */
 public abstract class NIFServlet extends HttpServlet {
+
+    static{ RDFUnitStaticValidator.initWrapper(
+            new RDFUnitTestSuiteGenerator.Builder()
+            .addLocalResourceOrSchemaURI("nif", "org/uni-leipzig/persistence/nlp2rdf/nif-core/nif-core.ttl", "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#")
+    .build()
+    );}
 
     private static Logger log = LoggerFactory.getLogger(NIFServlet.class);
     private int counter = 0;
@@ -88,12 +97,24 @@ public abstract class NIFServlet extends HttpServlet {
             NIFParameters nifParameters = NIFParameterWebserviceFactory.getInstance(httpServletRequest, defaultPrefix);
             log.debug("NIFParameters Object created: " + logMonitor(mon.stop()));
 
+
+
+
             //execute the task
             mon = MonitorFactory.getTimeMonitor("NIFServlet.execute").start();
-
             OntModel out = execute(nifParameters);
             out.setNsPrefix("p", defaultPrefix);
             log.debug("NIF Component executed task: " + logMonitor(mon.stop()));
+
+
+            //validation
+            if(nifParameters.isValidate()) {
+                mon = MonitorFactory.getTimeMonitor("NIFServlet.validate").start();
+                Model validationResults = RDFUnitStaticValidator.validate(nifParameters.getInputModel());
+                out.add(validationResults);
+                log.debug("NIF input validated: " + logMonitor(mon.stop()));
+            }
+
             //write the response
             write(httpServletResponse, out, nifParameters.getOutputFormat());
             log.info("output (" + nifParameters.getOutputFormat() + ", " + nifParameters.getOutputFormat() + ") written, triples from input: " + nifParameters.getInputModel().size() + ", added by component: " + out.size());

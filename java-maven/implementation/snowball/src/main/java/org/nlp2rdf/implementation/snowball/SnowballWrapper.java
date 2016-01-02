@@ -16,9 +16,11 @@
 
 package org.nlp2rdf.implementation.snowball;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -37,7 +39,9 @@ import org.nlp2rdf.core.Span;
 import org.nlp2rdf.core.Text2RDF;
 import org.nlp2rdf.core.urischemes.URIScheme;
 import org.nlp2rdf.core.vocab.NIFDatatypeProperties;
+import org.nlp2rdf.core.vocab.NIFOntClasses;
 import org.nlp2rdf.core.vocab.RLOGIndividuals;
+import org.nlp2rdf.implementation.stanfordcorenlp.StanfordWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tartarus.snowball.SnowballProgram;
@@ -61,13 +65,14 @@ import java.util.*;
 
 public class SnowballWrapper {
 	private static Logger log = LoggerFactory.getLogger(SnowballWrapper.class);
+	private String stemmerClass = "PorterStemmer";
+
 
 	/**
 	 * For the English PorterStemmer
 	 */
 	public SnowballWrapper() {
 		this("PorterStemmer");
-
 	}
 
 	/**
@@ -77,6 +82,7 @@ public class SnowballWrapper {
 	 *            /api/contrib-stanfordcore/index.html
 	 */
 	public SnowballWrapper(String stemmerClass) {
+		this.stemmerClass = stemmerClass;
 		// openNLPTokenizer = new OpenNLPTokenizer();
 		// try {
 		// decoratee = (SnowballProgram)
@@ -89,9 +95,8 @@ public class SnowballWrapper {
 		// " transformed to org.tartarus.stanfordcore.ext." + stemmerClass;
 		// log.error(msg, e);
 		// throw new InvalidParameterException(msg);
-		// }
-
 	}
+
 
 	private final Set<String> stopWords = new HashSet<String>(
 			Arrays.asList(new String[] { "i", "me", "my", "myself", "we",
@@ -122,6 +127,45 @@ public class SnowballWrapper {
 					"more", "most", "other", "some", "such", "no", "nor",
 					"not", "only", "own", "same", "so", "than", "too", "very" }));
 
+
+
+	public void processText(Individual context, OntModel inputModel,
+							OntModel outputModel, NIFParameters nifParameters) {
+
+		new StanfordWrapper().processText(context,inputModel,outputModel,nifParameters);
+		String contextString = context
+				.getPropertyValue(
+						NIFDatatypeProperties.isString
+								.getDatatypeProperty(inputModel)).asLiteral()
+				.getString();
+		int x = 0;
+
+		for (ExtendedIterator<Individual> it = outputModel
+				.listIndividuals(NIFOntClasses.Word.getOntClass(outputModel)); it
+					 .hasNext();) {
+			Individual word = it.next();
+			/********************************
+			 * Stem
+			 ******/
+			// EnglishStemmer stem = new EnglishStemmer();
+			int begin = word.getPropertyValue(NIFDatatypeProperties.beginIndex.getDatatypeProperty(outputModel)).asLiteral().getInt();
+			int end = word.getPropertyValue(NIFDatatypeProperties.endIndex.getDatatypeProperty(outputModel)).asLiteral().getInt();
+			String targetstring = new Span(begin, end).getCoveredText(contextString).toString()
+					.toLowerCase();
+
+			PorterStemmer stemmer = new PorterStemmer();
+			stemmer.setCurrent(targetstring);
+			stemmer.stem();
+
+			String stemmedWord = stemmer.getCurrent();
+			word.addProperty(NIFDatatypeProperties.stem
+					.getDatatypeProperty(outputModel), stemmedWord, XSDDatatype.XSDstring);
+
+
+			x++;
+		}
+	}
+
 	public void processText2(String prefix, Individual context,
 			URIScheme urischeme, OntModel model) {
 		String contextString = context
@@ -140,6 +184,8 @@ public class SnowballWrapper {
 		 **/
 	}
 
+
+
 	public SnowballProgram decoratee;
 
 	/**
@@ -152,8 +198,9 @@ public class SnowballWrapper {
 	 * //add additional data new Text2RDF().addNextAndPreviousProperties(prefix,
 	 * text, urigenerator, model); }
 	 **/
-
-	public void processText(Individual context, OntModel inputModel,
+}
+	/*
+	public void processText3(Individual context, OntModel inputModel,
 			OntModel outputModel, NIFParameters nifParameters) {
 
 		String contextString = context
@@ -232,9 +279,9 @@ public class SnowballWrapper {
 					continue;
 				}
 
-				/********************************
+				********************************
 				 * Stem
-				 ******/
+				 ******
 				// EnglishStemmer stem = new EnglishStemmer();
 
 				String word = wordSpan.getCoveredText(contextString).toString()
@@ -252,5 +299,4 @@ public class SnowballWrapper {
 							.getDatatypeProperty(outputModel), stemmedWord);
 			}
 		}
-	}
-}
+	} */
